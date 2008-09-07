@@ -1,4 +1,4 @@
-package org.trivee.fb2;
+package org.trivee.fb2pdf;
 
 public class FB2toPDFException extends Exception
 {

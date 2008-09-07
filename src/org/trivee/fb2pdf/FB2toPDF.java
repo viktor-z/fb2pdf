@@ -1,4 +1,4 @@
-package org.trivee.fb2;
+package org.trivee.fb2pdf;
 
 import java.io.*;
 import java.util.Vector;
@@ -20,7 +20,6 @@ import com.lowagie.text.Anchor;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Paragraph;
-import com.lowagie.text.Phrase;
 import com.lowagie.text.Font;
 import com.lowagie.text.Image;
 
@@ -32,6 +31,8 @@ import org.apache.commons.codec.binary.Base64;
 
 public class FB2toPDF
 {
+    private String BASE_PATH = ".";
+
     private String fromName;
     private String toName;
     
@@ -153,22 +154,22 @@ public class FB2toPDF
         throws DocumentException, IOException
     {
         arial = new FontFamily(
-            "c:/trivee/itext/data/arial.ttf",
-            "c:/trivee/itext/data/arialbd.ttf",
-            "c:/trivee/itext/data/ariali.ttf",
-            "c:/trivee/itext/data/arialbi.ttf");
+            BASE_PATH + "/data/arial.ttf",
+            BASE_PATH + "/data/arialbd.ttf",
+            BASE_PATH + "/data/ariali.ttf",
+            BASE_PATH + "/data/arialbi.ttf");
 
         georgia = new FontFamily(
-            "c:/trivee/itext/data/georgia.ttf",
-            "c:/trivee/itext/data/georgiab.ttf",
-            "c:/trivee/itext/data/georgiai.ttf",
-            "c:/trivee/itext/data/georgiaz.ttf");
+            BASE_PATH + "/data/georgia.ttf",
+            BASE_PATH + "/data/georgiab.ttf",
+            BASE_PATH + "/data/georgiai.ttf",
+            BASE_PATH + "/data/georgiaz.ttf");
 
-        com.lowagie.text.pdf.hyphenation.Hyphenator.setHyphenDir("c:/trivee/itext/data");
+        com.lowagie.text.pdf.hyphenation.Hyphenator.setHyphenDir(BASE_PATH + "/data");
 
         hyphen_ru = new HyphenationAuto("ru", "none", 2, 2);
 
-        style = new Style("c:/trivee/itext/data/style.properties");
+        style = new Style(BASE_PATH + "/data/style.properties");
     }
 
     private org.w3c.dom.Document fb2;
@@ -222,7 +223,7 @@ public class FB2toPDF
         }
     }
 
-    private void openPDF()
+    private void createPDFDoc()
         throws DocumentException, FileNotFoundException
     {
         Rectangle pageSize = new Rectangle(style.getPageWidth(), style.getPageHeight());
@@ -232,7 +233,6 @@ public class FB2toPDF
 
         writer = PdfWriter.getInstance(doc, new FileOutputStream(toName));
 
-        doc.open();
     }
 
     private void closePDF()
@@ -370,7 +370,7 @@ public class FB2toPDF
         loadData();
 
         readFB2();
-        openPDF();
+        createPDFDoc();
 
         org.w3c.dom.Element root = fb2.getDocumentElement();
         if (!root.getTagName().equals("FictionBook"))
@@ -382,9 +382,16 @@ public class FB2toPDF
 
         org.w3c.dom.Element description = getOptionalChildByTagName(root, "description");
         if (description != null)
+        {
+            addMetaInfo(description);
+            doc.open();
             processDescription(description);
+        }
         else
+        {
+            doc.open();
             System.err.println("Description not found");
+        }
 
 
         NodeList bodies = getChildElementsByTagName(root, "body");
@@ -566,6 +573,42 @@ public class FB2toPDF
             }
         }
 
+    }
+    
+    private void addMetaInfo(org.w3c.dom.Element description)
+        throws FB2toPDFException, DocumentException
+    {
+        org.w3c.dom.Element titleInfo = getOptionalChildByTagName(description, "title-info");
+        if (titleInfo != null)
+        {
+            NodeList authors = getChildElementsByTagName(titleInfo, "author");
+            for (int i = 0; i < authors.getLength(); ++i)
+            {
+                org.w3c.dom.Element author = (org.w3c.dom.Element)authors.item(i);
+                String authorName = author.getTextContent();
+                System.out.println("Adding author: " + transliterate(authorName));
+                doc.addAuthor(transliterate(authorName));
+            }
+
+            org.w3c.dom.Element bookTitle = getOptionalChildByTagName(titleInfo, "book-title");
+            org.w3c.dom.Element sequence = getOptionalChildByTagName(titleInfo, "sequence");
+
+            if (bookTitle != null && sequence == null)
+            {
+                String titleString = bookTitle.getTextContent();
+                doc.addTitle(transliterate(titleString));
+                System.out.println("Adding title: " + transliterate(titleString));
+            }
+            else if (bookTitle != null && sequence != null)
+            {
+                String titleString = bookTitle.getTextContent();
+                String subtitle = "(" + sequence.getAttribute("name") + " #" + sequence.getAttribute("number") + ")";
+
+                doc.addTitle(transliterate(titleString));
+                System.out.println("Adding title: " + transliterate(titleString));
+                doc.addTitle(transliterate(subtitle));
+            }
+        }
     }
 
     private void makeBookInfoPage(org.w3c.dom.Element description)
