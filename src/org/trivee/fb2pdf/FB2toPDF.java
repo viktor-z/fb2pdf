@@ -1363,7 +1363,6 @@ public class FB2toPDF
         { "\u0446", "ts" },
         { "\u0447", "ch" },
         { "\u0448", "sh" },
-        { "\u044B", "yi" },
         { "\u044E", "yu" },
         { "\u044F", "ya" },
         // однобуквенные замены
@@ -1390,7 +1389,17 @@ public class FB2toPDF
         {"\u0445", "h"},
         {"\u044D", "e"},
         {"\u044C", "`"},
+        {"\u044B", "y"},
         {"\u044A", "'"},
+        // ukrainian 
+        {"\u0454", "ie"},
+        {"\u0404", "IE"},
+        {"\u0456", "i"},  
+        {"\u0406", "I"},
+        {"\u0457", "yi"},
+        {"\u0407", "YI"},
+        {"\u0491", "g"},
+        {"\u0490", "G"},
     };
 
     private static String transliterate(String text)
