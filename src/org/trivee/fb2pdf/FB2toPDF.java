@@ -577,13 +577,10 @@ public class FB2toPDF
     
     private String getAuthorFullName(org.w3c.dom.Element author) throws FB2toPDFException
     {
-        org.w3c.dom.Element firstName = getOptionalChildByTagName(author, "first-name");
-        org.w3c.dom.Element middleName = getOptionalChildByTagName(author, "middle-name");
-        org.w3c.dom.Element lastName = getOptionalChildByTagName(author, "last-name");
-        return String.format("%s %s %s",
-                firstName.getTextContent(),
-                middleName.getTextContent(),
-                lastName.getTextContent());
+        String firstName = getTextContentByTagName(author, "first-name");
+        String middleName = getTextContentByTagName(author, "middle-name");
+        String lastName = getTextContentByTagName(author, "last-name");
+        return String.format("%s %s %s", firstName, middleName, lastName);
     }
     
     private void addMetaInfo(org.w3c.dom.Element description)
