@@ -575,6 +575,17 @@ public class FB2toPDF
 
     }
     
+    private String getAuthorFullName(org.w3c.dom.Element author) throws FB2toPDFException
+    {
+        org.w3c.dom.Element firstName = getOptionalChildByTagName(author, "first-name");
+        org.w3c.dom.Element middleName = getOptionalChildByTagName(author, "middle-name");
+        org.w3c.dom.Element lastName = getOptionalChildByTagName(author, "last-name");
+        return String.format("%s %s %s",
+                firstName.getTextContent(),
+                middleName.getTextContent(),
+                lastName.getTextContent());
+    }
+    
     private void addMetaInfo(org.w3c.dom.Element description)
         throws FB2toPDFException, DocumentException
     {
@@ -585,7 +596,7 @@ public class FB2toPDF
             for (int i = 0; i < authors.getLength(); ++i)
             {
                 org.w3c.dom.Element author = (org.w3c.dom.Element)authors.item(i);
-                String authorName = author.getTextContent();
+                String authorName = getAuthorFullName(author);
                 System.out.println("Adding author: " + transliterate(authorName));
                 doc.addAuthor(transliterate(authorName));
             }
@@ -666,7 +677,7 @@ public class FB2toPDF
             for (int i = 0; i < authors.getLength(); ++i)
             {
                 org.w3c.dom.Element author = (org.w3c.dom.Element)authors.item(i);
-                String authorName = author.getTextContent();
+                String authorName = getAuthorFullName(author);
                 // doc.addAuthor(transliterate(authorName));
                 addTitleLine(authorName, arial.getRegular(), style.getAuthorFontSize(), 0, 0);
             }
