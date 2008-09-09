@@ -783,8 +783,11 @@ public class FB2toPDF
 
 
             Anchor anchor = new Anchor(chunk);
-            anchor.setReference("#section" + i);
-            System.err.println("Adding A HREF=#section" + i);
+            String ref = section.getAttribute("id");
+            if(ref.isEmpty())
+                ref = "section" + i;
+            anchor.setReference("#" + ref);
+            System.err.println("Adding A HREF=#" + ref);
 
             Paragraph para = new Paragraph(em);
             para.setAlignment(Paragraph.ALIGN_LEFT);
