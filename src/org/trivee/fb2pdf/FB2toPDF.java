@@ -96,7 +96,7 @@ public class FB2toPDF
         private FontFamily serif;
 
         public Style(String propfile)
-            throws IOException, DocumentException
+            throws IOException, DocumentException, FB2toPDFException
         {
             Properties properties = new Properties();
 
@@ -126,18 +126,17 @@ public class FB2toPDF
             bodyFontSize                = Float.parseFloat(properties.getProperty("body.fontSize",                  "12.0"));
             poemFontSize                = Float.parseFloat(properties.getProperty("poem.fontSize",                  "12.0"));
 
-            sansSerif = new FontFamily(
-                properties.getProperty("sansSerif.regular").trim(),
-                properties.getProperty("sansSerif.bold").trim(),
-                properties.getProperty("sansSerif.italic").trim(),
-                properties.getProperty("sansSerif.bolditalic").trim());
-
             serif = new FontFamily(
-                properties.getProperty("serif.regular").trim(),
-                properties.getProperty("serif.bold").trim(),
-                properties.getProperty("serif.italic").trim(),
-                properties.getProperty("serif.bolditalic").trim());
+                readFontFileName(properties, "serif.regular"),
+                readFontFileName(properties, "serif.bold"),
+                readFontFileName(properties, "serif.italic"),
+                readFontFileName(properties, "serif.bolditalic"));
 
+            sansSerif = new FontFamily(
+                readFontFileName(properties, "sansSerif.regular"),
+                readFontFileName(properties, "sansSerif.bold"),
+                readFontFileName(properties, "sansSerif.italic"),
+                readFontFileName(properties, "sansSerif.bolditalic"));
         }
         
         public float getPageWidth()     { return pageWidth; }
@@ -163,12 +162,20 @@ public class FB2toPDF
         
         public FontFamily getSerif()                    { return serif; }
         public FontFamily getSansSerif()                { return sansSerif; }
+        
+        private String readFontFileName(Properties properties, String propertyName) throws FB2toPDFException
+        {
+            String res = properties.getProperty(propertyName, "").trim();
+            if (res.isEmpty())
+                throw new FB2toPDFException(propertyName + " property is invalid");
+            return res;
+        }
     }
 
     private Style style;
 
     private void loadData()
-        throws DocumentException, IOException
+        throws DocumentException, IOException, FB2toPDFException
     {
         com.lowagie.text.pdf.hyphenation.Hyphenator.setHyphenDir(BASE_PATH + "/data");
 
