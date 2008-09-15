@@ -26,6 +26,7 @@ import com.lowagie.text.Image;
 import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.HyphenationAuto;
 import com.lowagie.text.pdf.PdfWriter;
+import com.lowagie.text.pdf.PdfAction;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -1207,10 +1208,22 @@ public class FB2toPDF
         {
             if (currentReference != null)
             {
-                Anchor anchor = new Anchor(currentChunk);
-                anchor.setReference(currentReference);
-                System.err.println("Adding A HREF=" + currentReference);
-                currentParagraph.add(anchor);
+                if (currentReference.charAt(0) == '#')
+                {
+                    //Unlike Anchor, Action won't fail even when local destination does not exist
+                    String refname = currentReference.substring(1); //getting rid of "#" at the begin of the reference
+                    PdfAction action = PdfAction.gotoLocalPage(refname, false);
+                    System.err.println("Adding Action LocalGoTo " + refname);
+                    currentChunk.setAction(action);
+                    currentParagraph.add(currentChunk);
+                }
+                else
+                {
+                    Anchor anchor = new Anchor(currentChunk);
+                    anchor.setReference(currentReference);
+                    System.err.println("Adding A HREF=" + currentReference);
+                    currentParagraph.add(anchor);
+                }
             }
             else
                 currentParagraph.add(currentChunk);
