@@ -53,10 +53,10 @@ public class FB2toPDF
         public FontFamily(String regular, String bold, String italic, String boldItalic)
             throws DocumentException, IOException
         {
-            this.regular     = BaseFont.createFont(regular,    "Cp1251", BaseFont.EMBEDDED);
-            this.bold        = BaseFont.createFont(bold,       "Cp1251", BaseFont.EMBEDDED);
-            this.italic      = BaseFont.createFont(italic,     "Cp1251", BaseFont.EMBEDDED);
-            this.bold_italic = BaseFont.createFont(boldItalic, "Cp1251", BaseFont.EMBEDDED);
+            this.regular     = BaseFont.createFont(regular, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            this.bold        = BaseFont.createFont(bold, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            this.italic      = BaseFont.createFont(italic, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            this.bold_italic = BaseFont.createFont(boldItalic, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
         }
 
         public BaseFont getRegular()    { return regular; }
