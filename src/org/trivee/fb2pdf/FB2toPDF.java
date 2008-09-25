@@ -195,6 +195,7 @@ public class FB2toPDF
         factory.setCoalescing(true);
         factory.setNamespaceAware(true);
         factory.setValidating(false);
+        factory.setAttribute("http://apache.org/xml/features/continue-after-fatal-error", new Boolean(true));
 
         DocumentBuilder builder = factory.newDocumentBuilder();
         builder.setErrorHandler(new org.xml.sax.ErrorHandler() {
