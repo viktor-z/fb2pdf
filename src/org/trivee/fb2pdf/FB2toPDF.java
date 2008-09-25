@@ -1217,7 +1217,7 @@ public class FB2toPDF
     {
         if (currentChunk != null)
         {
-            if (currentReference != null)
+            if (currentReference != null && !currentReference.isEmpty())
             {
                 if (currentReference.charAt(0) == '#')
                 {
