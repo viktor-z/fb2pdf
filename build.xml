@@ -29,35 +29,8 @@
 
     <target name="all" depends="compile" />
 
-    <target name="runTest" depends="compile">
-        <java classname="org.trivee.Test" fork="yes" >
-            <classpath>
-                <pathelement path="${build}"/>
-                <path refid="lib"/>
-            </classpath>
-        </java>        
-    </target>
-
-    <target name="testColumn" depends="compile">
-        <java classname="org.trivee.fb2pdf.testColumn" fork="yes" >
-            <classpath>
-                <pathelement path="${build}"/>
-                <path refid="lib"/>
-            </classpath>
-        </java>        
-    </target>
-
-    <target name="ColumnControl" depends="compile">
-        <java classname="org.trivee.fb2pdf.ColumnControl" fork="yes" >
-            <classpath>
-                <pathelement path="${build}"/>
-                <path refid="lib"/>
-            </classpath>
-        </java>        
-    </target>
-
-    <target name="ColumnElements" depends="compile">
-        <java classname="org.trivee.fb2pdf.ColumnElements" fork="yes" >
+    <target name="testStylesheet" depends="compile">
+        <java classname="org.trivee.fb2pdf.Stylesheet" fork="yes" >
             <classpath>
                 <pathelement path="${build}"/>
                 <path refid="lib"/>

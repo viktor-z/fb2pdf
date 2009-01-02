@@ -30,6 +30,8 @@ import com.lowagie.text.pdf.PdfAction;
 
 import org.apache.commons.codec.binary.Base64;
 
+import com.google.gson.Gson;
+
 public class FB2toPDF
 {
     private String BASE_PATH = ".";
@@ -43,33 +45,11 @@ public class FB2toPDF
         this.toName   = toName;
     }
 
-    private static class FontFamily
-    {
-        private BaseFont regular;
-        private BaseFont bold;
-        private BaseFont italic;
-        private BaseFont bold_italic;
-
-        public FontFamily(String regular, String bold, String italic, String boldItalic)
-            throws DocumentException, IOException
-        {
-            this.regular     = BaseFont.createFont(regular, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-            this.bold        = BaseFont.createFont(bold, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-            this.italic      = BaseFont.createFont(italic, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-            this.bold_italic = BaseFont.createFont(boldItalic, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-        }
-
-        public BaseFont getRegular()    { return regular; }
-        public BaseFont getBold()       { return bold; }
-        public BaseFont getItalic()     { return italic; }
-        public BaseFont getBoldItalic() { return bold_italic; }
-    }
-
     private HyphenationAuto hyphen_ru;
 
     private static final float MM_TO_POINTS = 72.0f / 25.4f;
 
-    private static class Style
+    private static class OldStyle
     {
         private float pageWidth;
         private float pageHeight;
@@ -92,10 +72,7 @@ public class FB2toPDF
         private float bodyFontSize;
         private float poemFontSize;
 
-        private FontFamily sansSerif;
-        private FontFamily serif;
-
-        public Style(String propfile)
+        public OldStyle(String propfile)
             throws IOException, DocumentException, FB2toPDFException
         {
             Properties properties = new Properties();
@@ -125,18 +102,6 @@ public class FB2toPDF
             subSubSectionTitleFontSize  = Float.parseFloat(properties.getProperty("subSubSectionTitle.fontSize",    "14.0"));
             bodyFontSize                = Float.parseFloat(properties.getProperty("body.fontSize",                  "12.0"));
             poemFontSize                = Float.parseFloat(properties.getProperty("poem.fontSize",                  "12.0"));
-
-            serif = new FontFamily(
-                readFontFileName(properties, "serif.regular"),
-                readFontFileName(properties, "serif.bold"),
-                readFontFileName(properties, "serif.italic"),
-                readFontFileName(properties, "serif.bolditalic"));
-
-            sansSerif = new FontFamily(
-                readFontFileName(properties, "sansSerif.regular"),
-                readFontFileName(properties, "sansSerif.bold"),
-                readFontFileName(properties, "sansSerif.italic"),
-                readFontFileName(properties, "sansSerif.bolditalic"));
         }
         
         public float getPageWidth()     { return pageWidth; }
@@ -159,20 +124,10 @@ public class FB2toPDF
         public float getSubSubSectionTitleFontSize()    { return subSubSectionTitleFontSize; }
         public float getBodyFontSize()                  { return bodyFontSize; }
         public float getPoemFontSize()                  { return poemFontSize; }
-        
-        public FontFamily getSerif()                    { return serif; }
-        public FontFamily getSansSerif()                { return sansSerif; }
-        
-        private String readFontFileName(Properties properties, String propertyName) throws FB2toPDFException
-        {
-            String res = properties.getProperty(propertyName, "").trim();
-            if (res.isEmpty())
-                throw new FB2toPDFException(propertyName + " property is invalid");
-            return res;
-        }
     }
 
-    private Style style;
+    private OldStyle style;
+    private Stylesheet stylesheet;
 
     private void loadData()
         throws DocumentException, IOException, FB2toPDFException
@@ -181,7 +136,11 @@ public class FB2toPDF
 
         hyphen_ru = new HyphenationAuto("ru", "none", 2, 2);
 
-        style = new Style(BASE_PATH + "/data/style.properties");
+        style = new OldStyle(BASE_PATH + "/data/style.properties");
+
+        Gson gson = new Gson();
+        stylesheet = gson.fromJson(new FileReader(BASE_PATH + "/data/stylesheet.json"), Stylesheet.class);
+        stylesheet.validate();
     }
 
     private org.w3c.dom.Document fb2;
@@ -253,72 +212,26 @@ public class FB2toPDF
         doc.close();
     }
 
-    private static class NodeCollection implements NodeList
-    {
-        private Vector<Node> nodes = new Vector<Node>();
-        public NodeCollection()         { }
-        public void add(Node node)      { nodes.add(node); }
-        public int getLength()          { return nodes.size(); }
-        public Node item(int index)     { return nodes.elementAt(index); }
-    }
-
-    private static NodeList getChildElementsByTagName(org.w3c.dom.Element element, String tagName)
-    {
-        NodeCollection result = new NodeCollection();
-
-        NodeList nodes = element.getChildNodes();
-        for (int i = 0; i < nodes.getLength(); ++i)
-        {
-            Node node = nodes.item(i);
-            if (node.getNodeType() != Node.ELEMENT_NODE)
-                continue;
-
-            org.w3c.dom.Element child = (org.w3c.dom.Element)node;
-            if (child.getTagName().equals(tagName))
-                result.add(child);
-        }
-
-        return result;
-    }
-
-    private static NodeList getChildElements(org.w3c.dom.Element element)
-    {
-        NodeCollection result = new NodeCollection();
-
-        NodeList nodes = element.getChildNodes();
-        for (int i = 0; i < nodes.getLength(); ++i)
-        {
-            Node node = nodes.item(i);
-            if (node.getNodeType() != Node.ELEMENT_NODE)
-                continue;
-
-            org.w3c.dom.Element child = (org.w3c.dom.Element)node;
-            result.add(child);
-        }
-
-        return result;
-    }
-
     private static org.w3c.dom.Element getOnlyChildByTagName(org.w3c.dom.Element element, String tagName)
         throws FB2toPDFException
     {
-        NodeList children = getChildElementsByTagName(element, tagName);
+        ElementCollection children = ElementCollection.childrenByTagName(element, tagName);
         if (children.getLength() == 0)
             throw new FB2toPDFException("Element not found: " + element.getTagName() + "/" + tagName);
         else if (children.getLength() > 1)
             throw new FB2toPDFException("More than one element found: " + element.getTagName() + "/" + tagName);
-        return (org.w3c.dom.Element)children.item(0);
+        return children.item(0);
     }
 
     private static org.w3c.dom.Element getOptionalChildByTagName(org.w3c.dom.Element element, String tagName)
         throws FB2toPDFException
     {
-        NodeList children = getChildElementsByTagName(element, tagName);
+        ElementCollection children = ElementCollection.childrenByTagName(element, tagName);
         if (children.getLength() == 0)
             return null;
         else if (children.getLength() > 1)
             throw new FB2toPDFException("More than one element found: " + element.getTagName() + "/" + tagName);
-        return (org.w3c.dom.Element)children.item(0);
+        return children.item(0);
     }
 
     private static String fixCharacters(String text)
@@ -353,7 +266,7 @@ public class FB2toPDF
     private static String getTextContentByTagName(org.w3c.dom.Element element, String tagName, String prefix, String suffix)
     {
         // collect text content
-        NodeList children = getChildElementsByTagName(element, tagName);
+        ElementCollection children = ElementCollection.childrenByTagName(element, tagName);
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < children.getLength(); ++i)
         {
@@ -407,11 +320,11 @@ public class FB2toPDF
         }
 
 
-        NodeList bodies = getChildElementsByTagName(root, "body");
+        ElementCollection bodies = ElementCollection.childrenByTagName(root, "body");
         if (bodies.getLength() == 0)
             throw new FB2toPDFException("Element not found: FictionBook/body");
 
-        org.w3c.dom.Element body = (org.w3c.dom.Element)bodies.item(0);
+        org.w3c.dom.Element body = bodies.item(0);
         makeTOCPage(body);
 
         for (int i = 0; i < bodies.getLength(); ++i)
@@ -461,10 +374,10 @@ public class FB2toPDF
 
     private void extractBinaries(org.w3c.dom.Element root)
     {
-        NodeList binaries = getChildElementsByTagName(root, "binary");
+        ElementCollection binaries = ElementCollection.childrenByTagName(root, "binary");
         for (int i = 0; i < binaries.getLength(); ++i)
         {
-            org.w3c.dom.Element binary = (org.w3c.dom.Element)binaries.item(i);
+            org.w3c.dom.Element binary = binaries.item(i);
             attachments.add(new BinaryAttachment(binary));
         }
     }
@@ -489,16 +402,16 @@ public class FB2toPDF
             if (bold)
             {
                 if (italic)
-                    return new Font(family.getBoldItalic(), size);
+                    return new Font(family.getBoldItalicFont(), size);
                 else
-                    return new Font(family.getBold(), size);
+                    return new Font(family.getBoldFont(), size);
             }
             else
             {
                 if (italic)
-                    return new Font(family.getItalic(), size);
+                    return new Font(family.getItalicFont(), size);
                 else
-                    return new Font(family.getRegular(), size);
+                    return new Font(family.getRegularFont(), size);
             }
         }
 
@@ -566,10 +479,10 @@ public class FB2toPDF
         org.w3c.dom.Element coverPage = getOptionalChildByTagName(titleInfo, "coverpage");
         if (coverPage != null)
         {
-            NodeList images = getChildElementsByTagName(coverPage, "image");
+            ElementCollection images = ElementCollection.childrenByTagName(coverPage, "image");
             for (int i = 0; i < images.getLength(); ++i)
             {
-                org.w3c.dom.Element coverImage = (org.w3c.dom.Element)images.item(i);
+                org.w3c.dom.Element coverImage = images.item(i);
 
                 String href = coverImage.getAttributeNS(NS_XLINK, "href");
                 Image image = getImage(href);
@@ -602,10 +515,10 @@ public class FB2toPDF
         org.w3c.dom.Element titleInfo = getOptionalChildByTagName(description, "title-info");
         if (titleInfo != null)
         {
-            NodeList authors = getChildElementsByTagName(titleInfo, "author");
+            ElementCollection authors = ElementCollection.childrenByTagName(titleInfo, "author");
             for (int i = 0; i < authors.getLength(); ++i)
             {
-                org.w3c.dom.Element author = (org.w3c.dom.Element)authors.item(i);
+                org.w3c.dom.Element author = authors.item(i);
                 String authorName = getAuthorFullName(author);
                 System.out.println("Adding author: " + transliterate(authorName));
                 doc.addAuthor(transliterate(authorName));
@@ -643,19 +556,19 @@ public class FB2toPDF
                 getTextContentByTagName(publishInfo, "publisher") +
                 getTextContentByTagName(publishInfo, "city", ", ")+
                 getTextContentByTagName(publishInfo, "year", ", " ),
-                    style.getSansSerif().getRegular(), style.getFrontMatterFontSize(), 0, 0, Paragraph.ALIGN_LEFT);
+                    stylesheet.getFontFamily("sansSerif").getRegularFont(), style.getFrontMatterFontSize(), 0, 0, Paragraph.ALIGN_LEFT);
             addLine(
                 "ISBN: " + getTextContentByTagName(publishInfo, "isbn"),
-                    style.getSansSerif().getRegular(), style.getFrontMatterFontSize(), 0, 0, Paragraph.ALIGN_LEFT);
+                    stylesheet.getFontFamily("sansSerif").getRegularFont(), style.getFrontMatterFontSize(), 0, 0, Paragraph.ALIGN_LEFT);
         }
 
         org.w3c.dom.Element documentInfo = getOptionalChildByTagName(description, "document-info");
-        NodeList documentAuthors = null;
+        ElementCollection documentAuthors = null;
         if (documentInfo != null)
-            documentAuthors = getChildElementsByTagName(documentInfo, "author");
+            documentAuthors = ElementCollection.childrenByTagName(documentInfo, "author");
         for (int i = 0; documentAuthors != null && i < documentAuthors.getLength(); ++i)
         {
-            org.w3c.dom.Element documentAuthor = (org.w3c.dom.Element)documentAuthors.item(i);
+            org.w3c.dom.Element documentAuthor = documentAuthors.item(i);
             addLine(
                 "FB2: " +
                 getTextContentByTagName(documentAuthor, "first-name", " ") +
@@ -664,32 +577,32 @@ public class FB2toPDF
                 getTextContentByTagName(documentAuthor, "email", " <", ">") +
                 getTextContentByTagName(documentInfo, "date", ", ") +
                 getTextContentByTagName(documentInfo, "version", ", version "),
-                    style.getSansSerif().getRegular(), style.getFrontMatterFontSize(), 0, 0, Paragraph.ALIGN_LEFT);
+                    stylesheet.getFontFamily("sansSerif").getRegularFont(), style.getFrontMatterFontSize(), 0, 0, Paragraph.ALIGN_LEFT);
         }
         if (documentInfo != null)
         {
             addLine(
                 "UUID: " + getTextContentByTagName(documentInfo, "id"),
-                    style.getSansSerif().getRegular(), style.getFrontMatterFontSize(), 0, 0, Paragraph.ALIGN_LEFT);
+                    stylesheet.getFontFamily("sansSerif").getRegularFont(), style.getFrontMatterFontSize(), 0, 0, Paragraph.ALIGN_LEFT);
         }
 
         addLine("PDF: org.trivee.fb2pdf.FB2toPDF 1.0, " + 
             java.text.DateFormat.getDateInstance().format(new java.util.Date()),
-                    style.getSansSerif().getRegular(), style.getFrontMatterFontSize(), 0, 0, Paragraph.ALIGN_LEFT);
+                    stylesheet.getFontFamily("sansSerif").getRegularFont(), style.getFrontMatterFontSize(), 0, 0, Paragraph.ALIGN_LEFT);
 
 
-        addTitleLine(" ", style.getSansSerif().getRegular(), style.getTitleFontSize(), 0, 0);
+        addTitleLine(" ", stylesheet.getFontFamily("sansSerif").getRegularFont(), style.getTitleFontSize(), 0, 0);
 
         org.w3c.dom.Element titleInfo = getOptionalChildByTagName(description, "title-info");
         if (titleInfo != null)
         {
-            NodeList authors = getChildElementsByTagName(titleInfo, "author");
+            ElementCollection authors = ElementCollection.childrenByTagName(titleInfo, "author");
             for (int i = 0; i < authors.getLength(); ++i)
             {
-                org.w3c.dom.Element author = (org.w3c.dom.Element)authors.item(i);
+                org.w3c.dom.Element author = authors.item(i);
                 String authorName = getAuthorFullName(author);
                 // doc.addAuthor(transliterate(authorName));
-                addTitleLine(authorName, style.getSansSerif().getRegular(), style.getAuthorFontSize(), 0, 0);
+                addTitleLine(authorName, stylesheet.getFontFamily("sansSerif").getRegularFont(), style.getAuthorFontSize(), 0, 0);
             }
 
             org.w3c.dom.Element bookTitle = getOptionalChildByTagName(titleInfo, "book-title");
@@ -699,16 +612,16 @@ public class FB2toPDF
             {
                 String titleString = bookTitle.getTextContent();
                 // doc.addTitle(transliterate(titleString));
-                addTitleLine(titleString, style.getSansSerif().getRegular(),
+                addTitleLine(titleString, stylesheet.getFontFamily("sansSerif").getRegularFont(),
                     style.getTitleFontSize(), style.getTitleFontSize(), style.getTitleFontSize());
             }
             else if (bookTitle != null && sequence != null)
             {
                 String subtitle = "(" + sequence.getAttribute("name") + " #" + sequence.getAttribute("number") + ")";
 
-                addTitleLine(bookTitle.getTextContent(), style.getSansSerif().getRegular(),
+                addTitleLine(bookTitle.getTextContent(), stylesheet.getFontFamily("sansSerif").getRegularFont(),
                     style.getTitleFontSize(), style.getTitleFontSize(), 0);
-                addTitleLine(subtitle, style.getSansSerif().getRegular(),
+                addTitleLine(subtitle, stylesheet.getFontFamily("sansSerif").getRegularFont(),
                     style.getSubTitleFontSize(), 0, style.getTitleFontSize());
             }
 
@@ -716,7 +629,7 @@ public class FB2toPDF
             if (annotation != null)
             {
 
-                currentFonts = new FontManager(style.getSansSerif(), style.getAnnotationFontSize());
+                currentFonts = new FontManager(stylesheet.getFontFamily("sansSerif"), style.getAnnotationFontSize());
                 currentFonts.toggleItalic();
                 processSectionContent(annotation, PARAGRAPH_ANNOTATION, 0);
                 currentFonts = null;
@@ -759,28 +672,28 @@ public class FB2toPDF
     }
     
     private void processBody(org.w3c.dom.Element body)
-        throws DocumentException
+        throws DocumentException, FB2toPDFException
     {
         // XXX TODO processEpigraphs(body);
 
-        currentFonts = new FontManager(style.getSerif(), style.getBodyFontSize());
+        currentFonts = new FontManager(stylesheet.getFontFamily("serif"), style.getBodyFontSize());
         processSections(body);
         currentFonts = null;
     }
 
     private void makeTOCPage(org.w3c.dom.Element body)
-        throws DocumentException
+        throws DocumentException, FB2toPDFException
     {
-        NodeList sections = getChildElementsByTagName(body, "section");
+        ElementCollection sections = ElementCollection.childrenByTagName(body, "section");
         if (sections.getLength() <= 1)
             return;
 
-        addTitleLine("Содержание", style.getSansSerif().getRegular(),
+        addTitleLine("Содержание", stylesheet.getFontFamily("sansSerif").getRegularFont(),
             style.getContentsTitleFontSize(), 0, style.getContentsTitleFontSize());
 
         for (int i = 0; i < sections.getLength(); ++i)
         {
-            org.w3c.dom.Element section = (org.w3c.dom.Element)sections.item(i);
+            org.w3c.dom.Element section = sections.item(i);
 
             String title = getTextContentByTagName(section, "title");
             if (title.length() == 0)
@@ -788,7 +701,7 @@ public class FB2toPDF
 
             float em = style.getContentsItemFontSize();
 
-            Font font = new Font(style.getSansSerif().getBold(), em);
+            Font font = new Font(stylesheet.getFontFamily("sansSerif").getBoldFont(), em);
 
             Chunk chunk = new Chunk();
             chunk.setFont(font);
@@ -815,12 +728,12 @@ public class FB2toPDF
     }
 
     private void processSections(org.w3c.dom.Element body)
-        throws DocumentException
+        throws DocumentException, FB2toPDFException
     {
-        NodeList sections = getChildElementsByTagName(body, "section");
+        ElementCollection sections = ElementCollection.childrenByTagName(body, "section");
         for (int i = 0; i < sections.getLength(); ++i)
         {
-            org.w3c.dom.Element section = (org.w3c.dom.Element)sections.item(i);
+            org.w3c.dom.Element section = sections.item(i);
             // XXX TODO if s.getAttribute('id') not in notes],'')
             processSection(section, 0, i);
         }
@@ -828,7 +741,7 @@ public class FB2toPDF
     }
 
     private void processSection(org.w3c.dom.Element section, int level, int index)
-        throws DocumentException
+        throws DocumentException, FB2toPDFException
     {
         if (level == 0)
             doc.newPage();
@@ -845,7 +758,7 @@ public class FB2toPDF
 
         if (id.length() > 0)
         {
-            Anchor anchor = new Anchor(".", new Font(style.getSansSerif().getRegular(), 0.01f));
+            Anchor anchor = new Anchor(".", new Font(stylesheet.getFontFamily("sansSerif").getRegularFont(), 0.01f));
             anchor.setName(id);
             doc.add(anchor);
             System.err.println("Adding A NAME=" + id);
@@ -877,15 +790,15 @@ public class FB2toPDF
     }
 
     private void processSectionContent(org.w3c.dom.Element parent, int paragraphType, int level)
-        throws DocumentException
+        throws DocumentException, FB2toPDFException
     {
         boolean bFirst = true;
 
-        NodeList nodes = getChildElements(parent);
+        ElementCollection nodes = ElementCollection.children(parent);
         int subsectionIndex = 0;
         for (int i = 0; i < nodes.getLength(); ++i)
         {
-            org.w3c.dom.Element element = (org.w3c.dom.Element)nodes.item(i);
+            org.w3c.dom.Element element = nodes.item(i);
 
             if (element.getTagName().equals("section"))
             {
@@ -970,30 +883,30 @@ public class FB2toPDF
     }
 
     private void processTitle(org.w3c.dom.Element title, int level)
-        throws DocumentException
+        throws DocumentException, FB2toPDFException
     {
         float em = currentFonts.getSize();
         FontManager previousFonts = currentFonts;
 
         if (level == 0)
         {
-            currentFonts = new FontManager(style.getSansSerif(), style.getSectionTitleFontSize());
+            currentFonts = new FontManager(stylesheet.getFontFamily("sansSerif"), style.getSectionTitleFontSize());
             currentFonts.toggleBold();
         }
         else if (level == 1)
         {
-            currentFonts = new FontManager(style.getSansSerif(), style.getSubSectionTitleFontSize());
+            currentFonts = new FontManager(stylesheet.getFontFamily("sansSerif"), style.getSubSectionTitleFontSize());
         }
         else
         {
-            currentFonts = new FontManager(style.getSansSerif(), style.getSubSubSectionTitleFontSize());
+            currentFonts = new FontManager(stylesheet.getFontFamily("sansSerif"), style.getSubSubSectionTitleFontSize());
             currentFonts.toggleBold();
         }
 
-        NodeList nodes = getChildElements(title);
+        ElementCollection nodes = ElementCollection.children(title);
         for (int i = 0; i < nodes.getLength(); ++i)
         {
-            org.w3c.dom.Element element = (org.w3c.dom.Element)nodes.item(i);
+            org.w3c.dom.Element element = nodes.item(i);
 
             if (element.getTagName().equals("p"))
             {
@@ -1022,16 +935,16 @@ public class FB2toPDF
     }
 
     private void processEpigraph(org.w3c.dom.Element epigraph)
-        throws DocumentException
+        throws DocumentException, FB2toPDFException
     {
         FontManager previousFonts = currentFonts;
-        currentFonts = new FontManager(style.getSerif(), style.getPoemFontSize());
+        currentFonts = new FontManager(stylesheet.getFontFamily("serif"), style.getPoemFontSize());
         currentFonts.toggleItalic();
 
-        NodeList nodes = getChildElements(epigraph);
+        ElementCollection nodes = ElementCollection.children(epigraph);
         for (int i = 0; i < nodes.getLength(); ++i)
         {
-            org.w3c.dom.Element element = (org.w3c.dom.Element)nodes.item(i);
+            org.w3c.dom.Element element = nodes.item(i);
 
             if (element.getTagName().equals("p"))
             {
@@ -1063,16 +976,16 @@ public class FB2toPDF
     }
 
     private void processCite(org.w3c.dom.Element cite)
-        throws DocumentException
+        throws DocumentException, FB2toPDFException
     {
         FontManager previousFonts = currentFonts;
-        currentFonts = new FontManager(style.getSerif(), style.getPoemFontSize());
+        currentFonts = new FontManager(stylesheet.getFontFamily("serif"), style.getPoemFontSize());
         currentFonts.toggleItalic();
 
-        NodeList nodes = getChildElements(cite);
+        ElementCollection nodes = ElementCollection.children(cite);
         for (int i = 0; i < nodes.getLength(); ++i)
         {
-            org.w3c.dom.Element element = (org.w3c.dom.Element)nodes.item(i);
+            org.w3c.dom.Element element = nodes.item(i);
 
             if (element.getTagName().equals("p"))
             {
@@ -1100,16 +1013,16 @@ public class FB2toPDF
     }
 
     private void processPoem(org.w3c.dom.Element poem)
-        throws DocumentException
+        throws DocumentException, FB2toPDFException
     {
         FontManager previousFonts = currentFonts;
-        currentFonts = new FontManager(style.getSerif(), style.getPoemFontSize());
+        currentFonts = new FontManager(stylesheet.getFontFamily("serif"), style.getPoemFontSize());
         currentFonts.toggleItalic();
 
-        NodeList nodes = getChildElements(poem);
+        ElementCollection nodes = ElementCollection.children(poem);
         for (int i = 0; i < nodes.getLength(); ++i)
         {
-            org.w3c.dom.Element element = (org.w3c.dom.Element)nodes.item(i);
+            org.w3c.dom.Element element = nodes.item(i);
 
             if (element.getTagName().equals("stanza"))
             {
@@ -1125,12 +1038,12 @@ public class FB2toPDF
     }
 
     private void processStanza(org.w3c.dom.Element stanza)
-        throws DocumentException
+        throws DocumentException, FB2toPDFException
     {
-        NodeList nodes = getChildElements(stanza);
+        ElementCollection nodes = ElementCollection.children(stanza);
         for (int i = 0; i < nodes.getLength(); ++i)
         {
-            org.w3c.dom.Element element = (org.w3c.dom.Element)nodes.item(i);
+            org.w3c.dom.Element element = nodes.item(i);
 
             if (element.getTagName().equals("v"))
             {
@@ -1155,7 +1068,7 @@ public class FB2toPDF
 
     private void processParagraph(org.w3c.dom.Element paragraph, int type,
                                   boolean bFirst, boolean bLast)
-        throws DocumentException
+        throws DocumentException, FB2toPDFException
     {
         float em = currentFonts.getSize();
 
@@ -1198,6 +1111,7 @@ public class FB2toPDF
         {
             currentParagraph.setAlignment(Paragraph.ALIGN_JUSTIFIED);
             currentParagraph.setFirstLineIndent(2.5f * em);
+            currentParagraph.setLeading(1.3f * em);
         }
 
         processParagraphContent(paragraph, type);
@@ -1244,7 +1158,7 @@ public class FB2toPDF
     }
 
     private void processParagraphContent(org.w3c.dom.Element parent, int type)
-        throws DocumentException
+        throws DocumentException, FB2toPDFException
     {
         NodeList nodes = parent.getChildNodes();
         for (int i = 0; i < nodes.getLength(); ++i)
@@ -1286,7 +1200,7 @@ public class FB2toPDF
                     String citeId = child.getAttribute("id");
                     if (citeId.length() > 0)
                     {
-                        Anchor anchor = new Anchor(".", new Font(style.getSansSerif().getRegular(), 0.01f));
+                        Anchor anchor = new Anchor(".", new Font(stylesheet.getFontFamily("sansSerif").getRegularFont(), 0.01f));
                         anchor.setName(citeId);
                         currentParagraph.add(anchor);
                         System.err.println("Adding A NAME=" + citeId);

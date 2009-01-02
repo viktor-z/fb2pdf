@@ -1,0 +1,20 @@
+{
+    "fontFamilies" : [
+        {
+            "name":         "sansSerif",
+            "regular":      "./data/arial.ttf",
+            "bold":         "./data/arialbd.ttf",
+            "italic":       "./data/ariali.ttf",
+            "boldItalic":   "./data/arialbi.ttf"
+        },
+        {
+            "name":         "serif",
+            "regular":      "./data/georgia.ttf",
+            "bold":         "./data/georgiab.ttf",
+            "italic":       "./data/georgiai.ttf",
+            "boldItalic":   "./data/georgiaz.ttf"
+        }
+    ]
+}
+
+
