@@ -6,25 +6,15 @@ import java.util.LinkedList;
 
 import com.lowagie.text.DocumentException;
 
-import com.google.gson.GsonBuilder;
-import com.google.gson.Gson;
+import com.google.gson.*;
 
 public class Stylesheet
 {
     private LinkedList<FontFamily> fontFamilies = new LinkedList<FontFamily>();
+    private PageStyle pageStyle = new PageStyle();
 
     public Stylesheet()
-        throws Exception
     {
-    }
-
-    public void validate()
-        throws DocumentException, IOException, FB2toPDFException
-    {
-        for (FontFamily family: fontFamilies)
-        {
-            family.validate();
-        }
     }
 
     public FontFamily getFontFamily(String name)
@@ -39,19 +29,47 @@ public class Stylesheet
         throw new FB2toPDFException("Font family " + name + " not defined in the stylesheet.");
     }
 
+    public PageStyle getPageStyle()
+    {
+        return pageStyle;
+    }
+
+    public static Stylesheet readStylesheet(String filename)
+        throws DocumentException, IOException, FB2toPDFException
+    {
+        Gson gson =
+            Dimension.prepare(
+            FontFamily.prepare(
+                new GsonBuilder()
+            ))
+            .serializeNulls()
+            .setPrettyPrinting()
+            .create();
+
+        Stylesheet stylesheet = gson.fromJson(new FileReader(filename), Stylesheet.class);
+        return stylesheet;
+    }
+
+    public String toString()
+    {
+        Gson gson =
+            Dimension.prepare(
+            FontFamily.prepare(
+                new GsonBuilder()
+            ))
+            .serializeNulls()
+            .setPrettyPrinting()
+            .create();
+
+        return gson.toJson(this);
+    }
+    
     public static void main(String[] args)
     {
         try
         {
-            Gson gson = new GsonBuilder()
-                .serializeNulls()
-                .setPrettyPrinting()
-                .create();
-
-            Stylesheet s = gson.fromJson(new FileReader("./data/stylesheet.json"), Stylesheet.class);
-            s.validate();
-
-            System.out.println(gson.toJson(s));
+            Stylesheet s = readStylesheet("./data/stylesheet.json");
+            System.out.println(s);
         }
         catch (Exception e)
         {

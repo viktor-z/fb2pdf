@@ -14,7 +14,15 @@
             "italic":       "./data/georgiai.ttf",
             "boldItalic":   "./data/georgiaz.ttf"
         }
-    ]
+    ],
+    "pageStyle" : {
+        "pageWidth":    "88.2mm",
+        "pageHeight":   "115.4mm",
+        "marginLeft":   "2.0mm",
+        "marginRight":  "2.0mm",
+        "marginTop":    "2.0mm",
+        "marginBottom": "2.0mm"
+    }
 }
 
 

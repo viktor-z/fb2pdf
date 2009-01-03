@@ -38,4 +38,13 @@
         </java>        
     </target>
 
+    <target name="testDimension" depends="compile">
+        <java classname="org.trivee.fb2pdf.Dimension" fork="yes" >
+            <classpath>
+                <pathelement path="${build}"/>
+                <path refid="lib"/>
+            </classpath>
+        </java>        
+    </target>
+
 </project>

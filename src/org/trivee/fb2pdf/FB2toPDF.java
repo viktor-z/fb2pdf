@@ -30,8 +30,6 @@ import com.lowagie.text.pdf.PdfAction;
 
 import org.apache.commons.codec.binary.Base64;
 
-import com.google.gson.Gson;
-
 public class FB2toPDF
 {
     private String BASE_PATH = ".";
@@ -47,18 +45,8 @@ public class FB2toPDF
 
     private HyphenationAuto hyphen_ru;
 
-    private static final float MM_TO_POINTS = 72.0f / 25.4f;
-
     private static class OldStyle
     {
-        private float pageWidth;
-        private float pageHeight;
-
-        private float marginLeft;
-        private float marginRight;
-        private float marginTop;
-        private float marginBottom;
-
         private float frontMatterFontSize;
         private float titleFontSize;
         private float subTitleFontSize;
@@ -82,14 +70,6 @@ public class FB2toPDF
             properties.load(in); 
             in.close();
 
-            pageWidth  = MM_TO_POINTS * Float.parseFloat(properties.getProperty("page.width",  "215.9"));
-            pageHeight = MM_TO_POINTS * Float.parseFloat(properties.getProperty("page.height", "279.4"));
-
-            marginLeft   = MM_TO_POINTS * Float.parseFloat(properties.getProperty("margin.left",   "25.4"));
-            marginRight  = MM_TO_POINTS * Float.parseFloat(properties.getProperty("margin.right",  "25.4"));
-            marginTop    = MM_TO_POINTS * Float.parseFloat(properties.getProperty("margin.top",    "25.4"));
-            marginBottom = MM_TO_POINTS * Float.parseFloat(properties.getProperty("margin.bottom", "25.4"));
-
             frontMatterFontSize         = Float.parseFloat(properties.getProperty("frontMatter.fontSize",           "12.0"));
             titleFontSize               = Float.parseFloat(properties.getProperty("title.fontSize",                 "20.0"));
             subTitleFontSize            = Float.parseFloat(properties.getProperty("subTitle.fontSize",              "16.0"));
@@ -104,14 +84,6 @@ public class FB2toPDF
             poemFontSize                = Float.parseFloat(properties.getProperty("poem.fontSize",                  "12.0"));
         }
         
-        public float getPageWidth()     { return pageWidth; }
-        public float getPageHeight()    { return pageHeight; }
-
-        public float getMarginLeft()    { return marginLeft; }
-        public float getMarginRight()   { return marginRight; }
-        public float getMarginTop()     { return marginTop; }
-        public float getMarginBottom()  { return marginBottom; }
-
         public float getFrontMatterFontSize()           { return frontMatterFontSize; }
         public float getTitleFontSize()                 { return titleFontSize; }
         public float getSubTitleFontSize()              { return subTitleFontSize; }
@@ -138,9 +110,7 @@ public class FB2toPDF
 
         style = new OldStyle(BASE_PATH + "/data/style.properties");
 
-        Gson gson = new Gson();
-        stylesheet = gson.fromJson(new FileReader(BASE_PATH + "/data/stylesheet.json"), Stylesheet.class);
-        stylesheet.validate();
+        stylesheet = Stylesheet.readStylesheet(BASE_PATH + "/data/stylesheet.json");
     }
 
     private org.w3c.dom.Document fb2;
@@ -198,10 +168,13 @@ public class FB2toPDF
     private void createPDFDoc()
         throws DocumentException, FileNotFoundException
     {
-        Rectangle pageSize = new Rectangle(style.getPageWidth(), style.getPageHeight());
+        PageStyle ps = stylesheet.getPageStyle();
+
+        Rectangle pageSize = new Rectangle(ps.getPageWidth(), ps.getPageHeight());
+
         doc = new com.lowagie.text.Document(pageSize,
-            style.getMarginLeft(), style.getMarginRight(),
-            style.getMarginTop(), style.getMarginBottom());
+            ps.getMarginLeft(), ps.getMarginRight(),
+            ps.getMarginTop(), ps.getMarginBottom());
 
         writer = PdfWriter.getInstance(doc, new FileOutputStream(toName));
 
