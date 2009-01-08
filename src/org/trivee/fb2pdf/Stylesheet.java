@@ -12,6 +12,7 @@ public class Stylesheet
 {
     private LinkedList<FontFamily> fontFamilies = new LinkedList<FontFamily>();
     private PageStyle pageStyle = new PageStyle();
+    private LinkedList<ParagraphStyle> paragraphStyles = new LinkedList<ParagraphStyle>();
 
     public Stylesheet()
     {
@@ -22,6 +23,9 @@ public class Stylesheet
     {
         for (FontFamily family: fontFamilies)
         {
+            if (family.getName() == null)
+                throw new FB2toPDFException("Font family without a name found in the stylesheet.");
+
             if (family.getName().equalsIgnoreCase(name))
                 return family;
         }
@@ -34,15 +38,33 @@ public class Stylesheet
         return pageStyle;
     }
 
+    public ParagraphStyle getParagraphStyle(String name)
+        throws FB2toPDFException
+    {
+        for (ParagraphStyle paragraphStyle: paragraphStyles)
+        {
+            if (paragraphStyle.getName() == null)
+                throw new FB2toPDFException("Paragraph style without a name found in the stylesheet.");
+
+            if (paragraphStyle.getName().equalsIgnoreCase(name))
+            {
+                paragraphStyle.setStylesheet(this);
+                return paragraphStyle;
+            }
+        }
+
+        throw new FB2toPDFException("Paragraph style " + name + " not defined in the stylesheet.");
+    }
+
     public static Stylesheet readStylesheet(String filename)
         throws DocumentException, IOException, FB2toPDFException
     {
         Gson gson =
             Dimension.prepare(
             FontFamily.prepare(
+            ParagraphStyle.prepare(
                 new GsonBuilder()
-            ))
-            .serializeNulls()
+            )))
             .setPrettyPrinting()
             .create();
 
@@ -55,9 +77,9 @@ public class Stylesheet
         Gson gson =
             Dimension.prepare(
             FontFamily.prepare(
+            ParagraphStyle.prepare(
                 new GsonBuilder()
-            ))
-            .serializeNulls()
+            )))
             .setPrettyPrinting()
             .create();
 

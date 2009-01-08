@@ -1,5 +1,5 @@
 {
-    "fontFamilies" : [
+    "fontFamilies": [
         {
             "name":         "sansSerif",
             "regular":      "./data/arial.ttf",
@@ -22,7 +22,51 @@
         "marginRight":  "2.0mm",
         "marginTop":    "2.0mm",
         "marginBottom": "2.0mm"
-    }
+    },
+    "paragraphStyles": [
+        {
+            "name":             "default",
+            "fontFamily":       "sansSerif",
+            "fontSize":         "11.0pt"
+        },
+        {
+            "comment":          "Front matter style: authors, publishers, uuid, creator tool",
+            "name":             "frontMatter",
+            "baseStyle":        "default",
+            "fontSize":         "9.0pt"
+        },
+        {
+            "name":             "title",
+            "baseStyle":        "default",
+            "fontSize":         "16.0pt",
+            "alignment":        "center"
+        },
+        {
+            "name":             "subtitle",
+            "baseStyle":        "default",
+            "fontSize":         "12.0pt",
+            "alignment":        "center"
+        },
+        {
+            "name":             "author",
+            "baseStyle":        "default",
+            "fontSize":         "14.0pt",
+            "alignment":        "center"
+        },
+        {
+            "name":             "tocTitle",
+            "baseStyle":        "default",
+            "fontSize":         "16.0pt",
+            "alignment":        "center",
+            "spacingAfter":     "1em",
+            "text":             "\u0421\u043E\u0434\u0435\u0440\u0436\u0430\u043D\u0438\u0435"
+        },
+        {
+            "name":             "tocItem",
+            "baseStyle":        "default",
+            "fontSize":         "12.0pt"
+        }
+    ]
 }
 
 

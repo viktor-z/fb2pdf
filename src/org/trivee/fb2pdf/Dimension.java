@@ -12,14 +12,14 @@ public class Dimension
     private static final float MM_TO_POINTS = 72.0f / 25.4f;
 
     private String  dimension;
-    private float   points;
     private boolean relative;
+    private float   points;
 
     public Dimension()
     {
         dimension = "0pt";
-        points = 0.0f;
         relative = false;
+        points = 0.0f;
     }
 
     public Dimension(String dimension)
@@ -34,17 +34,18 @@ public class Dimension
         this.dimension = dimension;
         if (dimension.endsWith(PT))
         {
+            relative = false;
             points = Float.parseFloat(dimension.substring(0, dimension.length()-2));
         }
         else if (dimension.endsWith(MM))
         {
-            points = MM_TO_POINTS * Float.parseFloat(dimension.substring(0, dimension.length()-2));
             relative = false;
+            points = MM_TO_POINTS * Float.parseFloat(dimension.substring(0, dimension.length()-2));
         }
         else if (dimension.endsWith(EM))
         {
-            points = 12.0f * Float.parseFloat(dimension.substring(0, dimension.length()-2));
             relative = true;
+            points = 12.0f * Float.parseFloat(dimension.substring(0, dimension.length()-2));
         }
         else
         {
@@ -57,6 +58,11 @@ public class Dimension
         return dimension;
     }
 
+    public boolean isRelative()
+    {
+        return relative;
+    }
+
     public float getPoints()
     {
         return points;
@@ -64,7 +70,7 @@ public class Dimension
 
     public float getPoints(float fontSize)
     {
-        if (relative)
+        if (isRelative())
             return points * fontSize / 12.0f;
         else
             return points;
