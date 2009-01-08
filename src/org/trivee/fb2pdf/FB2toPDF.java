@@ -48,8 +48,6 @@ public class FB2toPDF
     private static class OldStyle
     {
         private float annotationFontSize;
-        private float contentsTitleFontSize;
-        private float contentsItemFontSize;
         private float sectionTitleFontSize;
         private float subSectionTitleFontSize;
         private float subSubSectionTitleFontSize;
@@ -67,7 +65,6 @@ public class FB2toPDF
             in.close();
 
             annotationFontSize          = Float.parseFloat(properties.getProperty("annotation.fontSize",            "12.0"));
-            contentsItemFontSize        = Float.parseFloat(properties.getProperty("contentsItem.fontSize",          "16.0"));
             sectionTitleFontSize        = Float.parseFloat(properties.getProperty("sectionTitle.fontSize",          "20.0"));
             subSectionTitleFontSize     = Float.parseFloat(properties.getProperty("subSectionTitle.fontSize",       "16.0"));
             subSubSectionTitleFontSize  = Float.parseFloat(properties.getProperty("subSubSectionTitle.fontSize",    "14.0"));
@@ -76,7 +73,6 @@ public class FB2toPDF
         }
         
         public float getAnnotationFontSize()            { return annotationFontSize; }
-        public float getContentsItemFontSize()          { return contentsItemFontSize; }
         public float getSectionTitleFontSize()          { return sectionTitleFontSize; }
         public float getSubSectionTitleFontSize()       { return subSectionTitleFontSize; }
         public float getSubSubSectionTitleFontSize()    { return subSubSectionTitleFontSize; }
@@ -402,16 +398,9 @@ public class FB2toPDF
     private void addLine(String text, ParagraphStyle style)
         throws FB2toPDFException, DocumentException
     {
-        Chunk chunk = new Chunk();
-        chunk.setFont(style.getFont());
+        Chunk chunk = style.createChunk();
         chunk.append(text);
-
-        Paragraph para = new Paragraph();
-        para.setLeading(style.getAbsoluteLeading(), style.getRelativeLeading());
-        para.setAlignment(style.getAlignment());
-        para.setSpacingBefore(style.getSpacingBefore());
-        para.setSpacingAfter(style.getSpacingAfter());
-
+        Paragraph para = style.createParagraph();
         para.add(chunk);
         doc.add(para);
     }
@@ -644,6 +633,7 @@ public class FB2toPDF
             return;
 
         ParagraphStyle tocTitleStyle   = stylesheet.getParagraphStyle("tocTitle");
+        ParagraphStyle tocItemStyle    = stylesheet.getParagraphStyle("tocItem");
 
         addLine(tocTitleStyle.getText(), tocTitleStyle);
 
@@ -655,12 +645,7 @@ public class FB2toPDF
             if (title.length() == 0)
                 title = "#" + (i+1);
 
-            float em = style.getContentsItemFontSize();
-
-            Font font = new Font(stylesheet.getFontFamily("sansSerif").getBoldFont(), em);
-
-            Chunk chunk = new Chunk();
-            chunk.setFont(font);
+            Chunk chunk = tocItemStyle.createChunk();
             chunk.append(title);
 
 
@@ -671,10 +656,7 @@ public class FB2toPDF
             anchor.setReference("#" + ref);
             System.err.println("Adding A HREF=#" + ref);
 
-            Paragraph para = new Paragraph(em);
-            para.setAlignment(Paragraph.ALIGN_LEFT);
-            para.setIndentationLeft(5.0f * em);
-            para.setFirstLineIndent(-2.5f * em);
+            Paragraph para = tocItemStyle.createParagraph();
             para.add(anchor);
 
             doc.add(para);

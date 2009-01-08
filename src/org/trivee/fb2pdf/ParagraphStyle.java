@@ -3,6 +3,7 @@ package org.trivee.fb2pdf;
 import java.lang.reflect.Type;
 import com.google.gson.*;
 
+import com.lowagie.text.Chunk;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Font;
 import com.lowagie.text.pdf.BaseFont;
@@ -147,6 +148,8 @@ public class ParagraphStyle
     private AlignmentInfo alignment;
     private Dimension spacingBefore;
     private Dimension spacingAfter;
+    private Dimension leftIndent;
+    private Dimension firstLineIndent;
 
     private String text;
     
@@ -326,8 +329,71 @@ public class ParagraphStyle
         return getSpacingAfterDimension().getPoints(getFontSize().getPoints());
     }
 
+    private Dimension getLeftIndentDimension()
+        throws FB2toPDFException
+    {
+        if (leftIndent != null)
+            return leftIndent;
+
+        ParagraphStyle baseStyle = getBaseStyle();
+        if (baseStyle != null)
+            return baseStyle.getLeftIndentDimension();
+
+        // default value
+        return new Dimension("0pt");
+    }
+
+    public float getLeftIndent()
+        throws FB2toPDFException
+    {
+        return getLeftIndentDimension().getPoints(getFontSize().getPoints());
+    }
+
+    private Dimension getFirstLineIndentDimension()
+        throws FB2toPDFException
+    {
+        if (firstLineIndent != null)
+            return firstLineIndent;
+
+        ParagraphStyle baseStyle = getBaseStyle();
+        if (baseStyle != null)
+            return baseStyle.getFirstLineIndentDimension();
+
+        // default value
+        return new Dimension("0pt");
+    }
+
+    public float getFirstLineIndent()
+        throws FB2toPDFException
+    {
+        return getFirstLineIndentDimension().getPoints(getFontSize().getPoints());
+    }
+
     public String getText()
     {
         return text;
+    }
+
+
+    public Chunk createChunk()
+        throws FB2toPDFException
+    {
+        Chunk chunk = new Chunk();
+        chunk.setFont(getFont());
+        return chunk;
+    }
+
+    public Paragraph createParagraph()
+        throws FB2toPDFException
+    {
+        Paragraph para = new Paragraph();
+        para.setLeading(getAbsoluteLeading(), getRelativeLeading());
+        para.setAlignment(getAlignment());
+        para.setSpacingBefore(getSpacingBefore());
+        para.setSpacingAfter(getSpacingAfter());
+        para.setIndentationLeft(getLeftIndent());
+        para.setFirstLineIndent(getFirstLineIndent());
+
+        return para;
     }
 }

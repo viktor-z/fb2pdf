@@ -64,9 +64,10 @@
         {
             "name":             "tocItem",
             "baseStyle":        "default",
-            "fontSize":         "12.0pt"
+            "fontSize":         "12.0pt",
+            "fontStyle":        "bold",
+            "leftIndent":       "5.0em",
+            "firstLineIndent":  "-2.5em"
         }
     ]
 }
-
-
