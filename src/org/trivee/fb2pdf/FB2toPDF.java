@@ -416,8 +416,9 @@ public class FB2toPDF
                 getTextContentByTagName(publishInfo, "city", ", ")+
                 getTextContentByTagName(publishInfo, "year", ", " ),
                     frontMatter);
-            addLine(
-                "ISBN: " + getTextContentByTagName(publishInfo, "isbn"),
+            String isbn = getTextContentByTagName(publishInfo, "isbn");
+            if (isbn.length() > 0)
+                addLine("ISBN: " + isbn,
                     frontMatter);
         }
 
@@ -560,8 +561,8 @@ public class FB2toPDF
             Chunk chunk = tocItemStyle.createChunk();
             chunk.append(title);
 
-
-            Anchor anchor = new Anchor(chunk);
+            Anchor anchor = tocItemStyle.createAnchor();
+            anchor.add(chunk);
             String ref = section.getAttribute("id");
             if(ref.isEmpty())
                 ref = "section" + i;
@@ -608,7 +609,7 @@ public class FB2toPDF
 
         if (id.length() > 0)
         {
-            Anchor anchor = new Anchor(".", new Font(stylesheet.getFontFamily("sansSerif").getRegularFont(), 0.01f));
+            Anchor anchor = currentStyle.createInvisibleAnchor();
             anchor.setName(id);
             doc.add(anchor);
             System.err.println("Adding A NAME=" + id);
@@ -900,7 +901,7 @@ public class FB2toPDF
     }
 
     private void flushCurrentChunk()
-        throws DocumentException
+        throws DocumentException, FB2toPDFException
     {
         if (currentChunk != null)
         {
@@ -917,7 +918,8 @@ public class FB2toPDF
                 }
                 else
                 {
-                    Anchor anchor = new Anchor(currentChunk);
+                    Anchor anchor = currentStyle.createAnchor();
+                    anchor.add(currentChunk);
                     anchor.setReference(currentReference);
                     System.err.println("Adding A HREF=" + currentReference);
                     currentParagraph.add(anchor);
@@ -972,7 +974,7 @@ public class FB2toPDF
                     String citeId = child.getAttribute("id");
                     if (citeId.length() > 0)
                     {
-                        Anchor anchor = new Anchor(".", new Font(stylesheet.getFontFamily("sansSerif").getRegularFont(), 0.01f));
+                        Anchor anchor = currentStyle.createInvisibleAnchor();
                         anchor.setName(citeId);
                         currentParagraph.add(anchor);
                         System.err.println("Adding A NAME=" + citeId);

@@ -33,8 +33,7 @@
             "comment":          "Front matter style: authors, publishers, uuid, creator tool",
             "name":             "frontMatter",
             "baseStyle":        "default",
-            "fontSize":         "9.0pt",
-            "leading":          "1.3em"
+            "fontSize":         "7.0pt"
         },
         {
             "name":             "title",
@@ -67,8 +66,8 @@
             "baseStyle":        "default",
             "fontSize":         "12.0pt",
             "fontStyle":        "bold",
-            "leftIndent":       "5.0em",
-            "firstLineIndent":  "-2.5em"
+            "leftIndent":       "2.0em",
+            "firstLineIndent":  "-2.0em"
         },
         {
             "name":             "annotation",

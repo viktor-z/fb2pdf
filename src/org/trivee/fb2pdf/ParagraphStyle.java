@@ -3,6 +3,7 @@ package org.trivee.fb2pdf;
 import java.lang.reflect.Type;
 import com.google.gson.*;
 
+import com.lowagie.text.Anchor;
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Font;
@@ -263,6 +264,15 @@ public class ParagraphStyle
         return new Font(bf, getFontSize().getPoints());
     }
 
+    public Font getTinyFont()
+        throws FB2toPDFException
+    {
+        FontFamily ff = getFontFamily();
+        BaseFont bf = ff.getRegularFont();
+
+        return new Font(bf, 0.01f);
+    }
+
     private Dimension getLeadingDimension()
         throws FB2toPDFException
     {
@@ -437,6 +447,23 @@ public class ParagraphStyle
         return chunk;
     }
 
+    public Anchor createAnchor()
+        throws FB2toPDFException
+    {
+        return new Anchor(getAbsoluteLeading());
+    }
+
+    public Anchor createInvisibleAnchor()
+        throws FB2toPDFException
+    {
+        Chunk chunk = new Chunk();
+        chunk.setFont(getTinyFont());
+        chunk.append(".");
+        Anchor anchor = new Anchor(0.01f);
+        anchor.add(chunk);
+        return anchor;
+    }
+
     public Paragraph createParagraph()
         throws FB2toPDFException
     {
@@ -447,7 +474,6 @@ public class ParagraphStyle
         para.setSpacingAfter(getSpacingAfter());
         para.setIndentationLeft(getLeftIndent());
         para.setFirstLineIndent(getFirstLineIndent());
-
         return para;
     }
 
