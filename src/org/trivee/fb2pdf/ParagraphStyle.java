@@ -143,11 +143,15 @@ public class ParagraphStyle
 
     private String fontFamily;
     private FontStyleInfo fontStyle;
+    private transient boolean boldToggle;
+    private transient boolean italicToggle;
     private Dimension fontSize;
     private Dimension leading;
     private AlignmentInfo alignment;
     private Dimension spacingBefore;
+    private Dimension firstSpacingBefore;
     private Dimension spacingAfter;
+    private Dimension lastSpacingAfter;
     private Dimension leftIndent;
     private Dimension firstLineIndent;
 
@@ -226,6 +230,16 @@ public class ParagraphStyle
 
         throw new FB2toPDFException("Font size for style " + name + " not defined.");
     }
+
+    public void toggleBold()
+    {
+        boldToggle = !boldToggle;
+    }
+
+    public void toggleItalic()
+    {
+        italicToggle = !italicToggle;
+    }
     
     public Font getFont()
         throws FB2toPDFException
@@ -234,17 +248,17 @@ public class ParagraphStyle
 
         FontStyleInfo fs = getFontStyle();
 
-        BaseFont bf;
-        if (fs.isFontItalic())
-            if (fs.isFontBold())
-                bf = ff.getBoldItalicFont();
-            else
-                bf = ff.getItalicFont();
-        else
-            if (fs.isFontBold())
-                bf = ff.getBoldFont();
-            else
-                bf = ff.getRegularFont();
+        boolean bold = fs.isFontBold();
+        if (boldToggle)
+            bold = !bold;
+
+        boolean italic = fs.isFontItalic();
+        if (italicToggle)
+            italic = !italic;
+
+        BaseFont bf = italic ?
+            (bold ? ff.getBoldItalicFont() : ff.getItalicFont()):
+            (bold ? ff.getBoldFont()       : ff.getRegularFont());
 
         return new Font(bf, getFontSize().getPoints());
     }
@@ -323,10 +337,50 @@ public class ParagraphStyle
         return new Dimension("0pt");
     }
 
+    private Dimension getFirstSpacingBeforeDimension()
+        throws FB2toPDFException
+    {
+        if (firstSpacingBefore != null)
+            return firstSpacingBefore;
+
+        ParagraphStyle baseStyle = getBaseStyle();
+        if (baseStyle != null)
+            return baseStyle.getFirstSpacingBeforeDimension();
+
+        // default value
+        return getSpacingBeforeDimension();
+    }
+
+    public float getFirstSpacingBefore()
+        throws FB2toPDFException
+    {
+        return getFirstSpacingBeforeDimension().getPoints(getFontSize().getPoints());
+    }
+
     public float getSpacingAfter()
         throws FB2toPDFException
     {
         return getSpacingAfterDimension().getPoints(getFontSize().getPoints());
+    }
+
+    private Dimension getLastSpacingAfterDimension()
+        throws FB2toPDFException
+    {
+        if (lastSpacingAfter != null)
+            return lastSpacingAfter;
+
+        ParagraphStyle baseStyle = getBaseStyle();
+        if (baseStyle != null)
+            return baseStyle.getLastSpacingAfterDimension();
+
+        // default value
+        return getSpacingAfterDimension();
+    }
+
+    public float getLastSpacingAfter()
+        throws FB2toPDFException
+    {
+        return getLastSpacingAfterDimension().getPoints(getFontSize().getPoints());
     }
 
     private Dimension getLeftIndentDimension()
@@ -393,6 +447,19 @@ public class ParagraphStyle
         para.setSpacingAfter(getSpacingAfter());
         para.setIndentationLeft(getLeftIndent());
         para.setFirstLineIndent(getFirstLineIndent());
+
+        return para;
+    }
+
+    public Paragraph createParagraph(boolean bFirst, boolean bLast)
+        throws FB2toPDFException
+    {
+        Paragraph para = createParagraph();
+
+        if (bFirst)
+            para.setSpacingBefore(getFirstSpacingBefore());
+        if (bLast)
+            para.setSpacingAfter(getLastSpacingAfter());
 
         return para;
     }

@@ -33,7 +33,8 @@
             "comment":          "Front matter style: authors, publishers, uuid, creator tool",
             "name":             "frontMatter",
             "baseStyle":        "default",
-            "fontSize":         "9.0pt"
+            "fontSize":         "9.0pt",
+            "leading":          "1.3em"
         },
         {
             "name":             "title",
@@ -68,6 +69,89 @@
             "fontStyle":        "bold",
             "leftIndent":       "5.0em",
             "firstLineIndent":  "-2.5em"
-        }
+        },
+        {
+            "name":             "annotation",
+            "baseStyle":        "default",
+            "fontSize":         "11.0pt",
+            "fontStyle":        "italic",
+            "alignment":        "justified",
+            "firstSpacingBefore":   "0.3em",
+            "spacingAfter":     "0.3em"
+        },
+        {
+            "name":             "sectionTitle",
+            "baseStyle":        "default",
+            "fontSize":         "16.0pt",
+            "fontStyle":        "bold",
+            "alignment":        "left",
+            "spacingBefore":        "0.3em",
+            "firstSpacingBefore":   "0.6em",
+            "lastSpacingAfter":     "0.6em"
+        },
+        {
+            "name":             "subSectionTitle",
+            "baseStyle":        "default",
+            "fontSize":         "14.0pt",
+            "fontStyle":        "bold",
+            "alignment":        "center",
+            "spacingBefore":    "0.3em",
+            "spacingAfter":     "0.3em"
+        },
+        {
+            "name":             "subSubSectionTitle",
+            "baseStyle":        "default",
+            "fontSize":         "12.0pt",
+            "fontStyle":        "bold"
+        },
+        {
+            "name":             "poem",
+            "fontFamily":       "serif",
+            "fontSize":         "11.0pt",
+            "fontStyle":        "italic",
+            "leftIndent":       "5.0em",
+            "firstLineIndent":  "-2.5em",
+            "firstSpacingBefore":   "0.5em",
+            "lastSpacingAfter":     "0.5em"
+        },
+        {
+            "name":             "epigraph",
+            "fontFamily":       "serif",
+            "fontSize":         "11.0pt",
+            "fontStyle":        "italic",
+            "leftIndent":       "2.5em",
+            "firstSpacingBefore":   "0.5em",
+            "lastSpacingAfter":     "0.5em"
+        },
+        {
+            "name":             "epigraphAuthor",
+            "baseStyle":        "epigraph",
+            "fontStyle":        "regular"
+        },
+        {
+            "name":             "cite",
+            "baseStyle":        "epigraph"
+        },
+        {
+            "name":             "citeAuthor",
+            "baseStyle":        "epigraphAuthor"
+        },
+        {
+            "name":             "body",
+            "fontFamily":       "serif",
+            "fontSize":         "11.0pt",
+            "alignment":        "justified",
+            "firstLineIndent":  "1.5em",
+            "leading":          "1.3em"
+        },
+        {
+            "name":             "bodySubtitle",
+            "fontFamily":       "sansSerif",
+            "fontSize":         "13.0pt",
+            "fontStyle":        "bold",
+            "alignment":        "center",
+            "spacingBefore":    "0.3em",
+            "spacingAfter":     "0.3em"
+        }            
     ]
 }
