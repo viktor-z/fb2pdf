@@ -1,156 +1,156 @@
 {
-    "fontFamilies": [
+    fontFamilies: [
         {
-            "name":         "sansSerif",
-            "regular":      "./data/arial.ttf",
-            "bold":         "./data/arialbd.ttf",
-            "italic":       "./data/ariali.ttf",
-            "boldItalic":   "./data/arialbi.ttf"
+            name:         "sansSerif",
+            regular:      "./data/arial.ttf",
+            bold:         "./data/arialbd.ttf",
+            italic:       "./data/ariali.ttf",
+            boldItalic:   "./data/arialbi.ttf"
         },
         {
-            "name":         "serif",
-            "regular":      "./data/georgia.ttf",
-            "bold":         "./data/georgiab.ttf",
-            "italic":       "./data/georgiai.ttf",
-            "boldItalic":   "./data/georgiaz.ttf"
+            name:         "serif",
+            regular:      "./data/georgia.ttf",
+            bold:         "./data/georgiab.ttf",
+            italic:       "./data/georgiai.ttf",
+            boldItalic:   "./data/georgiaz.ttf"
         }
     ],
-    "pageStyle" : {
-        "pageWidth":    "88.2mm",
-        "pageHeight":   "115.4mm",
-        "marginLeft":   "2.0mm",
-        "marginRight":  "2.0mm",
-        "marginTop":    "2.0mm",
-        "marginBottom": "2.0mm"
+    pageStyle: {
+        pageWidth:    "88.2mm",
+        pageHeight:   "115.4mm",
+        marginLeft:   "2.0mm",
+        marginRight:  "2.0mm",
+        marginTop:    "2.0mm",
+        marginBottom: "2.0mm"
     },
-    "paragraphStyles": [
+    paragraphStyles: [
         {
-            "name":             "default",
-            "fontFamily":       "sansSerif",
-            "fontSize":         "11.0pt"
+            name:             "default",
+            fontFamily:       "sansSerif",
+            fontSize:         "11.0pt"
         },
         {
-            "comment":          "Front matter style: authors, publishers, uuid, creator tool",
-            "name":             "frontMatter",
-            "baseStyle":        "default",
-            "fontSize":         "7.0pt"
+            comment:          "Front matter style: authors, publishers, uuid, creator tool",
+            name:             "frontMatter",
+            baseStyle:        "default",
+            fontSize:         "7.0pt"
         },
         {
-            "name":             "title",
-            "baseStyle":        "default",
-            "fontSize":         "16.0pt",
-            "alignment":        "center"
+            name:             "title",
+            baseStyle:        "default",
+            fontSize:         "16.0pt",
+            alignment:        "center"
         },
         {
-            "name":             "subtitle",
-            "baseStyle":        "default",
-            "fontSize":         "12.0pt",
-            "alignment":        "center"
+            name:             "subtitle",
+            baseStyle:        "default",
+            fontSize:         "12.0pt",
+            alignment:        "center"
         },
         {
-            "name":             "author",
-            "baseStyle":        "default",
-            "fontSize":         "14.0pt",
-            "alignment":        "center"
+            name:             "author",
+            baseStyle:        "default",
+            fontSize:         "14.0pt",
+            alignment:        "center"
         },
         {
-            "name":             "tocTitle",
-            "baseStyle":        "default",
-            "fontSize":         "16.0pt",
-            "alignment":        "center",
-            "spacingAfter":     "1em",
-            "text":             "\u0421\u043E\u0434\u0435\u0440\u0436\u0430\u043D\u0438\u0435"
+            name:             "tocTitle",
+            baseStyle:        "default",
+            fontSize:         "16.0pt",
+            alignment:        "center",
+            spacingAfter:     "1em",
+            text:             "\u0421\u043E\u0434\u0435\u0440\u0436\u0430\u043D\u0438\u0435"
         },
         {
-            "name":             "tocItem",
-            "baseStyle":        "default",
-            "fontSize":         "12.0pt",
-            "fontStyle":        "bold",
-            "leftIndent":       "2.0em",
-            "firstLineIndent":  "-2.0em"
+            name:             "tocItem",
+            baseStyle:        "default",
+            fontSize:         "12.0pt",
+            fontStyle:        "bold",
+            leftIndent:       "2.0em",
+            firstLineIndent:  "-2.0em"
         },
         {
-            "name":             "annotation",
-            "baseStyle":        "default",
-            "fontSize":         "11.0pt",
-            "fontStyle":        "italic",
-            "alignment":        "justified",
-            "firstSpacingBefore":   "0.3em",
-            "spacingAfter":     "0.3em"
+            name:             "annotation",
+            baseStyle:        "default",
+            fontSize:         "11.0pt",
+            fontStyle:        "italic",
+            alignment:        "justified",
+            firstSpacingBefore:   "0.3em",
+            spacingAfter:     "0.3em"
         },
         {
-            "name":             "sectionTitle",
-            "baseStyle":        "default",
-            "fontSize":         "16.0pt",
-            "fontStyle":        "bold",
-            "alignment":        "left",
-            "spacingBefore":        "0.3em",
-            "firstSpacingBefore":   "0.6em",
-            "lastSpacingAfter":     "0.6em"
+            name:             "sectionTitle",
+            baseStyle:        "default",
+            fontSize:         "16.0pt",
+            fontStyle:        "bold",
+            alignment:        "left",
+            spacingBefore:        "0.3em",
+            firstSpacingBefore:   "0.6em",
+            lastSpacingAfter:     "0.6em"
         },
         {
-            "name":             "subSectionTitle",
-            "baseStyle":        "default",
-            "fontSize":         "14.0pt",
-            "fontStyle":        "bold",
-            "alignment":        "center",
-            "spacingBefore":    "0.3em",
-            "spacingAfter":     "0.3em"
+            name:             "subSectionTitle",
+            baseStyle:        "default",
+            fontSize:         "14.0pt",
+            fontStyle:        "bold",
+            alignment:        "center",
+            spacingBefore:    "0.3em",
+            spacingAfter:     "0.3em"
         },
         {
-            "name":             "subSubSectionTitle",
-            "baseStyle":        "default",
-            "fontSize":         "12.0pt",
-            "fontStyle":        "bold"
+            name:             "subSubSectionTitle",
+            baseStyle:        "default",
+            fontSize:         "12.0pt",
+            fontStyle:        "bold"
         },
         {
-            "name":             "poem",
-            "fontFamily":       "serif",
-            "fontSize":         "11.0pt",
-            "fontStyle":        "italic",
-            "leftIndent":       "5.0em",
-            "firstLineIndent":  "-2.5em",
-            "firstSpacingBefore":   "0.5em",
-            "lastSpacingAfter":     "0.5em"
+            name:             "poem",
+            fontFamily:       "serif",
+            fontSize:         "11.0pt",
+            fontStyle:        "italic",
+            leftIndent:       "5.0em",
+            firstLineIndent:  "-2.5em",
+            firstSpacingBefore:   "0.5em",
+            lastSpacingAfter:     "0.5em"
         },
         {
-            "name":             "epigraph",
-            "fontFamily":       "serif",
-            "fontSize":         "11.0pt",
-            "fontStyle":        "italic",
-            "leftIndent":       "2.5em",
-            "firstSpacingBefore":   "0.5em",
-            "lastSpacingAfter":     "0.5em"
+            name:             "epigraph",
+            fontFamily:       "serif",
+            fontSize:         "11.0pt",
+            fontStyle:        "italic",
+            leftIndent:       "2.5em",
+            firstSpacingBefore:   "0.5em",
+            lastSpacingAfter:     "0.5em"
         },
         {
-            "name":             "epigraphAuthor",
-            "baseStyle":        "epigraph",
-            "fontStyle":        "regular"
+            name:             "epigraphAuthor",
+            baseStyle:        "epigraph",
+            fontStyle:        "regular"
         },
         {
-            "name":             "cite",
-            "baseStyle":        "epigraph"
+            name:             "cite",
+            baseStyle:        "epigraph"
         },
         {
-            "name":             "citeAuthor",
-            "baseStyle":        "epigraphAuthor"
+            name:             "citeAuthor",
+            baseStyle:        "epigraphAuthor"
         },
         {
-            "name":             "body",
-            "fontFamily":       "serif",
-            "fontSize":         "11.0pt",
-            "alignment":        "justified",
-            "firstLineIndent":  "1.5em",
-            "leading":          "1.3em"
+            name:             "body",
+            fontFamily:       "serif",
+            fontSize:         "11.0pt",
+            alignment:        "justified",
+            firstLineIndent:  "1.5em",
+            leading:          "1.3em"
         },
         {
-            "name":             "bodySubtitle",
-            "fontFamily":       "sansSerif",
-            "fontSize":         "13.0pt",
-            "fontStyle":        "bold",
-            "alignment":        "center",
-            "spacingBefore":    "0.3em",
-            "spacingAfter":     "0.3em"
+            name:             "bodySubtitle",
+            fontFamily:       "sansSerif",
+            fontSize:         "13.0pt",
+            fontStyle:        "bold",
+            alignment:        "center",
+            spacingBefore:    "0.3em",
+            spacingAfter:     "0.3em"
         }            
     ]
 }
