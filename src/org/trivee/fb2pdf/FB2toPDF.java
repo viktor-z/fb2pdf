@@ -50,8 +50,6 @@ public class FB2toPDF
     private void loadData()
         throws DocumentException, IOException, FB2toPDFException
     {
-        com.lowagie.text.pdf.hyphenation.Hyphenator.setHyphenDir(BASE_PATH + "/data");
-
         hyphen_ru = new HyphenationAuto("ru", "none", 2, 2);
 
         stylesheet = Stylesheet.readStylesheet(BASE_PATH + "/data/stylesheet.json");
