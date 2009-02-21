@@ -7,6 +7,7 @@
     <property name="build" location="build"/>
     <property name="lib" location="lib"/>
     <property name="src" location="src"/>
+    <property name="dist" location="dist"/>
 
     <path id="lib">
         <fileset dir="${lib}">
@@ -45,6 +46,18 @@
                 <path refid="lib"/>
             </classpath>
         </java>        
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${dist}"/>
+        <jar destfile="${dist}/fb2pdf.jar">
+            <fileset dir="${build}"
+                excludes="**/Test.class"/>
+        </jar>
+        <jar destfile="${dist}/fb2pdf-data.jar">
+            <fileset dir="."
+                includes="**/data/**"/>
+        </jar>
     </target>
 
 </project>

@@ -7,6 +7,9 @@ import java.util.LinkedList;
 import com.lowagie.text.DocumentException;
 
 import com.google.gson.*;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 public class Stylesheet
 {
@@ -59,6 +62,18 @@ public class Stylesheet
     public static Stylesheet readStylesheet(String filename)
         throws DocumentException, IOException, FB2toPDFException
     {
+        return readStylesheet(new FileReader(filename));
+    }
+
+    public static Stylesheet readStylesheet(InputStream stream)
+        throws DocumentException, IOException, FB2toPDFException
+    {
+        return readStylesheet(new InputStreamReader(stream));
+    }
+
+    public static Stylesheet readStylesheet(Reader reader)
+        throws DocumentException, IOException, FB2toPDFException
+    {
         Gson gson =
             Dimension.prepare(
             FontFamily.prepare(
@@ -68,7 +83,7 @@ public class Stylesheet
             .setPrettyPrinting()
             .create();
 
-        Stylesheet stylesheet = gson.fromJson(new FileReader(filename), Stylesheet.class);
+        Stylesheet stylesheet = gson.fromJson(reader, Stylesheet.class);
         return stylesheet;
     }
 

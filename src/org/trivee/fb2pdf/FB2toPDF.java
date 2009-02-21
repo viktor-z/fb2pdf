@@ -3,7 +3,6 @@ package org.trivee.fb2pdf;
 import java.io.*;
 import java.util.Vector;
 import java.util.StringTokenizer;
-import java.util.Properties;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipEntry;
 import org.xml.sax.SAXException;
@@ -20,10 +19,8 @@ import com.lowagie.text.Anchor;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Paragraph;
-import com.lowagie.text.Font;
 import com.lowagie.text.Image;
 
-import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.HyphenationAuto;
 import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.pdf.PdfAction;
@@ -50,9 +47,18 @@ public class FB2toPDF
     private void loadData()
         throws DocumentException, IOException, FB2toPDFException
     {
+        loadData(null);
+    }
+    private void loadData(InputStream stylesheetInputStream)
+        throws DocumentException, IOException, FB2toPDFException
+    {
         hyphen_ru = new HyphenationAuto("ru", "none", 2, 2);
 
-        stylesheet = Stylesheet.readStylesheet(BASE_PATH + "/data/stylesheet.json");
+        if (stylesheetInputStream == null)
+            stylesheet = Stylesheet.readStylesheet(BASE_PATH + "/data/stylesheet.json");
+        else
+            stylesheet = Stylesheet.readStylesheet(stylesheetInputStream);
+
     }
 
     private org.w3c.dom.Document fb2;
@@ -205,11 +211,11 @@ public class FB2toPDF
         return getTextContentByTagName(element, tagName, null, null);
     }
 
-    private void run()
+    private void run(InputStream stylesheetInputStream)
         throws IOException, DocumentException, FB2toPDFException, ParserConfigurationException, SAXException
     {
-        loadData();
-
+        loadData(stylesheetInputStream);
+ 
         readFB2();
         createPDFDoc();
 
@@ -1137,7 +1143,13 @@ public class FB2toPDF
     public static void translate(String fromName, String toName)
          throws DocumentException, IOException, FB2toPDFException, ParserConfigurationException, SAXException
     {
-        new FB2toPDF(fromName, toName).run();
+        translate(fromName, toName, null);
+    }
+
+    public static void translate(String fromName, String toName, InputStream stylesheet)
+         throws DocumentException, IOException, FB2toPDFException, ParserConfigurationException, SAXException
+    {
+        new FB2toPDF(fromName, toName).run(stylesheet);
     }
 
     public static void main(String [] args) 
