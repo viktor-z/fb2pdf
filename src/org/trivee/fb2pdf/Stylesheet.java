@@ -15,6 +15,7 @@ public class Stylesheet
 {
     private LinkedList<FontFamily> fontFamilies = new LinkedList<FontFamily>();
     private PageStyle pageStyle = new PageStyle();
+    private HyphenationSettings hyphenationSettings = new HyphenationSettings();
     private LinkedList<ParagraphStyle> paragraphStyles = new LinkedList<ParagraphStyle>();
 
     public Stylesheet()
@@ -39,6 +40,11 @@ public class Stylesheet
     public PageStyle getPageStyle()
     {
         return pageStyle;
+    }
+
+    public HyphenationSettings getHyphenationSettings()
+    {
+        return hyphenationSettings;
     }
 
     public ParagraphStyle getParagraphStyle(String name)
@@ -87,6 +93,7 @@ public class Stylesheet
         return stylesheet;
     }
 
+    @Override
     public String toString()
     {
         Gson gson =

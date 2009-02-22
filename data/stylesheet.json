@@ -23,6 +23,11 @@
         marginTop:    "2.0mm",
         marginBottom: "2.0mm"
     },
+    hyphenationSettings: {
+        defaultLanguage:	"ru",
+        defaultCountry: 	"none",
+        hyphenate: 	  		"true"
+    },
     paragraphStyles: [
         {
             name:             "default",

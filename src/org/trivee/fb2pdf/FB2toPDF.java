@@ -40,24 +40,21 @@ public class FB2toPDF
         this.toName   = toName;
     }
 
-    private HyphenationAuto hyphen_ru;
+    private HyphenationAuto hyphenation;
 
     private Stylesheet stylesheet;
 
-    private void loadData()
-        throws DocumentException, IOException, FB2toPDFException
-    {
-        loadData(null);
-    }
     private void loadData(InputStream stylesheetInputStream)
         throws DocumentException, IOException, FB2toPDFException
     {
-        hyphen_ru = new HyphenationAuto("ru", "none", 2, 2);
-
         if (stylesheetInputStream == null)
             stylesheet = Stylesheet.readStylesheet(BASE_PATH + "/data/stylesheet.json");
         else
             stylesheet = Stylesheet.readStylesheet(stylesheetInputStream);
+
+        HyphenationSettings hyphSettings = stylesheet.getHyphenationSettings();
+        if (hyphSettings.hyphenate)
+            hyphenation = new HyphenationAuto(hyphSettings.defaultLanguage, hyphSettings.defaultCountry, 2, 2);
 
     }
 
@@ -1025,7 +1022,7 @@ public class FB2toPDF
                 if (currentChunk == null)
                 {
                     currentChunk = currentStyle.createChunk();
-                    currentChunk.setHyphenation(hyphen_ru);
+                    currentChunk.setHyphenation(hyphenation);
                 }
 
                 String text = node.getTextContent();
