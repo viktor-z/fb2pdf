@@ -25,8 +25,8 @@
     },
     hyphenationSettings: {
         defaultLanguage:	"ru",
-        defaultCountry: 	"none",
-        hyphenate: 	  		"true"
+        hyphenate: 	  		"true",
+        overrideLanguage:	"false"
     },
     paragraphStyles: [
         {

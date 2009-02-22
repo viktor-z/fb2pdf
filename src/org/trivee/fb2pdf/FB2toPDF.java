@@ -51,11 +51,6 @@ public class FB2toPDF
             stylesheet = Stylesheet.readStylesheet(BASE_PATH + "/data/stylesheet.json");
         else
             stylesheet = Stylesheet.readStylesheet(stylesheetInputStream);
-
-        HyphenationSettings hyphSettings = stylesheet.getHyphenationSettings();
-        if (hyphSettings.hyphenate)
-            hyphenation = new HyphenationAuto(hyphSettings.defaultLanguage, hyphSettings.defaultCountry, 2, 2);
-
     }
 
     private org.w3c.dom.Document fb2;
@@ -227,6 +222,7 @@ public class FB2toPDF
         org.w3c.dom.Element description = getOptionalChildByTagName(root, "description");
         if (description != null)
         {
+            setupHyphenation(description);
             addMetaInfo(description);
             doc.open();
             processDescription(description);
@@ -1164,5 +1160,37 @@ public class FB2toPDF
         {
             e.printStackTrace();
         }
+    }
+
+
+    private String getLang(org.w3c.dom.Element description) throws FB2toPDFException
+    {
+        org.w3c.dom.Element titleInfo = getOptionalChildByTagName(description, "title-info");
+        if (titleInfo != null)
+        {
+            org.w3c.dom.Element lang = getOptionalChildByTagName(titleInfo, "lang");
+            if (lang != null)
+            {
+                String langString = lang.getTextContent();
+                System.out.println("Language of the FB2: " + langString);
+                return langString;
+            }
+        }
+       System.out.println("Language of the FB2 not found");
+       return null; 
+    }
+
+    private void setupHyphenation(org.w3c.dom.Element description) throws FB2toPDFException {
+        HyphenationSettings hyphSettings = stylesheet.getHyphenationSettings();
+        if (hyphSettings.hyphenate) {
+            System.out.println("Hyphenation is on");
+            String bookLang = getLang(description);
+            if (bookLang == null || bookLang.trim().isEmpty() || hyphSettings.overrideLanguage)
+                bookLang = hyphSettings.defaultLanguage;
+            hyphenation = new HyphenationAuto(bookLang, "none", 2, 2);
+            System.out.println("Hyphenation language is: " + bookLang);
+        }
+        else
+            System.out.println("Hyphenation is off");
     }
 }
