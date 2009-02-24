@@ -25,6 +25,9 @@ import com.lowagie.text.pdf.HyphenationAuto;
 import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.pdf.PdfAction;
 
+import com.lowagie.text.pdf.PdfContentByte;
+import com.lowagie.text.pdf.PdfDestination;
+import com.lowagie.text.pdf.PdfOutline;
 import org.apache.commons.codec.binary.Base64;
 
 public class FB2toPDF
@@ -265,7 +268,7 @@ public class FB2toPDF
             this.contentType = binary.getAttribute("content-type");
             this.data        = Base64.decodeBase64(binary.getTextContent().getBytes());
 
-            System.err.println("Loaded binary " + this.href + " (" + this.contentType + ")");
+            System.out.println("Loaded binary " + this.href + " (" + this.contentType + ")");
         }
 
         public String getHREF()
@@ -495,7 +498,7 @@ public class FB2toPDF
 
     private Image getImage(String href)
     {
-        System.err.println("Loading image at " + href);
+        System.out.println("Loading image at " + href);
         for (int i = 0; i < attachments.size(); ++i)
         {
             BinaryAttachment attachment = attachments.elementAt(i);
@@ -564,7 +567,7 @@ public class FB2toPDF
             if(ref.isEmpty())
                 ref = "section" + i;
             anchor.setReference("#" + ref);
-            System.err.println("Adding A HREF=#" + ref);
+            System.out.println("Adding A HREF=#" + ref);
 
             Paragraph para = tocItemStyle.createParagraph();
             para.add(anchor);
@@ -588,11 +591,23 @@ public class FB2toPDF
 
     }
 
+    private void addBookmark(String title)
+    {
+        System.out.println("Adding bookmark: " + transliterate(title));
+        PdfContentByte cb = writer.getDirectContent();
+        PdfDestination destination = new PdfDestination(PdfDestination.FITH);
+        new PdfOutline(cb.getRootOutline(), destination, transliterate(title));
+    }
+
     private void processSection(org.w3c.dom.Element section, int level, int index)
         throws DocumentException, FB2toPDFException
     {
         if (level == 0)
+        {
             doc.newPage();
+            if (bodyIndex == 0)
+                addBookmark(getTextContentByTagName(section, "title"));
+        }
         else if (level == 1)
         {
             if (writer.getVerticalPosition(false) < doc.getPageSize().getHeight() * 0.5f)
@@ -609,7 +624,7 @@ public class FB2toPDF
             Anchor anchor = currentStyle.createInvisibleAnchor();
             anchor.setName(id);
             doc.add(anchor);
-            System.err.println("Adding A NAME=" + id);
+            System.out.println("Adding A NAME=" + id);
         }
 
 /* XXX TODO
@@ -909,7 +924,7 @@ public class FB2toPDF
                     //Unlike Anchor, Action won't fail even when local destination does not exist
                     String refname = currentReference.substring(1); //getting rid of "#" at the begin of the reference
                     PdfAction action = PdfAction.gotoLocalPage(refname, false);
-                    System.err.println("Adding Action LocalGoTo " + refname);
+                    System.out.println("Adding Action LocalGoTo " + refname);
                     currentChunk.setAction(action);
                     currentParagraph.add(currentChunk);
                 }
@@ -918,7 +933,7 @@ public class FB2toPDF
                     Anchor anchor = currentStyle.createAnchor();
                     anchor.add(currentChunk);
                     anchor.setReference(currentReference);
-                    System.err.println("Adding A HREF=" + currentReference);
+                    System.out.println("Adding A HREF=" + currentReference);
                     currentParagraph.add(anchor);
                 }
             }
@@ -974,7 +989,7 @@ public class FB2toPDF
                         Anchor anchor = currentStyle.createInvisibleAnchor();
                         anchor.setName(citeId);
                         currentParagraph.add(anchor);
-                        System.err.println("Adding A NAME=" + citeId);
+                        System.out.println("Adding A NAME=" + citeId);
                     }
                     processParagraphContent(child);
                     flushCurrentChunk();
@@ -1151,7 +1166,7 @@ public class FB2toPDF
         {
             if(args.length < 2)
             {
-                System.err.println("Usage: java " + FB2toPDF.class.getName() + " <input.fb2> <output.pdf>");
+                System.out.println("Usage: java " + FB2toPDF.class.getName() + " <input.fb2> <output.pdf>");
                 return;
             }
             translate(args[0], args[1]);
