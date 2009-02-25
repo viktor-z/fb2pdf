@@ -53,6 +53,10 @@
         <jar destfile="${dist}/fb2pdf.jar">
             <fileset dir="${build}"
                 excludes="**/Test.class"/>
+            <manifest>
+                <attribute name="Main-Class" value="org.trivee.fb2pdf.FB2toPDF"/>
+                <attribute name="Class-Path" value="itext-2.1.4.jar commons-codec-1.3.jar gson-1.3.jar fb2pdf-data.jar itext-hyph-xml.jar"/>
+            </manifest>
         </jar>
         <jar destfile="${dist}/fb2pdf-data.jar">
             <fileset dir="."
