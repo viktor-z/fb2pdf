@@ -1,4 +1,7 @@
 {
+    generalSettings: {
+        transliterateMetaInfo:	"true"
+    },
     fontFamilies: [
         {
             name:         "sansSerif",

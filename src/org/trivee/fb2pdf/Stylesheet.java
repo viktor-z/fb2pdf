@@ -16,6 +16,7 @@ public class Stylesheet
     private LinkedList<FontFamily> fontFamilies = new LinkedList<FontFamily>();
     private PageStyle pageStyle = new PageStyle();
     private HyphenationSettings hyphenationSettings = new HyphenationSettings();
+    private GeneralSettings generalSettings = new GeneralSettings();
     private LinkedList<ParagraphStyle> paragraphStyles = new LinkedList<ParagraphStyle>();
 
     public Stylesheet()
@@ -45,6 +46,11 @@ public class Stylesheet
     public HyphenationSettings getHyphenationSettings()
     {
         return hyphenationSettings;
+    }
+
+    public GeneralSettings getGeneralSettings()
+    {
+        return generalSettings;
     }
 
     public ParagraphStyle getParagraphStyle(String name)

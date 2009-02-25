@@ -1128,8 +1128,11 @@ public class FB2toPDF
         {"\u0490", "G"},
     };
 
-    private static String transliterate(String text)
+    private String transliterate(String text)
     {
+        if (!stylesheet.getGeneralSettings().transliterateMetaInfo)
+            return text;
+
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < text.length(); ++i)
         {
