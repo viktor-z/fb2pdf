@@ -17,8 +17,14 @@ public class FontFamily
         private FontInfo(String filename)
             throws DocumentException, IOException
         {
+            this(filename, BaseFont.IDENTITY_H);
+        }
+
+        private FontInfo(String filename, String encoding)
+            throws DocumentException, IOException
+        {
             this.filename = filename;
-            this.font = BaseFont.createFont(filename, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            this.font = BaseFont.createFont(filename, encoding, BaseFont.EMBEDDED);
         }
     };
 
@@ -30,7 +36,13 @@ public class FontFamily
         {
             try
             {
-                return new FontInfo(json.getAsString());
+                String[] parts = json.getAsString().split("#");
+                String filename = parts[0];
+                String encoding = parts.length > 1 ? parts[1] : null;
+                if (encoding == null)
+                    return new FontInfo(filename);
+                else
+                    return new FontInfo(filename, encoding);
             }
             catch(IOException ioe)
             {
@@ -46,6 +58,7 @@ public class FontFamily
         {
             return new JsonPrimitive(fontInfo.filename);
         }
+
     }
 
     public static GsonBuilder prepare(GsonBuilder gsonBuilder)
