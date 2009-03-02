@@ -5,6 +5,7 @@ import java.util.Vector;
 import java.util.StringTokenizer;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipEntry;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -25,7 +26,6 @@ import com.lowagie.text.pdf.HyphenationAuto;
 import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.pdf.PdfAction;
 
-import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfDestination;
 import com.lowagie.text.pdf.PdfOutline;
 import org.apache.commons.codec.binary.Base64;
@@ -46,6 +46,25 @@ public class FB2toPDF
     private HyphenationAuto hyphenation;
 
     private Stylesheet stylesheet;
+
+    private String getSequenceSubtitle(Element seq)
+    {
+        String seqname = seq.getAttribute("name");
+        String seqnumber = seq.getAttribute("number");
+        String subtitle = "";
+        if (isNotNullOrEmpty(seqname))
+            subtitle += seqname;
+        if (isNotNullOrEmpty(seqnumber))
+            subtitle += " #" + seqnumber;
+        if (isNotNullOrEmpty(subtitle))
+            subtitle = "(" + subtitle + ")";
+        return subtitle;
+    }
+
+    private boolean isNotNullOrEmpty(String str)
+    {
+        return str != null && !str.trim().isEmpty();
+    }
 
     private void loadData(InputStream stylesheetInputStream)
         throws DocumentException, IOException, FB2toPDFException
@@ -380,22 +399,26 @@ public class FB2toPDF
             }
 
             org.w3c.dom.Element bookTitle = getOptionalChildByTagName(titleInfo, "book-title");
-            org.w3c.dom.Element sequence = getOptionalChildByTagName(titleInfo, "sequence");
+            ElementCollection sequences = ElementCollection.childrenByTagName(titleInfo, "sequence");
 
-            if (bookTitle != null && sequence == null)
+            if (bookTitle != null && sequences.getLength() == 0)
             {
                 String titleString = bookTitle.getTextContent();
                 doc.addTitle(transliterate(titleString));
                 System.out.println("Adding title: " + transliterate(titleString));
             }
-            else if (bookTitle != null && sequence != null)
+            else if (bookTitle != null && sequences.getLength() != 0)
             {
-                String titleString = bookTitle.getTextContent();
-                String subtitle = "(" + sequence.getAttribute("name") + " #" + sequence.getAttribute("number") + ")";
+                for(int i = 0; i < sequences.getLength(); i++)
+                {
+                    String subtitle = getSequenceSubtitle(sequences.item(i));
+                    doc.addTitle(transliterate(subtitle));
+                    System.out.println("Adding subtitle: " + transliterate(subtitle));
+                }
 
+                String titleString = bookTitle.getTextContent();
                 doc.addTitle(transliterate(titleString));
                 System.out.println("Adding title: " + transliterate(titleString));
-                doc.addTitle(transliterate(subtitle));
             }
         }
     }
@@ -466,22 +489,24 @@ public class FB2toPDF
             }
 
             org.w3c.dom.Element bookTitle = getOptionalChildByTagName(titleInfo, "book-title");
-            org.w3c.dom.Element sequence = getOptionalChildByTagName(titleInfo, "sequence");
+            ElementCollection sequences = ElementCollection.childrenByTagName(titleInfo, "sequence");
 
-            if (bookTitle != null && sequence == null)
+            if (bookTitle != null && sequences.getLength() == 0)
             {
                 addLine(" ", titleStyle);
                 addLine(bookTitle.getTextContent(), titleStyle);
                 addLine(" ", titleStyle);
             }
-            else if (bookTitle != null && sequence != null)
+            else if (bookTitle != null && sequences.getLength() != 0)
             {
-                String subtitle = "(" + sequence.getAttribute("name") + " #" + sequence.getAttribute("number") + ")";
-
                 addLine(" ", titleStyle);
                 addLine(bookTitle.getTextContent(), titleStyle);
-                addLine(subtitle,                   subtitleStyle);
-                addLine(" ", titleStyle);
+                for(int i = 0; i < sequences.getLength(); i++)
+                {
+                    String subtitle = getSequenceSubtitle(sequences.item(i));
+                    addLine(subtitle, subtitleStyle);
+                    addLine(" ", titleStyle);
+                }
             }
 
             org.w3c.dom.Element annotation = getOptionalChildByTagName(titleInfo, "annotation");
