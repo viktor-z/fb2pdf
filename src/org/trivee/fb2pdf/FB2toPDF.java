@@ -28,6 +28,7 @@ import com.lowagie.text.pdf.PdfAction;
 
 import com.lowagie.text.pdf.PdfDestination;
 import com.lowagie.text.pdf.PdfOutline;
+import java.lang.reflect.Array;
 import org.apache.commons.codec.binary.Base64;
 
 public class FB2toPDF
@@ -380,7 +381,7 @@ public class FB2toPDF
         String firstName = getTextContentByTagName(author, "first-name");
         String middleName = getTextContentByTagName(author, "middle-name");
         String lastName = getTextContentByTagName(author, "last-name");
-        return String.format("%s %s %s", firstName, middleName, lastName);
+        return String.format("%s %s %s", firstName, middleName, lastName).trim();
     }
     
     private void addMetaInfo(org.w3c.dom.Element description)
@@ -390,13 +391,21 @@ public class FB2toPDF
         if (titleInfo != null)
         {
             ElementCollection authors = ElementCollection.childrenByTagName(titleInfo, "author");
+            StringBuilder allAuthors = new StringBuilder();
             for (int i = 0; i < authors.getLength(); ++i)
             {
                 org.w3c.dom.Element author = authors.item(i);
                 String authorName = getAuthorFullName(author);
                 System.out.println("Adding author: " + transliterate(authorName));
                 doc.addAuthor(transliterate(authorName));
+
+                if(allAuthors.length() > 0)
+                    allAuthors.append(", ");
+                allAuthors.append(transliterate(authorName));
             }
+
+            if (allAuthors.length() > 0)
+                doc.addAuthor(allAuthors.toString());
 
             org.w3c.dom.Element bookTitle = getOptionalChildByTagName(titleInfo, "book-title");
             ElementCollection sequences = ElementCollection.childrenByTagName(titleInfo, "sequence");
