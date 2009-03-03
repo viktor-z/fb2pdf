@@ -28,7 +28,6 @@ import com.lowagie.text.pdf.PdfAction;
 
 import com.lowagie.text.pdf.PdfDestination;
 import com.lowagie.text.pdf.PdfOutline;
-import java.lang.reflect.Array;
 import org.apache.commons.codec.binary.Base64;
 
 public class FB2toPDF
@@ -53,18 +52,18 @@ public class FB2toPDF
         String seqname = seq.getAttribute("name");
         String seqnumber = seq.getAttribute("number");
         String subtitle = "";
-        if (isNotNullOrEmpty(seqname))
+        if (!isNullOrEmpty(seqname))
             subtitle += seqname;
-        if (isNotNullOrEmpty(seqnumber))
+        if (!isNullOrEmpty(seqnumber))
             subtitle += " #" + seqnumber;
-        if (isNotNullOrEmpty(subtitle))
+        if (!isNullOrEmpty(subtitle))
             subtitle = "(" + subtitle + ")";
         return subtitle;
     }
 
-    private boolean isNotNullOrEmpty(String str)
+    private boolean isNullOrEmpty(String str)
     {
-        return str != null && !str.trim().isEmpty();
+        return str == null || str.trim().length() == 0;
     }
 
     private void loadData(InputStream stylesheetInputStream)
@@ -599,7 +598,7 @@ public class FB2toPDF
             Anchor anchor = tocItemStyle.createAnchor();
             anchor.add(chunk);
             String ref = section.getAttribute("id");
-            if(ref.isEmpty())
+            if(isNullOrEmpty(ref))
                 ref = "section" + i;
             anchor.setReference("#" + ref);
             System.out.println("Adding A HREF=#" + ref);
@@ -960,7 +959,7 @@ public class FB2toPDF
     {
         if (currentChunk != null)
         {
-            if (currentReference != null && !currentReference.isEmpty())
+            if (!isNullOrEmpty(currentReference))
             {
                 if (currentReference.charAt(0) == '#')
                 {
@@ -1246,7 +1245,7 @@ public class FB2toPDF
         if (hyphSettings.hyphenate) {
             System.out.println("Hyphenation is on");
             String bookLang = getLang(description);
-            if (bookLang == null || bookLang.trim().isEmpty() || hyphSettings.overrideLanguage)
+            if (isNullOrEmpty(bookLang) || hyphSettings.overrideLanguage)
                 bookLang = hyphSettings.defaultLanguage;
             hyphenation = new HyphenationAuto(bookLang, "none", 2, 2);
             System.out.println("Hyphenation language is: " + bookLang);
