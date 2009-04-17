@@ -568,7 +568,8 @@ public class FB2toPDF
         // XXX TODO processEpigraphs(body);
 
         currentStyle = stylesheet.getParagraphStyle("body");
-        processSections(body);
+        //processSections(body);
+        processSectionContent(body, -1);
         currentStyle = null;
     }
 
@@ -612,6 +613,7 @@ public class FB2toPDF
         doc.newPage();
     }
 
+    /*
     private void processSections(org.w3c.dom.Element body)
         throws DocumentException, FB2toPDFException
     {
@@ -624,6 +626,7 @@ public class FB2toPDF
         }
 
     }
+     */
 
     private PdfOutline addBookmark(String title)
     {
