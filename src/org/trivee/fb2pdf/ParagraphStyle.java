@@ -155,6 +155,7 @@ public class ParagraphStyle
     private Dimension lastSpacingAfter;
     private Dimension leftIndent;
     private Dimension firstLineIndent;
+    private Boolean disableHyphenation;
 
     private String text;
     
@@ -230,6 +231,19 @@ public class ParagraphStyle
             return baseStyle.getFontSize();
 
         throw new FB2toPDFException("Font size for style " + name + " not defined.");
+    }
+
+    public boolean getDisableHyphenation()
+        throws FB2toPDFException
+    {
+        if (disableHyphenation != null)
+            return disableHyphenation;
+
+        ParagraphStyle baseStyle = getBaseStyle();
+        if (baseStyle != null)
+            return baseStyle.getDisableHyphenation();
+
+        return new Boolean(false);
     }
 
     public void toggleBold()

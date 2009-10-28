@@ -1079,7 +1079,9 @@ public class FB2toPDF
                 if (currentChunk == null)
                 {
                     currentChunk = currentStyle.createChunk();
-                    currentChunk.setHyphenation(hyphenation);
+                    if (!currentStyle.getDisableHyphenation()) {
+                        currentChunk.setHyphenation(hyphenation);
+                    }
                 }
 
                 String text = node.getTextContent();
