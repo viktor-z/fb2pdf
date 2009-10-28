@@ -169,6 +169,7 @@ public class FB2toPDF
         return children.item(0);
     }
 
+    /*
     private static String fixCharacters(String text)
     {
         StringBuffer sb = new StringBuffer();
@@ -181,6 +182,7 @@ public class FB2toPDF
         }
         return sb.toString();
     }
+     */
 
     private static String removeExtraWhitespace(String text, boolean startWithSpace)
     {
@@ -212,7 +214,8 @@ public class FB2toPDF
         }
         if (sb.length() > 0 && suffix != null)
             sb.append(suffix);
-        return removeExtraWhitespace(fixCharacters(sb.toString()), prefix != null && prefix.length() > 0 && prefix.charAt(0) == ' ');
+        //return removeExtraWhitespace(fixCharacters(sb.toString()), prefix != null && prefix.length() > 0 && prefix.charAt(0) == ' ');
+        return removeExtraWhitespace(sb.toString(), prefix != null && prefix.length() > 0 && prefix.charAt(0) == ' ');
     }
 
     private static String getTextContentByTagName(org.w3c.dom.Element element, String tagName, String prefix)
@@ -565,8 +568,6 @@ public class FB2toPDF
     private void processBody(org.w3c.dom.Element body)
         throws DocumentException, FB2toPDFException
     {
-        // XXX TODO processEpigraphs(body);
-
         currentStyle = stylesheet.getParagraphStyle("body");
         //processSections(body);
         processSectionContent(body, -1);
@@ -1082,7 +1083,8 @@ public class FB2toPDF
                 }
 
                 String text = node.getTextContent();
-                currentChunk.append(fixCharacters(text));
+                //currentChunk.append(fixCharacters(text));
+                currentChunk.append(text);
             }
         }
     }
