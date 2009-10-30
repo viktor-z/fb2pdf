@@ -169,7 +169,6 @@ public class FB2toPDF
         return children.item(0);
     }
 
-    /*
     private static String fixCharacters(String text)
     {
         StringBuffer sb = new StringBuffer();
@@ -182,7 +181,6 @@ public class FB2toPDF
         }
         return sb.toString();
     }
-     */
 
     private static String removeExtraWhitespace(String text, boolean startWithSpace)
     {
@@ -214,8 +212,7 @@ public class FB2toPDF
         }
         if (sb.length() > 0 && suffix != null)
             sb.append(suffix);
-        //return removeExtraWhitespace(fixCharacters(sb.toString()), prefix != null && prefix.length() > 0 && prefix.charAt(0) == ' ');
-        return removeExtraWhitespace(sb.toString(), prefix != null && prefix.length() > 0 && prefix.charAt(0) == ' ');
+        return removeExtraWhitespace(fixCharacters(sb.toString()), prefix != null && prefix.length() > 0 && prefix.charAt(0) == ' ');
     }
 
     private static String getTextContentByTagName(org.w3c.dom.Element element, String tagName, String prefix)
@@ -335,7 +332,7 @@ public class FB2toPDF
         throws FB2toPDFException, DocumentException
     {
         Chunk chunk = style.createChunk();
-        chunk.append(text);
+        chunk.append(TypographyPrettifier.process(text));
         Paragraph para = style.createParagraph();
         para.add(chunk);
         doc.add(para);
@@ -595,7 +592,7 @@ public class FB2toPDF
                 title = "#" + (i+1);
 
             Chunk chunk = tocItemStyle.createChunk();
-            chunk.append(title);
+            chunk.append(TypographyPrettifier.process(title));
 
             Anchor anchor = tocItemStyle.createAnchor();
             anchor.add(chunk);
@@ -1086,7 +1083,7 @@ public class FB2toPDF
 
                 String text = node.getTextContent();
                 //currentChunk.append(fixCharacters(text));
-                currentChunk.append(text);
+                currentChunk.append(TypographyPrettifier.process(text));
             }
         }
     }
