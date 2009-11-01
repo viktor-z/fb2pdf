@@ -332,7 +332,7 @@ public class FB2toPDF
         throws FB2toPDFException, DocumentException
     {
         Chunk chunk = style.createChunk();
-        chunk.append(TypographyPrettifier.process(text));
+        chunk.append(TextPreprocessor.process(text, stylesheet.getTextPreprocessorSettings()));
         Paragraph para = style.createParagraph();
         para.add(chunk);
         doc.add(para);
@@ -592,7 +592,7 @@ public class FB2toPDF
                 title = "#" + (i+1);
 
             Chunk chunk = tocItemStyle.createChunk();
-            chunk.append(TypographyPrettifier.process(title));
+            chunk.append(TextPreprocessor.process(title, stylesheet.getTextPreprocessorSettings()));
 
             Anchor anchor = tocItemStyle.createAnchor();
             anchor.add(chunk);
@@ -1083,7 +1083,7 @@ public class FB2toPDF
 
                 String text = node.getTextContent();
                 //currentChunk.append(fixCharacters(text));
-                currentChunk.append(TypographyPrettifier.process(text));
+                currentChunk.append(TextPreprocessor.process(text, stylesheet.getTextPreprocessorSettings()));
             }
         }
     }
