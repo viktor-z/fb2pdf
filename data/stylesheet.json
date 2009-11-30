@@ -1,14 +1,15 @@
 {
     generalSettings: {
-        transliterateMetaInfo:	"true"
+        transliterateMetaInfo:	"true",
+        imageDpi: 166
     },
     fontFamilies: [
         {
             name:         "sansSerif",
-            regular:      "./data/arial.ttf",
-            bold:         "./data/arialbd.ttf",
-            italic:       "./data/ariali.ttf",
-            boldItalic:   "./data/arialbi.ttf"
+            regular:      "./data/verdana.ttf",
+            bold:         "./data/verdanab.ttf",
+            italic:       "./data/verdanai.ttf",
+            boldItalic:   "./data/verdanaz.ttf"
         },
         {
             name:         "serif",
@@ -21,15 +22,29 @@
     pageStyle: {
         pageWidth:    "88.2mm",
         pageHeight:   "115.4mm",
-        marginLeft:   "2.0mm",
-        marginRight:  "2.0mm",
-        marginTop:    "2.0mm",
-        marginBottom: "2.0mm"
+        marginLeft:   "1.0mm",
+        marginRight:  "1.0mm",
+        marginTop:    "1.0mm",
+        marginBottom: "1.0mm"
     },
     hyphenationSettings: {
         defaultLanguage:	"ru",
         hyphenate: 	  		"true",
         overrideLanguage:	"false"
+    },
+    textPreprocessorSettings: {
+        enabled:					"true",
+        makeEndUnbreakable:			"true",
+        makeReplacements:			"true",
+        replacementsMap: {
+                " \u2012 ": "\u00A0\u2012 ",
+                " \u2013 ": "\u00A0\u2013 ",
+                " \u2014 ": "\u00A0\u2014 ",
+                " \u2015 ": "\u00A0\u2015 ",
+                " \u2212 ": "\u00A0\u2212 ",
+                " \u2010 ": "\u00A0\u2010 ",
+                " \u002D ": "\u00A0\u002D " 
+		}
     },
     paragraphStyles: [
         {
@@ -46,6 +61,7 @@
         {
             name:             "title",
             baseStyle:        "default",
+            fontStyle:        "bold",
             fontSize:         "16.0pt",
             alignment:        "center"
         },
@@ -80,8 +96,8 @@
         {
             name:             "annotation",
             baseStyle:        "default",
-            fontSize:         "11.0pt",
-            fontStyle:        "italic",
+            fontFamily:       "serif",
+            fontSize:         "9.0pt",
             alignment:        "justified",
             firstSpacingBefore:   "0.3em",
             spacingAfter:     "0.3em"
@@ -91,10 +107,9 @@
             baseStyle:        "default",
             fontSize:         "16.0pt",
             fontStyle:        "bold",
-            alignment:        "left",
-            spacingBefore:        "0.3em",
-            firstSpacingBefore:   "0.6em",
-            lastSpacingAfter:     "0.6em"
+            alignment:        "center",
+            lastSpacingAfter:     "0.6em",
+            disableHyphenation: "true"
         },
         {
             name:             "subSectionTitle",
@@ -102,14 +117,17 @@
             fontSize:         "14.0pt",
             fontStyle:        "bold",
             alignment:        "center",
-            spacingBefore:    "0.3em",
-            spacingAfter:     "0.3em"
+            spacingBefore:        "0.3em",
+            firstSpacingBefore:   "0.6em",
+            lastSpacingAfter:     "0.6em",
+            disableHyphenation: "true"
         },
         {
             name:             "subSubSectionTitle",
             baseStyle:        "default",
             fontSize:         "12.0pt",
-            fontStyle:        "bold"
+            fontStyle:        "bold",
+            disableHyphenation: "true"
         },
         {
             name:             "poem",
@@ -132,8 +150,7 @@
         },
         {
             name:             "epigraphAuthor",
-            baseStyle:        "epigraph",
-            fontStyle:        "regular"
+            baseStyle:        "epigraph"
         },
         {
             name:             "cite",
@@ -149,7 +166,7 @@
             fontSize:         "11.0pt",
             alignment:        "justified",
             firstLineIndent:  "1.5em",
-            leading:          "1.3em"
+            leading:          "1.2em"
         },
         {
             name:             "bodySubtitle",

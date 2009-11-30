@@ -5,6 +5,7 @@ import java.util.Vector;
 import java.util.StringTokenizer;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipEntry;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 import org.w3c.dom.Node;
@@ -46,6 +47,29 @@ public class FB2toPDF
     private HyphenationAuto hyphenation;
 
     private Stylesheet stylesheet;
+
+    private void addImage(Element element) throws DocumentException, DOMException {
+        String href = element.getAttributeNS(NS_XLINK, "href");
+        Image image = getImage(href);
+        if (image != null) {
+            Rectangle pageSize = doc.getPageSize();
+            float dpi = stylesheet.getGeneralSettings().imageDpi;
+
+            float scaleWidth = (pageSize.getWidth() - doc.leftMargin() - doc.rightMargin()) * 0.95f;
+            float scaleHeight = (pageSize.getHeight() - doc.topMargin() - doc.bottomMargin()) * 0.95f;
+            float imgWidth = image.getWidth() / dpi * 72;
+            float imgHeight = image.getHeight() / dpi * 72;
+            if ((imgWidth <= scaleWidth) && (imgHeight <= scaleHeight)) {
+                scaleWidth = imgWidth;
+                scaleHeight = imgHeight;
+            }
+            image.scaleToFit(scaleWidth, scaleHeight);
+            image.setAlignment(Image.MIDDLE);
+            doc.add(image);
+        } else {
+            System.out.println("Image not found, href: " + href);
+        }
+    }
 
     private String getSequenceSubtitle(Element seq)
     {
@@ -738,21 +762,7 @@ public class FB2toPDF
             }
             else if (element.getTagName().equals("image"))
             {
-                String href = element.getAttributeNS(NS_XLINK, "href");
-                Image image = getImage(href);
-                if (image != null)
-                {
-                    Rectangle pageSize = doc.getPageSize();
-                    image.scaleToFit(
-                        (pageSize.getWidth() - doc.leftMargin() - doc.rightMargin()) / 2.0f,
-                        (pageSize.getHeight() - doc.topMargin() - doc.bottomMargin()) / 2.0f);
-                    image.setAlignment(Image.MIDDLE);
-                    doc.add(image);
-                }
-                else
-                {
-                    System.out.println("Image not found, href: " + href);
-                }
+                addImage(element);
             }
             else if (element.getTagName().equals("poem"))
             {
@@ -1044,7 +1054,12 @@ public class FB2toPDF
                     System.out.println("Style tag " + styleName + " ignored.");
                     processParagraphContent(child);
                 }
-                else {
+                else if (child.getTagName().equals("image"))
+                {
+                    addImage(child);
+                }
+                else
+                {
 /*
             elif s.tagName == "strikethrough":
                 res += u'\\sout{' + par(s,intitle) + u'}'
