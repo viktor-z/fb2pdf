@@ -292,6 +292,7 @@ public class FB2toPDF
             body = (org.w3c.dom.Element)bodies.item(i);
             bodyIndex = i;
             processBody(body);
+            doc.newPage();
         }
 
         closePDF();        
