@@ -15,20 +15,20 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.BadElementException;
-import com.lowagie.text.Anchor;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.Chunk;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.Image;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.BadElementException;
+import com.itextpdf.text.Anchor;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Image;
 
-import com.lowagie.text.pdf.HyphenationAuto;
-import com.lowagie.text.pdf.PdfWriter;
-import com.lowagie.text.pdf.PdfAction;
+import com.itextpdf.text.pdf.HyphenationAuto;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.PdfAction;
 
-import com.lowagie.text.pdf.PdfDestination;
-import com.lowagie.text.pdf.PdfOutline;
+import com.itextpdf.text.pdf.PdfDestination;
+import com.itextpdf.text.pdf.PdfOutline;
 import org.apache.commons.codec.binary.Base64;
 
 public class FB2toPDF
@@ -100,7 +100,7 @@ public class FB2toPDF
     }
 
     private org.w3c.dom.Document fb2;
-    private com.lowagie.text.Document doc;
+    private com.itextpdf.text.Document doc;
     private PdfWriter writer;
 
     private void readFB2()
@@ -158,7 +158,7 @@ public class FB2toPDF
 
         Rectangle pageSize = new Rectangle(ps.getPageWidth(), ps.getPageHeight());
 
-        doc = new com.lowagie.text.Document(pageSize,
+        doc = new com.itextpdf.text.Document(pageSize,
             ps.getMarginLeft(), ps.getMarginRight(),
             ps.getMarginTop(), ps.getMarginBottom());
 
@@ -565,6 +565,11 @@ public class FB2toPDF
                 continue;
             try
             {
+                /*
+                Toolkit toolkit = Toolkit.getDefaultToolkit();
+                java.awt.Image img = toolkit.createImage(attachment.getData());
+                return Image.getInstance(img, Color.WHITE);
+                 */
                 return Image.getInstance(attachment.getData());
             }
             catch (BadElementException e)

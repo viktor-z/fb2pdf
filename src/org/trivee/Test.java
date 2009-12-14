@@ -10,7 +10,7 @@ public class Test {
         throws DocumentException, IOException, FileNotFoundException
     {
         // step 1: creation of a document-object
-        com.lowagie.text.Document document = openITextDocument("HelloWorld.pdf");
+        com.itextpdf.text.Document document = openITextDocument("HelloWorld.pdf");
 
         // step 4: we add a paragraph to the document
 
@@ -18,7 +18,7 @@ public class Test {
             "Cp1251", BaseFont.EMBEDDED);
         Font font = new Font(bf, 9);
 
-        com.lowagie.text.pdf.hyphenation.Hyphenator.setHyphenDir(".");
+        com.itextpdf.text.pdf.hyphenation.Hyphenator.setHyphenDir(".");
         HyphenationAuto auto = new HyphenationAuto("ru", "none", 2, 2);
 
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("input.txt"), "Cp1251"));

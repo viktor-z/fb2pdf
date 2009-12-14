@@ -3,11 +3,11 @@ package org.trivee.fb2pdf;
 import java.lang.reflect.Type;
 import com.google.gson.*;
 
-import com.lowagie.text.Anchor;
-import com.lowagie.text.Chunk;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.Font;
-import com.lowagie.text.pdf.BaseFont;
+import com.itextpdf.text.Anchor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.pdf.BaseFont;
 
 public class ParagraphStyle
 {

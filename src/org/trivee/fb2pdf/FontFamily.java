@@ -1,8 +1,8 @@
 package org.trivee.fb2pdf;
 
 import java.io.IOException;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.pdf.BaseFont;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.BaseFont;
 
 import java.lang.reflect.Type;
 import com.google.gson.*;
