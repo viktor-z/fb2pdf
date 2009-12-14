@@ -29,6 +29,8 @@ import com.itextpdf.text.pdf.PdfAction;
 
 import com.itextpdf.text.pdf.PdfDestination;
 import com.itextpdf.text.pdf.PdfOutline;
+import java.awt.Color;
+import java.awt.Toolkit;
 import org.apache.commons.codec.binary.Base64;
 
 public class FB2toPDF
@@ -565,12 +567,14 @@ public class FB2toPDF
                 continue;
             try
             {
-                /*
-                Toolkit toolkit = Toolkit.getDefaultToolkit();
-                java.awt.Image img = toolkit.createImage(attachment.getData());
-                return Image.getInstance(img, Color.WHITE);
-                 */
-                return Image.getInstance(attachment.getData());
+                String overrideTransparency = stylesheet.getGeneralSettings().overrideImageTransparency;
+                if (overrideTransparency == null || overrideTransparency.isEmpty()) {
+                    return Image.getInstance(attachment.getData());
+                } else {
+                    Toolkit toolkit = Toolkit.getDefaultToolkit();
+                    java.awt.Image img = toolkit.createImage(attachment.getData());
+                    return Image.getInstance(img, Color.getColor(overrideTransparency));
+                }
             }
             catch (BadElementException e)
             {

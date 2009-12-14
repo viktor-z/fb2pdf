@@ -1,7 +1,8 @@
 {
     generalSettings: {
         transliterateMetaInfo:	"true",
-        imageDpi: 166
+        imageDpi: 166,
+        overrideImageTransparency: ""
     },
     fontFamilies: [
         {

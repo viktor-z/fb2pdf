@@ -12,6 +12,7 @@ package org.trivee.fb2pdf;
 public class GeneralSettings {
     public boolean transliterateMetaInfo;
     public float imageDpi;
+    public String overrideImageTransparency;
 
     public GeneralSettings()
     {
