@@ -782,6 +782,7 @@ public class FB2toPDF
                     res+='\\hypertarget{%s}{}\n' % pid
                 */
                 processParagraph(element, bFirst, i == nodes.getLength()-1);
+                bFirst = false;
             }
             else if (element.getTagName().equals("empty-line"))
             {
@@ -826,8 +827,6 @@ public class FB2toPDF
                 // XXX TODO logging.getLogger('fb2pdf').error("Unknown section element: %s" % x.tagName)
                 System.out.println("Unhandled section tag " + element.getTagName() );
             }
-
-            bFirst = false;
         }
     }
 

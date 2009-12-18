@@ -155,6 +155,7 @@ public class ParagraphStyle
     private Dimension lastSpacingAfter;
     private Dimension leftIndent;
     private Dimension firstLineIndent;
+    private Dimension firstFirstLineIndent;
     private Boolean disableHyphenation;
 
     private String text;
@@ -441,10 +442,30 @@ public class ParagraphStyle
         return new Dimension("0pt");
     }
 
+    private Dimension getFirstFirstLineIndentDimension()
+        throws FB2toPDFException
+    {
+        if (firstFirstLineIndent != null)
+            return firstFirstLineIndent;
+
+        ParagraphStyle baseStyle = getBaseStyle();
+        if (baseStyle != null)
+            return baseStyle.getFirstFirstLineIndentDimension();
+
+        // default value
+        return new Dimension("0pt");
+    }
+
     public float getFirstLineIndent()
         throws FB2toPDFException
     {
         return getFirstLineIndentDimension().getPoints(getFontSize().getPoints());
+    }
+
+    public float getFirstFirstLineIndent()
+        throws FB2toPDFException
+    {
+        return getFirstFirstLineIndentDimension().getPoints(getFontSize().getPoints());
     }
 
     public String getText()
@@ -496,8 +517,10 @@ public class ParagraphStyle
     {
         Paragraph para = createParagraph();
 
-        if (bFirst)
+        if (bFirst) {
             para.setSpacingBefore(getFirstSpacingBefore());
+            para.setFirstLineIndent(getFirstFirstLineIndent());
+        }
         if (bLast)
             para.setSpacingAfter(getLastSpacingAfter());
 
