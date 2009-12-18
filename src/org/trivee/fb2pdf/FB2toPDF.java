@@ -50,6 +50,25 @@ public class FB2toPDF
 
     private Stylesheet stylesheet;
 
+    private boolean isIgnoreEmptyLine(Element element) {
+
+        Node nextSib = element.getNextSibling();
+        Node prevSib = element.getPreviousSibling();
+        boolean ignore = false;
+        if (nextSib != null && nextSib.getNodeName().equalsIgnoreCase("image") &&
+                stylesheet.getGeneralSettings().ignoreEmptyLineBeforeImage) {
+            System.out.println("Skipping empty line before image");
+            ignore = true;
+        }
+        if (prevSib != null && prevSib.getNodeName().equalsIgnoreCase("image") &&
+                stylesheet.getGeneralSettings().ignoreEmptyLineAfterImage) {
+            System.out.println("Skipping empty line after image");
+            ignore = true;
+        }
+
+        return ignore;
+    }
+
     private void addImage(Element element) throws DocumentException, DOMException {
         String href = element.getAttributeNS(NS_XLINK, "href");
         Image image = getImage(href);
@@ -766,9 +785,8 @@ public class FB2toPDF
             }
             else if (element.getTagName().equals("empty-line"))
             {
-                // XXX TODO res+="\\vspace{12pt}\n\n"
-                addEmptyLine();
-                // System.out.println("Unhandled section tag " + element.getTagName() );
+                if (!isIgnoreEmptyLine(element))
+                    addEmptyLine();
             }
             else if (element.getTagName().equals("image"))
             {
@@ -847,9 +865,8 @@ public class FB2toPDF
             }
             else if (element.getTagName().equals("empty-line"))
             {
-                // XXX TODO res+="\\vspace{12pt}\n\n"
-                addEmptyLine();
-                // System.out.println("Unhandled section tag " + element.getTagName() );
+                if (!isIgnoreEmptyLine(element))
+                    addEmptyLine();
             }
             else
             {
@@ -904,7 +921,8 @@ public class FB2toPDF
             }
             else if (element.getTagName().equals("empty-line"))
             {
-                addEmptyLine();
+                if (!isIgnoreEmptyLine(element))
+                    addEmptyLine();
             }
             else
             {

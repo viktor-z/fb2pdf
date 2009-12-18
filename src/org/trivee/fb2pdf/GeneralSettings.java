@@ -13,6 +13,8 @@ public class GeneralSettings {
     public boolean transliterateMetaInfo;
     public float imageDpi;
     public String overrideImageTransparency;
+    public boolean ignoreEmptyLineBeforeImage;
+    public boolean ignoreEmptyLineAfterImage;
 
     public GeneralSettings()
     {

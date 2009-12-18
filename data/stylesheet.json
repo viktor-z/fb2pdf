@@ -2,7 +2,9 @@
     generalSettings: {
         transliterateMetaInfo:	"true",
         imageDpi: 166,
-        overrideImageTransparency: ""
+        overrideImageTransparency: "",
+        ignoreEmptyLineBeforeImage: "true",
+        ignoreEmptyLineAfterImage: "true"
     },
     fontFamilies: [
         {
