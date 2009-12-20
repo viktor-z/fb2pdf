@@ -1,0 +1,30 @@
+--- C:/PROJECTS/itext/lib/PdfChunk.java	Sun Dec  6 16:39:56 2009
++++ C:/PROJECTS/itext/src/core/com/itextpdf/text/pdf/PdfChunk.java	Wed Dec 16 01:41:06 2009
+@@ -276,13 +276,15 @@
+     protected int getWord(String text, int start) {
+         int len = text.length();
+         while (start < len) {
+-            if (!Character.isLetter(text.charAt(start)))
++            //if (!Character.isLetter(text.charAt(start)))
++            if (Character.isSpace(text.charAt(start)))
+                 break;
+             ++start;
+         }
+         return start;
+     }
+-    
++
++   
+ /**
+  * Splits this <CODE>PdfChunk</CODE> if it's too long for the given width.
+  * <P>
+@@ -372,7 +374,8 @@
+                     currentWidth += getCharWidth(Utilities.convertToUtf32(valueArray[currentPosition], valueArray[currentPosition + 1]));
+                 else
+                     currentWidth += getCharWidth(character);
+-                if (character == ' ') {
++                //if (character == ' ') {
++                if (character == ' ' || character == '-' ) {
+                     lastSpace = currentPosition + 1;
+                     lastSpaceWidth = currentWidth;
+                 }

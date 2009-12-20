@@ -1,0 +1,11 @@
+--- C:/PROJECTS/itext/lib/PdfDocument.java	Sun Dec  6 16:39:56 2009
++++ C:/PROJECTS/itext/src/core/com/itextpdf/text/pdf/PdfDocument.java	Fri Dec 18 20:03:49 2009
+@@ -1238,7 +1238,7 @@
+     }
+ 
+     /** The characters to be applied the hanging punctuation. */
+-    static final String hangingPunctuation = ".,;:'";
++    static final String hangingPunctuation = ".,;:'-";
+ 
+     /**
+      * Writes a text line to the document. It takes care of all the attributes.
