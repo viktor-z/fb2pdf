@@ -18,17 +18,21 @@ import javax.xml.parsers.ParserConfigurationException;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.Anchor;
+import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Image;
 
+import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.HyphenationAuto;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.PdfAction;
 
 import com.itextpdf.text.pdf.PdfDestination;
+import com.itextpdf.text.pdf.PdfDocument;
 import com.itextpdf.text.pdf.PdfOutline;
+import com.itextpdf.text.pdf.PdfTemplate;
 import java.awt.Color;
 import java.awt.Toolkit;
 import org.apache.commons.codec.binary.Base64;
@@ -49,6 +53,32 @@ public class FB2toPDF
     private HyphenationAuto hyphenation;
 
     private Stylesheet stylesheet;
+
+    protected int getDropCapCount(String text) {
+        int idx = 1;
+        if (Character.isDigit(text.charAt(0))) {
+            for (int c = 0; c < text.length(); c++) {
+                if (!Character.isDigit(text.charAt(c))) {
+                    idx = c;
+                    break;
+                }
+            }
+            if (idx > 9) {
+                idx = 1;
+            }
+        } else if (!Character.isLetter(text.charAt(0))) {
+            for (int c = 0; c < text.length(); c++) {
+                if (Character.isLetter(text.charAt(c))) {
+                    idx = c+1;
+                    break;
+                }
+            }
+            if (idx > 9) {
+                idx = 1;
+            }
+        }
+        return idx;
+    }
 
     private boolean isIgnoreEmptyLine(Element element) {
 
@@ -984,12 +1014,53 @@ public class FB2toPDF
     {
         currentParagraph = currentStyle.createParagraph(bFirst, bLast);
 
-        processParagraphContent(paragraph);
+        processParagraphContent(paragraph, bFirst);
         flushCurrentChunk();
 
         doc.add(currentParagraph);
         currentParagraph = null;
         currentReference = null;
+    }
+
+    private void addDropCap(String text, com.itextpdf.text.Document doc) throws DocumentException, FB2toPDFException {
+
+        ParagraphStyle dropcapStyle = stylesheet.getParagraphStyle(currentStyle.getDropcapStyle());
+
+        float dropCapSize = dropcapStyle.getFontSize().getPoints();
+        float spacingBefore = dropcapStyle.getSpacingBefore();
+        float identationRight = dropcapStyle.getSpacingAfter();
+        BaseFont basefont = dropcapStyle.getBaseFont();
+
+        float descent = basefont.getDescentPoint(text, dropCapSize);
+        float ascent = basefont.getAscentPoint(text, dropCapSize);
+        int[] bbox = basefont.getCharBBox(text.charAt(0));
+        float offsetLeft = bbox == null ? 0 : bbox[0] * 0.001f * dropCapSize;
+        bbox = basefont.getCharBBox(text.charAt(text.length()-1));
+        float offsetRight = bbox == null ? 0 : (basefont.getWidth(text.charAt(text.length()-1)) - bbox[2]) * 0.001f * dropCapSize;
+        float templateHight = basefont.getFontDescriptor(BaseFont.CAPHEIGHT, dropCapSize);
+        float templateWidth = basefont.getWidthPointKerned(text, dropCapSize) - offsetLeft - offsetRight;
+
+        PdfTemplate tp =  writer.getDirectContent().createTemplate(templateWidth, templateHight);
+        //tp.saveState();
+        //tp.setColorStroke(BaseColor.YELLOW);
+        //tp.setColorFill(BaseColor.YELLOW);
+        //tp.rectangle(-100, -100, 200, 200);
+        //tp.fillStroke();
+        //tp.setColorFill(BaseColor.RED);
+        //tp.rectangle(0, 0, templateWidth, templateHight);
+        //tp.fillStroke();
+        //tp.restoreState();
+        tp.beginText();
+        tp.setFontAndSize(basefont, dropCapSize);
+        tp.setTextMatrix(-offsetLeft, 0);
+        tp.showText(text);
+        tp.endText();
+        Image dropcap = Image.getInstance(tp);
+        dropcap.setAlignment(Image.TEXTWRAP);
+        dropcap.setIndentationRight(identationRight);
+        dropcap.setSpacingBefore(spacingBefore);
+        doc.add(dropcap);
+        tp.setBoundingBox(new Rectangle(0,descent,templateWidth,ascent));
     }
 
     private void flushCurrentChunk()
@@ -1023,9 +1094,15 @@ public class FB2toPDF
         }
     }
 
-    private void processParagraphContent(org.w3c.dom.Element parent)
-        throws DocumentException, FB2toPDFException
+    private void processParagraphContent(org.w3c.dom.Element parent) 
+            throws DocumentException, FB2toPDFException {
+        processParagraphContent(parent, false);
+    }
+
+    private void processParagraphContent(org.w3c.dom.Element parent, boolean bFirst)
+            throws DocumentException, FB2toPDFException
     {
+        boolean bFirstTextNode = true;
         NodeList nodes = parent.getChildNodes();
         for (int i = 0; i < nodes.getLength(); ++i)
         {
@@ -1038,7 +1115,8 @@ public class FB2toPDF
                 {
                     flushCurrentChunk();
                     currentStyle.toggleBold();
-                    processParagraphContent(child);
+                    processParagraphContent(child, bFirst && bFirstTextNode);
+                    bFirstTextNode = false;
                     flushCurrentChunk();
                     currentStyle.toggleBold();
                 }
@@ -1046,7 +1124,8 @@ public class FB2toPDF
                 {
                     flushCurrentChunk();
                     currentStyle.toggleItalic();
-                    processParagraphContent(child);
+                    processParagraphContent(child, bFirst && bFirstTextNode);
+                    bFirstTextNode = false;
                     flushCurrentChunk();
                     currentStyle.toggleItalic();
                 }
@@ -1114,7 +1193,18 @@ public class FB2toPDF
             }
             else if (node.getNodeType() == Node.TEXT_NODE)
             {
-                // XXX TODO res += _textQuote(s.data)
+                String text = node.getTextContent();
+                if (bodyIndex == 0 && bFirst && bFirstTextNode &&
+                        !currentStyle.getDropcapStyle().equals("")) {
+                    bFirstTextNode = false;
+                    int idx = getDropCapCount(text);
+                    String dropcap = text.substring(0, idx);
+                    text = text.substring(idx);
+                    if (dropcap != null && dropcap.trim().length() > 0)
+                        //doc.add(createDropCap(dropcap));
+                        addDropCap(dropcap, doc);
+                }
+
                 if (currentChunk == null)
                 {
                     currentChunk = currentStyle.createChunk();
@@ -1123,8 +1213,6 @@ public class FB2toPDF
                     }
                 }
 
-                String text = node.getTextContent();
-                //currentChunk.append(fixCharacters(text));
                 currentChunk.append(TextPreprocessor.process(text, stylesheet.getTextPreprocessorSettings()));
             }
         }

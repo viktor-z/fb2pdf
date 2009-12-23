@@ -37,7 +37,7 @@
     },
     textPreprocessorSettings: {
         enabled:					"true",
-        makeEndUnbreakable:			"true",
+        makeEndUnbreakable:			"false",
         makeReplacements:			"true",
         replacementsMap: {
                 " \u2012 ": "\u00A0\u2012 ",
@@ -169,8 +169,19 @@
             fontSize:         "11.0pt",
             alignment:        "justified",
             firstLineIndent:  "1.5em",
-            leading:          "1.2em"
+            leading:          "1.2em",
+            firstFirstLineIndent:  "0em",
+            dropcapStyle:	  "bodyDropCap"	
         },
+       	{
+       		name:			"bodyDropCap",
+            enabled: 	    "true",
+       		fontFamily:		"serif",
+       		fontSize:		"30.0pt",
+       		fontStyle:		"regular",
+       		spacingBefore:  "5.3pt",
+       		spacingAfter:	"1.0pt"
+       	},
         {
             name:             "bodySubtitle",
             fontFamily:       "sansSerif",

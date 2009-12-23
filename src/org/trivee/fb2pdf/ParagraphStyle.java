@@ -157,6 +157,7 @@ public class ParagraphStyle
     private Dimension firstLineIndent;
     private Dimension firstFirstLineIndent;
     private Boolean disableHyphenation;
+    private String dropcapStyle;
 
     private String text;
     
@@ -179,6 +180,21 @@ public class ParagraphStyle
         return name;
     }
 
+    public BaseFont getBaseFont() throws FB2toPDFException {
+        FontFamily ff = getFontFamily();
+        FontStyleInfo fs = getFontStyle();
+        boolean bold = fs.isFontBold();
+        if (boldToggle) {
+            bold = !bold;
+        }
+        boolean italic = fs.isFontItalic();
+        if (italicToggle) {
+            italic = !italic;
+        }
+        BaseFont bf = italic ? (bold ? ff.getBoldItalicFont() : ff.getItalicFont()) : (bold ? ff.getBoldFont() : ff.getRegularFont());
+        return bf;
+    }
+
     private ParagraphStyle getBaseStyle()
         throws FB2toPDFException
     {
@@ -191,7 +207,7 @@ public class ParagraphStyle
         return stylesheet.getParagraphStyle(baseStyle);
     }
     
-    private FontFamily getFontFamily()
+    public FontFamily getFontFamily()
         throws FB2toPDFException
     {
         if (stylesheet == null)
@@ -221,7 +237,7 @@ public class ParagraphStyle
         return new FontStyleInfo("regular");
     }
     
-    private Dimension getFontSize()
+    public Dimension getFontSize()
         throws FB2toPDFException
     {
         if (fontSize != null)
@@ -247,6 +263,18 @@ public class ParagraphStyle
         return new Boolean(false);
     }
 
+    public String getDropcapStyle() throws FB2toPDFException
+    {
+        if (dropcapStyle != null)
+            return dropcapStyle;
+
+        ParagraphStyle baseStyle = getBaseStyle();
+        if (baseStyle != null)
+            return baseStyle.getDropcapStyle();
+
+        return "";
+    }
+
     public void toggleBold()
     {
         boldToggle = !boldToggle;
@@ -260,21 +288,8 @@ public class ParagraphStyle
     public Font getFont()
         throws FB2toPDFException
     {
-        FontFamily ff = getFontFamily();
 
-        FontStyleInfo fs = getFontStyle();
-
-        boolean bold = fs.isFontBold();
-        if (boldToggle)
-            bold = !bold;
-
-        boolean italic = fs.isFontItalic();
-        if (italicToggle)
-            italic = !italic;
-
-        BaseFont bf = italic ?
-            (bold ? ff.getBoldItalicFont() : ff.getItalicFont()):
-            (bold ? ff.getBoldFont()       : ff.getRegularFont());
+        BaseFont bf = getBaseFont();
 
         return new Font(bf, getFontSize().getPoints());
     }
