@@ -1031,8 +1031,8 @@ public class FB2toPDF
         float identationRight = dropcapStyle.getSpacingAfter();
         BaseFont basefont = dropcapStyle.getBaseFont();
 
-        float descent = basefont.getDescentPoint(text, dropCapSize);
-        float ascent = basefont.getAscentPoint(text, dropCapSize);
+        //float descent = basefont.getDescentPoint(text, dropCapSize);
+        //float ascent = basefont.getAscentPoint(text, dropCapSize);
         int[] bbox = basefont.getCharBBox(text.charAt(0));
         float offsetLeft = bbox == null ? 0 : bbox[0] * 0.001f * dropCapSize;
         bbox = basefont.getCharBBox(text.charAt(text.length()-1));
@@ -1060,7 +1060,8 @@ public class FB2toPDF
         dropcap.setIndentationRight(identationRight);
         dropcap.setSpacingBefore(spacingBefore);
         doc.add(dropcap);
-        tp.setBoundingBox(new Rectangle(0,descent,templateWidth,ascent));
+        //tp.setBoundingBox(new Rectangle(0,descent,templateWidth,ascent));
+        tp.setBoundingBox(new Rectangle(-100, -100, 100, 100));
     }
 
     private void flushCurrentChunk()
