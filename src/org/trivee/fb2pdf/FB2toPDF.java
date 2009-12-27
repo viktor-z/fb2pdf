@@ -3,6 +3,8 @@ package org.trivee.fb2pdf;
 import java.io.*;
 import java.util.Vector;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipEntry;
 import org.w3c.dom.DOMException;
@@ -21,6 +23,7 @@ import com.itextpdf.text.Anchor;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Image;
 
@@ -29,9 +32,11 @@ import com.itextpdf.text.pdf.HyphenationAuto;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.PdfAction;
 
+import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfDestination;
 import com.itextpdf.text.pdf.PdfDocument;
 import com.itextpdf.text.pdf.PdfOutline;
+import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfTemplate;
 import java.awt.Color;
 import java.awt.Toolkit;
@@ -53,6 +58,37 @@ public class FB2toPDF
     private HyphenationAuto hyphenation;
 
     private Stylesheet stylesheet;
+
+    private class PageEventHandler extends PdfPageEventHelper {
+
+        private Image marginEnforcerImage = createSmallTranparentImage();
+
+        private Image createSmallTranparentImage(){
+            //byte[] data = new byte[]{0,(byte)255,0};
+            byte[] data = new byte[]{(byte)255,(byte)255,(byte)255};
+            int[] transparency = new int[]{0, 255, 0, 255, 0, 255};
+            Image img = null;
+            try {
+                //img = Image.getInstance(1, 1, 3, 8, data);
+                img = Image.getInstance(1, 1, 3, 8, data, transparency);
+            } catch (BadElementException ex) {
+                Logger.getLogger(FB2toPDF.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return img;
+        }
+
+        @Override
+        public void onEndPage(PdfWriter writer, Document document) {
+            PdfContentByte cb = writer.getDirectContent();
+            Rectangle pageSize = writer.getPageSize();
+            try {
+                cb.addImage(marginEnforcerImage, 1, 0, 0, 1, 0, 0);
+                cb.addImage(marginEnforcerImage, 1, 0, 0, 1, pageSize.getWidth()-1, pageSize.getHeight()-1);
+            } catch (DocumentException ex) {
+                Logger.getLogger(FB2toPDF.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
 
     protected int getDropCapCount(String text) {
         int idx = 1;
@@ -214,7 +250,9 @@ public class FB2toPDF
             ps.getMarginTop(), ps.getMarginBottom());
 
         writer = PdfWriter.getInstance(doc, new FileOutputStream(toName));
-
+        if (ps.enforcePageSize) {
+            writer.setPageEvent(new PageEventHandler());
+        }
     }
 
     private void closePDF()
@@ -732,8 +770,10 @@ public class FB2toPDF
         }
         else if (level == 1)
         {
-            if (writer.getVerticalPosition(false) < doc.getPageSize().getHeight() * 0.5f)
+            if (writer.getVerticalPosition(false) < doc.getPageSize().getHeight() * 0.5f) {
                 doc.newPage();
+                writer.setPageEmpty(false);
+            }
             if (bodyIndex == 0)
                 addBookmark(getTextContentByTagName(section, "title"));
         }
@@ -1202,7 +1242,6 @@ public class FB2toPDF
                     String dropcap = text.substring(0, idx);
                     text = text.substring(idx);
                     if (dropcap != null && dropcap.trim().length() > 0)
-                        //doc.add(createDropCap(dropcap));
                         addDropCap(dropcap, doc);
                 }
 

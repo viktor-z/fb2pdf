@@ -10,6 +10,8 @@ public class PageStyle
     private Dimension marginTop;
     private Dimension marginBottom;
 
+    public boolean enforcePageSize;
+
     public PageStyle()
     {
     }
