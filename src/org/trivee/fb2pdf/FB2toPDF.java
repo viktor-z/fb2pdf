@@ -773,10 +773,11 @@ public class FB2toPDF
         {
             if (writer.getVerticalPosition(false) < doc.getPageSize().getHeight() * 0.5f) {
                 doc.newPage();
-                writer.setPageEmpty(false);
             }
-            if (bodyIndex == 0)
+            writer.setPageEmpty(false);
+            if (bodyIndex == 0) {
                 addBookmark(getTextContentByTagName(section, "title"));
+            }
         }
 
         String id = section.getAttribute("id");
