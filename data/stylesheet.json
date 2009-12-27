@@ -28,7 +28,8 @@
         marginLeft:   "1.0mm",
         marginRight:  "1.0mm",
         marginTop:    "1.0mm",
-        marginBottom: "1.0mm"
+        marginBottom: "1.0mm",
+        enforcePageSize: "false"
     },
     hyphenationSettings: {
         defaultLanguage:	"ru",
