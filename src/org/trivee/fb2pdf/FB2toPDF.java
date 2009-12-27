@@ -24,6 +24,7 @@ import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
+import com.itextpdf.text.Font;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Image;
 
@@ -1204,6 +1205,15 @@ public class FB2toPDF
                 else if (child.getTagName().equals("image"))
                 {
                     addImage(child);
+                }
+                else if (child.getTagName().equals("strikethrough"))
+                {
+                    flushCurrentChunk();
+                    currentStyle.toggleStrikethrough();
+                    processParagraphContent(child, bFirst && bFirstTextNode);
+                    bFirstTextNode = false;
+                    flushCurrentChunk();
+                    currentStyle.toggleStrikethrough();
                 }
                 else
                 {

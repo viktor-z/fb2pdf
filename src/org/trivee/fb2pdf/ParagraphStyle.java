@@ -146,6 +146,7 @@ public class ParagraphStyle
     private FontStyleInfo fontStyle;
     private transient boolean boldToggle;
     private transient boolean italicToggle;
+    private transient boolean strikethroughToggle;
     private Dimension fontSize;
     private Dimension leading;
     private AlignmentInfo alignment;
@@ -285,13 +286,20 @@ public class ParagraphStyle
         italicToggle = !italicToggle;
     }
     
+    void toggleStrikethrough() {
+        strikethroughToggle = !strikethroughToggle;
+    }
+
     public Font getFont()
         throws FB2toPDFException
     {
 
         BaseFont bf = getBaseFont();
-
-        return new Font(bf, getFontSize().getPoints());
+        final Font font = new Font(bf, getFontSize().getPoints());
+        if (strikethroughToggle){
+            font.setStyle(Font.STRIKETHRU);
+        }
+        return font;
     }
 
     public Font getTinyFont()
