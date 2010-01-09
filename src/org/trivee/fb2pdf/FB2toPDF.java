@@ -57,6 +57,12 @@ public class FB2toPDF
 
     private Stylesheet stylesheet;
 
+    private void addGoToActionToChunk(String refname, Chunk chunk) {
+        PdfAction action = PdfAction.gotoLocalPage(refname, false);
+        System.out.println("Adding Action LocalGoTo " + refname);
+        chunk.setAction(action);
+    }
+
     private class PageEventHandler extends PdfPageEventHelper {
 
         public boolean enforcePageSize = false;
@@ -397,7 +403,9 @@ public class FB2toPDF
             throw new FB2toPDFException("Element not found: FictionBook/body");
 
         org.w3c.dom.Element body = bodies.item(0);
-        makeTOCPage(body);
+        if (stylesheet.getGeneralSettings().generateTOC) {
+            makeTOCPage(body);
+        }
 
         for (int i = 0; i < bodies.getLength(); ++i)
         {
@@ -738,16 +746,21 @@ public class FB2toPDF
             Chunk chunk = tocItemStyle.createChunk();
             chunk.append(TextPreprocessor.process(title, stylesheet.getTextPreprocessorSettings()));
 
-            Anchor anchor = tocItemStyle.createAnchor();
-            anchor.add(chunk);
             String ref = section.getAttribute("id");
             if(isNullOrEmpty(ref))
                 ref = "section" + i;
+            /*
+            Anchor anchor = tocItemStyle.createAnchor();
+            anchor.add(chunk);
             anchor.setReference("#" + ref);
             System.out.println("Adding A HREF=#" + ref);
 
             Paragraph para = tocItemStyle.createParagraph();
             para.add(anchor);
+             */
+            addGoToActionToChunk(ref, chunk);
+            Paragraph para = tocItemStyle.createParagraph();
+            para.add(chunk);
 
             doc.add(para);
         }
@@ -929,17 +942,19 @@ public class FB2toPDF
     {
         ParagraphStyle previousStyle = currentStyle;
 
-        if (level == 0)
-        {
-            currentStyle = stylesheet.getParagraphStyle("sectionTitle");
-        }
-        else if (level == 1)
-        {
-            currentStyle = stylesheet.getParagraphStyle("subSectionTitle");
-        }
-        else
-        {
-            currentStyle = stylesheet.getParagraphStyle("subSubSectionTitle");
+        switch (level) {
+            case -1:
+                currentStyle = stylesheet.getParagraphStyle("bodyTitle");
+                break;
+            case 0:
+                currentStyle = stylesheet.getParagraphStyle("sectionTitle");
+                break;
+            case 1:
+                currentStyle = stylesheet.getParagraphStyle("subSectionTitle");
+                break;
+            default:
+                currentStyle = stylesheet.getParagraphStyle("subSubSectionTitle");
+                break;
         }
 
         ElementCollection nodes = ElementCollection.children(title);
@@ -1139,9 +1154,7 @@ public class FB2toPDF
                 {
                     //Unlike Anchor, Action won't fail even when local destination does not exist
                     String refname = currentReference.substring(1); //getting rid of "#" at the begin of the reference
-                    PdfAction action = PdfAction.gotoLocalPage(refname, false);
-                    System.out.println("Adding Action LocalGoTo " + refname);
-                    currentChunk.setAction(action);
+                    addGoToActionToChunk(refname, currentChunk);
                     currentParagraph.add(currentChunk);
                 }
                 else

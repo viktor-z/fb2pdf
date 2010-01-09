@@ -15,6 +15,7 @@ public class GeneralSettings {
     public String overrideImageTransparency;
     public boolean ignoreEmptyLineBeforeImage;
     public boolean ignoreEmptyLineAfterImage;
+    public boolean generateTOC;
 
     public GeneralSettings()
     {

@@ -1,5 +1,6 @@
 {
     generalSettings: {
+        generateTOC:	"true",
         transliterateMetaInfo:	"true",
         imageDpi: 166,
         overrideImageTransparency: "0xFFFFFF",
@@ -107,6 +108,15 @@
             alignment:        "justified",
             firstSpacingBefore:   "0.3em",
             spacingAfter:     "0.3em"
+        },
+        {
+            name:             "bodyTitle",
+            baseStyle:        "default",
+            fontSize:         "16.0pt",
+            fontStyle:        "bold",
+            alignment:        "center",
+            lastSpacingAfter:     "0.6em",
+            disableHyphenation: "true"
         },
         {
             name:             "sectionTitle",
