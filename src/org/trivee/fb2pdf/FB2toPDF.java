@@ -20,11 +20,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.Anchor;
-import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
-import com.itextpdf.text.Font;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Image;
 
@@ -35,7 +33,6 @@ import com.itextpdf.text.pdf.PdfAction;
 
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfDestination;
-import com.itextpdf.text.pdf.PdfDocument;
 import com.itextpdf.text.pdf.PdfOutline;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfTemplate;
@@ -62,16 +59,43 @@ public class FB2toPDF
 
     private class PageEventHandler extends PdfPageEventHelper {
 
-        private Image marginEnforcerImage = createSmallTranparentImage();
+        public boolean enforcePageSize = false;
+        public Color pageSizeEnforcerColor;
+
+        private Image marginEnforcerImage = null;
+
+        protected void addPageSizeEnforcer(PdfWriter writer) {
+            if (marginEnforcerImage == null) {
+                marginEnforcerImage = createSmallTranparentImage();
+            }
+            PdfContentByte cb = writer.getDirectContent();
+            Rectangle pageSize = writer.getPageSize();
+            try {
+                cb.addImage(marginEnforcerImage, 0.5f, 0, 0, 0.5f, 0, 0);
+                cb.addImage(marginEnforcerImage, 0.5f, 0, 0, 0.5f, pageSize.getWidth() - 0.5f, pageSize.getHeight() - 0.5f);
+                cb.addImage(marginEnforcerImage, 0.5f, 0, 0, 0.5f, pageSize.getWidth() - 0.5f, 0);
+                cb.addImage(marginEnforcerImage, 0.5f, 0, 0, 0.5f, 0, pageSize.getHeight() - 0.5f);
+                cb.addImage(marginEnforcerImage, 0.5f, 0, 0, 0.5f, pageSize.getWidth() - 0.5f, pageSize.getHeight() - 0.5f);
+            } catch (DocumentException ex) {
+                Logger.getLogger(FB2toPDF.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
 
         private Image createSmallTranparentImage(){
             //byte[] data = new byte[]{0,(byte)255,0};
-            byte[] data = new byte[]{(byte)255,(byte)255,(byte)255};
-            int[] transparency = new int[]{0, 255, 0, 255, 0, 255};
+            //byte[] data = new byte[]{(byte)255,(byte)255,(byte)255};
+            //byte[] data = new byte[]{(byte)127,(byte)127,(byte)127};
+            //int[] transparency = new int[]{0, 255, 0, 255, 0, 255};
+
+            byte R = pageSizeEnforcerColor == null ? 127 : (byte)pageSizeEnforcerColor.getRed();
+            byte G = pageSizeEnforcerColor == null ? 127 : (byte)pageSizeEnforcerColor.getGreen();
+            byte B = pageSizeEnforcerColor == null ? 127 : (byte)pageSizeEnforcerColor.getBlue();
+            byte[] data = new byte[]{R,G,B};
+            
             Image img = null;
             try {
-                //img = Image.getInstance(1, 1, 3, 8, data);
-                img = Image.getInstance(1, 1, 3, 8, data, transparency);
+                img = Image.getInstance(1, 1, 3, 8, data);
+                //img = Image.getInstance(1, 1, 3, 8, data, transparency);
             } catch (BadElementException ex) {
                 Logger.getLogger(FB2toPDF.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -80,13 +104,8 @@ public class FB2toPDF
 
         @Override
         public void onEndPage(PdfWriter writer, Document document) {
-            PdfContentByte cb = writer.getDirectContent();
-            Rectangle pageSize = writer.getPageSize();
-            try {
-                cb.addImage(marginEnforcerImage, 1, 0, 0, 1, 0, 0);
-                cb.addImage(marginEnforcerImage, 1, 0, 0, 1, pageSize.getWidth()-1, pageSize.getHeight()-1);
-            } catch (DocumentException ex) {
-                Logger.getLogger(FB2toPDF.class.getName()).log(Level.SEVERE, null, ex);
+            if (enforcePageSize) {
+                addPageSizeEnforcer(writer);
             }
         }
     }
@@ -252,7 +271,10 @@ public class FB2toPDF
 
         writer = PdfWriter.getInstance(doc, new FileOutputStream(toName));
         if (ps.enforcePageSize) {
-            writer.setPageEvent(new PageEventHandler());
+            PageEventHandler pageEventHandler = new PageEventHandler();
+            pageEventHandler.enforcePageSize = ps.enforcePageSize;
+            pageEventHandler.pageSizeEnforcerColor = Color.decode(ps.pageSizeEnforcerColor);
+            writer.setPageEvent(pageEventHandler);
         }
     }
 
@@ -661,7 +683,7 @@ public class FB2toPDF
                 } else {
                     Toolkit toolkit = Toolkit.getDefaultToolkit();
                     java.awt.Image img = toolkit.createImage(attachment.getData());
-                    return Image.getInstance(img, Color.getColor(overrideTransparency));
+                    return Image.getInstance(img, Color.decode(overrideTransparency));
                 }
             }
             catch (BadElementException e)

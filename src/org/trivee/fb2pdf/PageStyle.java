@@ -11,6 +11,7 @@ public class PageStyle
     private Dimension marginBottom;
 
     public boolean enforcePageSize;
+    public String pageSizeEnforcerColor;
 
     public PageStyle()
     {

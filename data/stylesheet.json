@@ -2,7 +2,7 @@
     generalSettings: {
         transliterateMetaInfo:	"true",
         imageDpi: 166,
-        overrideImageTransparency: "",
+        overrideImageTransparency: "0xFFFFFF",
         ignoreEmptyLineBeforeImage: "true",
         ignoreEmptyLineAfterImage: "true"
     },
@@ -24,12 +24,14 @@
     ],
     pageStyle: {
         pageWidth:    "88.2mm",
-        pageHeight:   "115.4mm",
+        pageHeight:   "113.9mm",
         marginLeft:   "1.0mm",
         marginRight:  "1.0mm",
         marginTop:    "1.0mm",
         marginBottom: "1.0mm",
-        enforcePageSize: "false"
+        enforcePageSize: "false",
+        pageSizeEnforcerColor: "0x7F7F7F"
+
     },
     hyphenationSettings: {
         defaultLanguage:	"ru",
