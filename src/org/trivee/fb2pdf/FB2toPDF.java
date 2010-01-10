@@ -1138,6 +1138,10 @@ public class FB2toPDF
         dropcap.setAlignment(Image.TEXTWRAP);
         dropcap.setIndentationRight(identationRight);
         dropcap.setSpacingBefore(spacingBefore);
+
+        if(writer.getVerticalPosition(false) < spacingBefore + templateHight + doc.bottomMargin()) {
+            doc.newPage();
+        }
         doc.add(dropcap);
         //tp.setBoundingBox(new Rectangle(0,descent,templateWidth,ascent));
         tp.setBoundingBox(new Rectangle(-100, -100, 100, 100));
