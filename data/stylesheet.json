@@ -10,10 +10,10 @@
     fontFamilies: [
         {
             name:         "sansSerif",
-            regular:      "./data/verdana.ttf",
-            bold:         "./data/verdanab.ttf",
-            italic:       "./data/verdanai.ttf",
-            boldItalic:   "./data/verdanaz.ttf"
+            regular:      "./data/arial.ttf",
+            bold:         "./data/arialbd.ttf",
+            italic:       "./data/ariali.ttf",
+            boldItalic:   "./data/arialbi.ttf"
         },
         {
             name:         "serif",
