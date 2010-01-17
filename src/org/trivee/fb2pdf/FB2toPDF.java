@@ -57,6 +57,19 @@ public class FB2toPDF
 
     private Stylesheet stylesheet;
 
+    protected void addInvisibleAnchor(String name) throws FB2toPDFException, DocumentException {
+        Anchor anchor = currentStyle.createInvisibleAnchor();
+        anchor.setName(name);
+        currentParagraph.add(anchor);
+        System.out.println("Adding A NAME=" + name);
+    }
+
+    protected void addLine(Chunk chunk, ParagraphStyle style) throws FB2toPDFException, DocumentException {
+        Paragraph para = style.createParagraph();
+        para.add(chunk);
+        doc.add(para);
+    }
+
     private void addGoToActionToChunk(String refname, Chunk chunk) {
         PdfAction action = PdfAction.gotoLocalPage(refname, false);
         System.out.println("Adding Action LocalGoTo " + refname);
@@ -478,9 +491,7 @@ public class FB2toPDF
     {
         Chunk chunk = style.createChunk();
         chunk.append(TextPreprocessor.process(text, stylesheet.getTextPreprocessorSettings()));
-        Paragraph para = style.createParagraph();
-        para.add(chunk);
-        doc.add(para);
+        addLine(chunk, style);
     }
 
     private static final String NS_XLINK = "http://www.w3.org/1999/xlink";
@@ -852,17 +863,21 @@ public class FB2toPDF
 
         processSectionContent(section, level);
 
+        if (bodyIndex>0) {
+            Chunk chunk = currentStyle.createChunk();
+            chunk.append("^");
+            addGoToActionToChunk(id+"_backlink", chunk);
+            addEmptyLine();
+            addLine(chunk, currentStyle);
+        }
+
         currentOutline = previousOutline;
     }
 
     private void addEmptyLine()
         throws DocumentException, FB2toPDFException
     {
-        Chunk chunk = currentStyle.createChunk();
-        chunk.append(" ");
-        Paragraph p = currentStyle.createParagraph();
-        p.add(chunk);
-        doc.add(p);
+        addLine(" ", currentStyle);
     }
 
     private void processSectionContent(org.w3c.dom.Element parent, int level)
@@ -1159,7 +1174,10 @@ public class FB2toPDF
                     //Unlike Anchor, Action won't fail even when local destination does not exist
                     String refname = currentReference.substring(1); //getting rid of "#" at the begin of the reference
                     addGoToActionToChunk(refname, currentChunk);
-                    currentParagraph.add(currentChunk);
+                    //currentParagraph.add(currentChunk);
+                    Anchor anchor = new Anchor(currentChunk);
+                    anchor.setName(refname+"_backlink");
+                    currentParagraph.add(anchor);
                 }
                 else
                 {
@@ -1227,10 +1245,7 @@ public class FB2toPDF
                     String citeId = child.getAttribute("id");
                     if (citeId.length() > 0)
                     {
-                        Anchor anchor = currentStyle.createInvisibleAnchor();
-                        anchor.setName(citeId);
-                        currentParagraph.add(anchor);
-                        System.out.println("Adding A NAME=" + citeId);
+                        addInvisibleAnchor(citeId);
                     }
                     processParagraphContent(child);
                     flushCurrentChunk();
