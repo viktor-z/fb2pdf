@@ -27,7 +27,6 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Image;
 
 import com.itextpdf.text.pdf.BaseFont;
-import com.itextpdf.text.pdf.HyphenationAuto;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.PdfAction;
 
