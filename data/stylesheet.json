@@ -3,24 +3,24 @@
         generateTOC:	"true",
         transliterateMetaInfo:	"true",
         imageDpi: 166,
-        overrideImageTransparency: "0xFFFFFF",
+        overrideImageTransparency: "",
         ignoreEmptyLineBeforeImage: "true",
         ignoreEmptyLineAfterImage: "true"
     },
     fontFamilies: [
         {
             name:         "sansSerif",
-            regular:      "./data/arial.ttf",
-            bold:         "./data/arialbd.ttf",
-            italic:       "./data/ariali.ttf",
-            boldItalic:   "./data/arialbi.ttf"
+            regular:      "./data/DroidSans.ttf",
+            bold:         "./data/DroidSans-Bold.ttf",
+            italic:       "./data/DroidSans.ttf",
+            boldItalic:   "./data/DroidSans-Bold.ttf"
         },
         {
             name:         "serif",
-            regular:      "./data/georgia.ttf",
-            bold:         "./data/georgiab.ttf",
-            italic:       "./data/georgiai.ttf",
-            boldItalic:   "./data/georgiaz.ttf"
+            regular:      "./data/DroidSerif-Regular.ttf",
+            bold:         "./data/DroidSerif-Bold.ttf",
+            italic:       "./data/DroidSerif-Italic.ttf",
+            boldItalic:   "./data/DroidSerif-BoldItalic.ttf"
         }
     ],
     pageStyle: {
