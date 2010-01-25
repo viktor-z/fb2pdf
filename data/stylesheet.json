@@ -228,7 +228,7 @@
        		name:			"bodyDropCap",
             enabled: 	    "true",
        		fontFamily:		"serif",
-       		fontSize:		"30.0pt",
+       		fontSize:		"29.4pt",
        		fontStyle:		"regular",
        		spacingBefore:  "5.3pt",
        		spacingAfter:	"1.0pt"
