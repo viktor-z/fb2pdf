@@ -38,6 +38,7 @@ import com.itextpdf.text.pdf.PdfTemplate;
 import java.awt.Color;
 import java.awt.Toolkit;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 
 public class FB2toPDF
 {
@@ -862,7 +863,7 @@ public class FB2toPDF
 
         processSectionContent(section, level);
 
-        if (bodyIndex>0) {
+        if (bodyIndex>0 && StringUtils.isNotBlank(id)) {
             Chunk chunk = currentStyle.createChunk();
             chunk.append("^");
             addGoToActionToChunk(id+"_backlink", chunk);
@@ -1174,7 +1175,8 @@ public class FB2toPDF
                     String refname = currentReference.substring(1); //getting rid of "#" at the begin of the reference
                     addGoToActionToChunk(refname, currentChunk);
                     //currentParagraph.add(currentChunk);
-                    Anchor anchor = new Anchor(currentChunk);
+                    Anchor anchor = currentStyle.createAnchor();
+                    anchor.add(currentChunk);
                     anchor.setName(refname+"_backlink");
                     currentParagraph.add(anchor);
                 }
