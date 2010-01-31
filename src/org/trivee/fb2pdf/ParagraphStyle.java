@@ -155,6 +155,7 @@ public class ParagraphStyle
     private Dimension spacingAfter;
     private Dimension lastSpacingAfter;
     private Dimension leftIndent;
+    private Dimension rightIndent;
     private Dimension firstLineIndent;
     private Dimension firstFirstLineIndent;
     private Boolean disableHyphenation;
@@ -445,10 +446,30 @@ public class ParagraphStyle
         return new Dimension("0pt");
     }
 
+    private Dimension getRightIndentDimension()
+        throws FB2toPDFException
+    {
+        if (rightIndent != null)
+            return rightIndent;
+
+        ParagraphStyle baseStyle = getBaseStyle();
+        if (baseStyle != null)
+            return baseStyle.getRightIndentDimension();
+
+        // default value
+        return new Dimension("0pt");
+    }
+
     public float getLeftIndent()
         throws FB2toPDFException
     {
         return getLeftIndentDimension().getPoints(getFontSize().getPoints());
+    }
+
+    public float getRightIndent()
+        throws FB2toPDFException
+    {
+        return getRightIndentDimension().getPoints(getFontSize().getPoints());
     }
 
     private Dimension getFirstLineIndentDimension()
@@ -531,6 +552,7 @@ public class ParagraphStyle
         para.setSpacingBefore(getSpacingBefore());
         para.setSpacingAfter(getSpacingAfter());
         para.setIndentationLeft(getLeftIndent());
+        para.setIndentationRight(getRightIndent());
         para.setFirstLineIndent(getFirstLineIndent());
         return para;
     }
