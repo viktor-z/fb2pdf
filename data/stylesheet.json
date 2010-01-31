@@ -3,6 +3,7 @@
         generateTOC:	"true",
         transliterateMetaInfo:	"true",
         imageDpi: 166,
+		trackingSpaceCharRatio: 2.5,
         overrideImageTransparency: "",
         ignoreEmptyLineBeforeImage: "true",
         ignoreEmptyLineAfterImage: "true"

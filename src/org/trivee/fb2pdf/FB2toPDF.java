@@ -295,6 +295,7 @@ public class FB2toPDF
             pageEventHandler.pageSizeEnforcerColor = Color.decode(ps.pageSizeEnforcerColor);
             writer.setPageEvent(pageEventHandler);
         }
+        writer.setSpaceCharRatio(stylesheet.getGeneralSettings().trackingSpaceCharRatio);
     }
 
     private void closePDF()

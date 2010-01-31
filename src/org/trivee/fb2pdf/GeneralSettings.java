@@ -16,6 +16,7 @@ public class GeneralSettings {
     public boolean ignoreEmptyLineBeforeImage;
     public boolean ignoreEmptyLineAfterImage;
     public boolean generateTOC;
+    public float trackingSpaceCharRatio;
 
     public GeneralSettings()
     {
