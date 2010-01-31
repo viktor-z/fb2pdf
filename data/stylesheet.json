@@ -31,6 +31,10 @@
         marginRight:  "1.0mm",
         marginTop:    "1.0mm",
         marginBottom: "1.0mm",
+        sectionNewPage: {
+        	"0": 1.0,
+        	"1": 0.5
+        },
         enforcePageSize: "false",
         pageSizeEnforcerColor: "0x7F7F7F"
 

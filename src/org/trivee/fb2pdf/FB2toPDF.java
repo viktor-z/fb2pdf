@@ -57,6 +57,21 @@ public class FB2toPDF
 
     private Stylesheet stylesheet;
 
+    protected void addAnchor(String id) throws DocumentException, FB2toPDFException {
+        Anchor anchor = currentStyle.createInvisibleAnchor();
+        anchor.setName(id);
+        doc.add(anchor);
+        System.out.println("Adding A NAME=" + id);
+    }
+
+    protected void addBacklink(String id) throws DocumentException, FB2toPDFException {
+        Chunk chunk = currentStyle.createChunk();
+        chunk.append("^");
+        addGoToActionToChunk(id + "_backlink", chunk);
+        addEmptyLine();
+        addLine(chunk, currentStyle);
+    }
+
     protected void addInvisibleAnchor(String name) throws FB2toPDFException, DocumentException {
         Anchor anchor = currentStyle.createInvisibleAnchor();
         anchor.setName(name);
@@ -807,9 +822,16 @@ public class FB2toPDF
     {
         PdfOutline previousOutline = currentOutline;
 
+        Float newPagePosition = stylesheet.getPageStyle().sectionNewPage.get(level);
+
+        if (newPagePosition != null && writer.getVerticalPosition(false) < doc.getPageSize().getHeight() * newPagePosition) {
+            doc.newPage();
+            writer.setPageEmpty(false);
+        }
+
         if (level == 0)
         {
-            doc.newPage();
+            //doc.newPage();
             if (bodyIndex == 0)
             {
                 currentOutline = writer.getDirectContent().getRootOutline();
@@ -818,58 +840,28 @@ public class FB2toPDF
         }
         else if (level == 1)
         {
-            if (writer.getVerticalPosition(false) < doc.getPageSize().getHeight() * 0.5f) {
-                doc.newPage();
-            }
-            writer.setPageEmpty(false);
+            //if (writer.getVerticalPosition(false) < doc.getPageSize().getHeight() * 0.5f) {
+            //    doc.newPage();
+            //}
+            //writer.setPageEmpty(false);
             if (bodyIndex == 0) {
                 addBookmark(getTextContentByTagName(section, "title"));
             }
         }
 
         String id = section.getAttribute("id");
-
         if (id.length() == 0 && bodyIndex == 0 && level == 0)
             id = "section" + index;
 
         if (id.length() > 0)
         {
-            Anchor anchor = currentStyle.createInvisibleAnchor();
-            anchor.setName(id);
-            doc.add(anchor);
-            System.out.println("Adding A NAME=" + id);
+            addAnchor(id);
         }
-
-/* XXX TODO
-    res = u''
-    if level!=-1:
-        pid=s.getAttribute('id')
-        if pid:
-            res+='\\hypertarget{%s}{}\n' % pid
-
-        t = find(s,"title")
-        if t:
-            title = getSectionTitle(t)
-        else:
-            title = ""
-
-        if level>=len(section_commands):
-            cmd = "section"
-        else:
-            cmd = section_commands[level]
-
-        res+="\n\\%s{%s}\n" % (cmd,_tocElement(title, t))
-        res+=processEpigraphs(s)
-*/
 
         processSectionContent(section, level);
 
         if (bodyIndex>0 && StringUtils.isNotBlank(id)) {
-            Chunk chunk = currentStyle.createChunk();
-            chunk.append("^");
-            addGoToActionToChunk(id+"_backlink", chunk);
-            addEmptyLine();
-            addLine(chunk, currentStyle);
+            addBacklink(id);
         }
 
         currentOutline = previousOutline;

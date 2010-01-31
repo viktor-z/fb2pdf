@@ -1,5 +1,7 @@
 package org.trivee.fb2pdf;
 
+import java.util.HashMap;
+
 public class PageStyle
 {
     private Dimension pageWidth;
@@ -12,6 +14,8 @@ public class PageStyle
 
     public boolean enforcePageSize;
     public String pageSizeEnforcerColor;
+
+    public HashMap<Integer, Float> sectionNewPage = new HashMap<Integer, Float>();
 
     public PageStyle()
     {
