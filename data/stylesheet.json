@@ -204,8 +204,6 @@
             fontSize:         "11.0pt",
             fontStyle:        "italic",
             leftIndent:       "2.5em",
-            rightIndent:       "2.5em",
-            alignment:        "justified",
             firstSpacingBefore:   "0.5em",
             lastSpacingAfter:     "0.5em"
         },
