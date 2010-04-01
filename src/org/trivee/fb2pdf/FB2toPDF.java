@@ -311,6 +311,7 @@ public class FB2toPDF
             writer.setPageEvent(pageEventHandler);
         }
         writer.setSpaceCharRatio(stylesheet.getGeneralSettings().trackingSpaceCharRatio);
+        writer.setStrictImageSequence(stylesheet.getGeneralSettings().strictImageSequence);
     }
 
     private void closePDF()
@@ -1095,6 +1096,8 @@ public class FB2toPDF
     private Paragraph currentParagraph;
     private String    currentReference;
     private Chunk     currentChunk;
+    private boolean   superscript;
+    private boolean   subscript;
 
     private void processParagraph(org.w3c.dom.Element paragraph, boolean bFirst, boolean bLast)
         throws DocumentException, FB2toPDFException
@@ -1264,6 +1267,28 @@ public class FB2toPDF
                     flushCurrentChunk();
                     currentStyle.toggleStrikethrough();
                 }
+                else if (child.getTagName().equals("sup"))
+                {
+                    flushCurrentChunk();
+                    currentStyle.toggleHalfSize();
+                    superscript = true;
+                    processParagraphContent(child, bFirst && bFirstTextNode);
+                    bFirstTextNode = false;
+                    flushCurrentChunk();
+                    currentStyle.toggleHalfSize();
+                    superscript = false;
+                }
+                else if (child.getTagName().equals("sub"))
+                {
+                    flushCurrentChunk();
+                    currentStyle.toggleHalfSize();
+                    subscript = true;
+                    processParagraphContent(child, bFirst && bFirstTextNode);
+                    bFirstTextNode = false;
+                    flushCurrentChunk();
+                    currentStyle.toggleHalfSize();
+                    subscript = false;
+                }
                 else
                 {
 /*
@@ -1307,6 +1332,12 @@ public class FB2toPDF
                 if (currentChunk == null)
                 {
                     currentChunk = currentStyle.createChunk();
+                    if (superscript) {
+                        currentChunk.setTextRise(currentStyle.getFontSize().getPoints()/3);
+                    }
+                    if (subscript) {
+                        currentChunk.setTextRise(-currentStyle.getFontSize().getPoints()/6);
+                    }
                     if (!currentStyle.getDisableHyphenation()) {
                         currentChunk.setHyphenation(hyphenation);
                     }

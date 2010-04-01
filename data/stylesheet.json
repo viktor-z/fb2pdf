@@ -6,7 +6,8 @@
 		trackingSpaceCharRatio: 2.5,
         overrideImageTransparency: "",
         ignoreEmptyLineBeforeImage: "true",
-        ignoreEmptyLineAfterImage: "true"
+        ignoreEmptyLineAfterImage: "true",
+        strictImageSequence:	"false"
     },
     fontFamilies: [
         {
