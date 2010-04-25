@@ -1241,7 +1241,7 @@ public class PdfDocument extends Document {
     /** The characters to be applied the hanging punctuation. */
     
     //static final String hangingPunctuation = ".,;:'"; //VIKTORZ --
-    static final String hangingPunctuation = ".,;:'-"; //VIKTORZ ++
+    public static String hangingPunctuation = ".,;:'-"; //VIKTORZ ++
 
     /**
      * Writes a text line to the document. It takes care of all the attributes.

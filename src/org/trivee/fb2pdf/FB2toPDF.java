@@ -32,6 +32,7 @@ import com.itextpdf.text.pdf.PdfAction;
 
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfDestination;
+import com.itextpdf.text.pdf.PdfDocument;
 import com.itextpdf.text.pdf.PdfOutline;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfTemplate;
@@ -295,23 +296,25 @@ public class FB2toPDF
     private void createPDFDoc()
         throws DocumentException, FileNotFoundException
     {
-        PageStyle ps = stylesheet.getPageStyle();
+        final PageStyle pageStyle = stylesheet.getPageStyle();
+        final GeneralSettings generalSettings = stylesheet.getGeneralSettings();
 
-        Rectangle pageSize = new Rectangle(ps.getPageWidth(), ps.getPageHeight());
+        Rectangle pageSize = new Rectangle(pageStyle.getPageWidth(), pageStyle.getPageHeight());
 
         doc = new com.itextpdf.text.Document(pageSize,
-            ps.getMarginLeft(), ps.getMarginRight(),
-            ps.getMarginTop(), ps.getMarginBottom());
+            pageStyle.getMarginLeft(), pageStyle.getMarginRight(),
+            pageStyle.getMarginTop(), pageStyle.getMarginBottom());
 
         writer = PdfWriter.getInstance(doc, new FileOutputStream(toName));
-        if (ps.enforcePageSize) {
+        if (pageStyle.enforcePageSize) {
             PageEventHandler pageEventHandler = new PageEventHandler();
-            pageEventHandler.enforcePageSize = ps.enforcePageSize;
-            pageEventHandler.pageSizeEnforcerColor = Color.decode(ps.pageSizeEnforcerColor);
+            pageEventHandler.enforcePageSize = pageStyle.enforcePageSize;
+            pageEventHandler.pageSizeEnforcerColor = Color.decode(pageStyle.pageSizeEnforcerColor);
             writer.setPageEvent(pageEventHandler);
         }
-        writer.setSpaceCharRatio(stylesheet.getGeneralSettings().trackingSpaceCharRatio);
-        writer.setStrictImageSequence(stylesheet.getGeneralSettings().strictImageSequence);
+        writer.setSpaceCharRatio(generalSettings.trackingSpaceCharRatio);
+        writer.setStrictImageSequence(generalSettings.strictImageSequence);
+        PdfDocument.hangingPunctuation = generalSettings.hangingPunctuation;
     }
 
     private void closePDF()
@@ -319,6 +322,7 @@ public class FB2toPDF
         doc.close();
     }
 
+    /*
     private static org.w3c.dom.Element getOnlyChildByTagName(org.w3c.dom.Element element, String tagName)
         throws FB2toPDFException
     {
@@ -329,6 +333,7 @@ public class FB2toPDF
             throw new FB2toPDFException("More than one element found: " + element.getTagName() + "/" + tagName);
         return children.item(0);
     }
+     */
 
     private static org.w3c.dom.Element getOptionalChildByTagName(org.w3c.dom.Element element, String tagName)
         throws FB2toPDFException

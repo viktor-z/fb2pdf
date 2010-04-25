@@ -18,6 +18,7 @@ public class GeneralSettings {
     public boolean generateTOC;
     public float trackingSpaceCharRatio;
     public boolean strictImageSequence;
+    public String hangingPunctuation = ".,;:'-";
 
     public GeneralSettings()
     {
