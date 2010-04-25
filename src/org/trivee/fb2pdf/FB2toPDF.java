@@ -314,6 +314,7 @@ public class FB2toPDF
         }
         writer.setSpaceCharRatio(generalSettings.trackingSpaceCharRatio);
         writer.setStrictImageSequence(generalSettings.strictImageSequence);
+        PdfDocument.preventWidows = pageStyle.preventWidows;
         PdfDocument.hangingPunctuation = generalSettings.hangingPunctuation;
     }
 

@@ -496,15 +496,16 @@ public class PdfDocument extends Document {
                     // we adjust the parameters of the document
                     alignment = paragraph.getAlignment();
                     leading = paragraph.getTotalLeading();
-                    carriageReturn();
+                    carriageReturn(false);
 
                     // we don't want to make orphans/widows
-                    if (currentHeight + line.height() + leading > indentTop() - indentBottom()) {
+                    //if (currentHeight + line.height() + leading > indentTop() - indentBottom()) { //VIKTORZ --
+                    if (preventWidows && (currentHeight + line.height() + leading > indentTop() - indentBottom())) {   //VIKTORZ ++
                         newPage();
                     }
                     indentation.indentLeft += paragraph.getIndentationLeft();
                     indentation.indentRight += paragraph.getIndentationRight();
-                    carriageReturn();
+                    carriageReturn(false);
 
                     PdfPageEvent pageEvent = writer.getPageEvent();
                     if (pageEvent != null && !isSectionTitle)
@@ -529,7 +530,7 @@ public class PdfDocument extends Document {
                     else {
                     	line.setExtraIndent(paragraph.getFirstLineIndent());
                     	element.process(this);
-                        carriageReturn();
+                        carriageReturn(false);
                         addSpacing(paragraph.getSpacingAfter(), paragraph.getTotalLeading(), paragraph.getFont());
                     }
 
@@ -539,7 +540,7 @@ public class PdfDocument extends Document {
                     alignment = Element.ALIGN_LEFT;
                     indentation.indentLeft -= paragraph.getIndentationLeft();
                     indentation.indentRight -= paragraph.getIndentationRight();
-                    carriageReturn();
+                    carriageReturn(false);
                     leadingCount--;
                     break;
                 }
@@ -1126,6 +1127,10 @@ public class PdfDocument extends Document {
      * of lines and a new empty line is added.
      */
     protected void carriageReturn() {
+        carriageReturn(true);
+    }
+
+    protected void carriageReturn(boolean preventWidows) {
         // the arraylist with lines may not be null
         if (lines == null) {
             lines = new ArrayList<PdfLine>();
@@ -1133,7 +1138,8 @@ public class PdfDocument extends Document {
         // If the current line is not null
         if (line != null) {
             // we check if the end of the page is reached (bugfix by Francois Gravel)
-            if (currentHeight + line.height() + leading < indentTop() - indentBottom()) {
+            float h = preventWidows ? currentHeight + line.height() : currentHeight;
+            if (h + leading < indentTop() - indentBottom()) {
                 // if so nonempty lines are added and the height is augmented
                 if (line.size() > 0) {
                     currentHeight += line.height();
@@ -1242,6 +1248,7 @@ public class PdfDocument extends Document {
     
     //static final String hangingPunctuation = ".,;:'"; //VIKTORZ --
     public static String hangingPunctuation = ".,;:'-"; //VIKTORZ ++
+    public static boolean preventWidows = true;         //VIKTORZ ++
 
     /**
      * Writes a text line to the document. It takes care of all the attributes.
