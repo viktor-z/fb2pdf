@@ -563,6 +563,7 @@ public class ParagraphStyle
         para.setIndentationLeft(getLeftIndent());
         para.setIndentationRight(getRightIndent());
         para.setFirstLineIndent(getFirstLineIndent());
+        para.setFont(getFont());
         return para;
     }
 
@@ -570,7 +571,6 @@ public class ParagraphStyle
         throws FB2toPDFException
     {
         Paragraph para = createParagraph();
-        para.setFont(getFont());
 
         if (bFirst) {
             para.setSpacingBefore(getFirstSpacingBefore());
