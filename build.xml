@@ -15,12 +15,19 @@
         </fileset>
     </path>
 
+    <target name="clean">
+    	<delete dir="${build}" />
+    	<delete dir="${dist}" />
+    </target>
+
     <target name="compile" description="compile the source">
+        <mkdir dir="${build}"/>
         <javac destdir="${build}" source="1.5" target="1.5" deprecation="on" fork="yes" debug="true" encoding="Cp1251">
             <compilerarg value="-Xlint:unchecked"/>
             <src path="${src}"/>
 
             <include name="org/trivee/**" />
+            <include name="com/itextpdf/**" />
 
             <classpath>
                  <path refid="lib"/>
