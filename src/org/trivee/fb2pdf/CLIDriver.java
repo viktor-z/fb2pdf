@@ -15,7 +15,7 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Option;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -27,12 +27,12 @@ import org.apache.commons.cli.PosixParser;
  */
 public class CLIDriver {
 
-    private static String hlpText = "Usage: fb2pdf [-h] [-s styles] <input file | directory> [-r] [<output file | directory>]\n\n" +
-            "Examples:\n\n" +
-            "\tfb2pdf test.fb2\n\n" +
-            "\tfb2pdf \"c:\\My Books\"\n\n" +
-            "\tfb2pdf test.fb2 mybook.pdf\n" +
-            "\tfb2pdf -s data\\mystyle.json test.fb2";
+    private static String hlpText = "fb2pdf [-h] [-s styles] <input file | directory> [-r] [<output file | directory>]" +
+            "\n\nExamples:" +
+            "\n\n\tfb2pdf test.fb2" +
+            "\n\n\tfb2pdf \"c:\\My Books\"" +
+            "\n\n\tfb2pdf test.fb2 mybook.pdf" +
+            "\n\n\tfb2pdf -s data\\mystyle.json test.fb2";
     private static int succeeded = 0;
     private static int failed = 0;
     private static CommandLine cl;
@@ -56,16 +56,18 @@ public class CLIDriver {
                 .withArgName("PATH")
                 .withDescription("Stylesheet file")
                 .create('s'));
+        options.addOption("l", "log", true, "Log creation");
 
         cl = new PosixParser().parse(options, args);
 
+        HelpFormatter formatter = new HelpFormatter();
         if(args.length == 0 || cl.hasOption('h')){
-                println(hlpText);
+                formatter.printHelp(hlpText, options);
                 return;
         }
 
         if (cl.getArgs().length < 1 || cl.getArgs().length > 2) {
-                println(hlpText);
+                formatter.printHelp(hlpText, options);
                 return;
         }
 
@@ -128,11 +130,14 @@ public class CLIDriver {
     private static void translate(String fb2name, String pdfname, String stylesheetName) throws FileNotFoundException, UnsupportedEncodingException {
                 FileInputStream stylesheet = new FileInputStream(stylesheetName);
 
-                FileOutputStream log = new FileOutputStream(String.format("%s.fb2pdf.log", fb2name));
-                PrintStream newOut = new PrintStream(log, true, "cp1251");
                 PrintStream saveOut = System.out;
-
-                System.setOut(newOut);
+                boolean createLog = cl.hasOption('l') ? Boolean.parseBoolean(cl.getOptionValue('l')) : true;
+                if(createLog) {
+                    FileOutputStream log = new FileOutputStream(String.format("%s.fb2pdf.log", fb2name));
+                    PrintStream newOut = new PrintStream(log, true, "cp1251");
+                    System.setOut(newOut);
+                    System.setErr(newOut);
+                }
                 try
                 {
                         FB2toPDF.translate(fb2name, pdfname, stylesheet);
@@ -147,7 +152,9 @@ public class CLIDriver {
                 }
                 finally
                 {
+                    if(createLog) {
                         System.setOut(saveOut);
+                    }
                 }
     }
 
