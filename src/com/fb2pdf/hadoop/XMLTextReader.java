@@ -10,12 +10,17 @@ import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.hadoop.mapred.*;
 
+import com.fb2pdf.hadoop.OnDemandSAXParser.StringPair;
+
+
 public class XMLTextReader implements RecordReader<Text, Text>
 {
+
     private CompressionCodecFactory compressionCodecs;
     InputStream                     in;
     private long                    start;
     private long                    end;
+    private OnDemandSAXParser       parser;
 
     public XMLTextReader(JobConf job, FileSplit split) throws IOException
     {
@@ -34,11 +39,14 @@ public class XMLTextReader implements RecordReader<Text, Text>
             in = codec.createInputStream(fileIn);
         else
             in = fileIn;
+
+        parser = new OnDemandSAXParser(in);
     }
 
     @Override
     public void close() throws IOException
     {
+        parser.stop();
         in.close();
     }
 
@@ -72,8 +80,16 @@ public class XMLTextReader implements RecordReader<Text, Text>
     @Override
     public boolean next(Text key, Text value) throws IOException
     {
-        // TODO Auto-generated method stub
-        return false;
+        StringPair n = parser.getNext();
+        if(n != null)
+        {
+            key.set(n.a);
+            value.set(n.b);
+            return true;
+        } else
+        {
+            return false; // EOF
+        }
     }
 
 }
