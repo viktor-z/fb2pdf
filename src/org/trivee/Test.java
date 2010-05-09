@@ -1,7 +1,6 @@
 package org.trivee;
 
 import org.trivee.fb2pdf.FB2toPDF;
-import org.trivee.fb2pdf.FB2toPDFException;
 
 public class Test {
 

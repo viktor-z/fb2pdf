@@ -2,12 +2,11 @@ package org.trivee.fb2pdf;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URLDecoder;
+import java.lang.reflect.Type;
+
+import com.google.gson.*;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.BaseFont;
-
-import java.lang.reflect.Type;
-import com.google.gson.*;
 
 public class FontFamily
 {
