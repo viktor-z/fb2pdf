@@ -81,6 +81,7 @@ import com.itextpdf.text.pdf.internal.PdfViewerPreferencesImp;
  * @author Paulo Soares
  * @author Kazuya Ujihara
  */
+@SuppressWarnings("deprecation")
 public class PdfReader implements PdfViewerPreferences {
 
 	/**

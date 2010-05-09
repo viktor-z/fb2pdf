@@ -48,6 +48,7 @@ import com.itextpdf.text.pdf.ByteBuffer;
 /**
  * Encodes data in the CCITT G4 FAX format.
  */
+@SuppressWarnings("unused")
 public class CCITTG4Encoder {
     private int rowbytes;
     private int rowpixels;

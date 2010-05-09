@@ -592,6 +592,7 @@ public class Base64 {
         
         // Isolate options
         int gzip           = (options & GZIP);
+        @SuppressWarnings("unused")
         int dontBreakLines = (options & DONT_BREAK_LINES);
         
         try {
@@ -1282,6 +1283,7 @@ public class Base64 {
         private int     lineLength;
         private boolean breakLines;     // Break lines at less than 80 characters
         private int     options;        // Record options used to create the stream.
+        @SuppressWarnings("unused")
         private byte[]  alphabet;	    // Local copies to avoid extra method calls
         private byte[]  decodabet;		// Local copies to avoid extra method calls
         
@@ -1487,6 +1489,7 @@ public class Base64 {
      * @see Base64
      * @since 1.3
      */
+    @SuppressWarnings("unused")
     public static class OutputStream extends java.io.FilterOutputStream {
         private boolean encode;
         private int     position;

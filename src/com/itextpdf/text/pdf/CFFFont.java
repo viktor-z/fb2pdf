@@ -80,6 +80,7 @@ import java.util.LinkedList;
 
 import com.itextpdf.text.ExceptionConverter;
 
+@SuppressWarnings("unused")
 public class CFFFont {
 
     static final String operatorNames[] = {

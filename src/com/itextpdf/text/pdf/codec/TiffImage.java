@@ -171,6 +171,7 @@ public class TiffImage {
             if ((size == null || (size.length == 1 && (size[0] == 0 || size[0] + offset[0] > s.length()))) && h == rowsStrip) { // some TIFF producers are really lousy, so...
                 size = new long[]{s.length() - (int)offset[0]};
             }
+            @SuppressWarnings("unused")
             boolean reverse = false;
             TIFFField fillOrderField =  dir.getField(TIFFConstants.TIFFTAG_FILLORDER);
             if (fillOrderField != null)

@@ -46,7 +46,7 @@
 package com.itextpdf.text.pdf.codec;
 
 import com.itextpdf.text.error_messages.MessageLocalization;
-
+@SuppressWarnings("unused")
 public class TIFFFaxDecoder {
     
     private int bitPointer, bytePointer;

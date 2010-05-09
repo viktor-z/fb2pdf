@@ -60,6 +60,7 @@ import java.security.DigestException;
  * @author Paulo Soares
  * @author Kazuya Ujihara
  */
+@SuppressWarnings("unused")
 public class PdfEncryption {
 
 	public static final int STANDARD_ENCRYPTION_40 = 2;

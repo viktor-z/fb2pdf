@@ -112,6 +112,7 @@ import com.itextpdf.text.pdf.PdfString;
  *
  * @author  Paulo Soares
  */
+@SuppressWarnings("unused")
 public class BmpImage {
 
     // BMP variables

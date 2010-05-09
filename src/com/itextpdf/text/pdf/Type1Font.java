@@ -58,6 +58,7 @@ import com.itextpdf.text.pdf.fonts.FontsResourceAnchor;
  *
  * @author Paulo Soares
  */
+@SuppressWarnings("unused")
 class Type1Font extends BaseFont
 {
     private static FontsResourceAnchor resourceAnchor;

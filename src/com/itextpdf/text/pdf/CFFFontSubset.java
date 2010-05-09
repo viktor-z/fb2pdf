@@ -238,7 +238,8 @@ public class CFFFontSubset extends CFFFont {
      */
     int CountRange(int NumofGlyphs,int Type){
     	int num=0;
-    	char Sid;
+    	@SuppressWarnings("unused")
+        char Sid;
     	int i=1,nLeft;
     	while (i<NumofGlyphs){
     		num++;
@@ -1215,6 +1216,7 @@ public class CFFFontSubset extends CFFFont {
 	/**
 	 * Function Copies the header from the original fileto the output list
 	 */
+	@SuppressWarnings("unused")
 	protected void CopyHeader()
 	{
 		seek(0);

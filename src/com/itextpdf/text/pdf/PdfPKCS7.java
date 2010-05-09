@@ -119,6 +119,7 @@ import com.itextpdf.text.error_messages.MessageLocalization;
  * <p>
  * It's based in code found at org.bouncycastle.
  */
+@SuppressWarnings("unused")
 public class PdfPKCS7 {
 
     private byte sigAttr[];
