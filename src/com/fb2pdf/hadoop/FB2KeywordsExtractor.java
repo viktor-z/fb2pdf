@@ -22,14 +22,15 @@ public class FB2KeywordsExtractor extends Configured implements Tool
     private static final Log          logger = LogFactory.getLog("com.fb2pdf.hadoop.FB2KeywordsExtractor");
     private final static LongWritable one    = new LongWritable(1);
 
-    class ExtractKeywordsMapper extends MapReduceBase implements Mapper<LongWritable, Text, Text, LongWritable>
+    class ExtractKeywordsMapper extends MapReduceBase implements Mapper<Text, Text, Text, LongWritable>
     {
         private Text word = new Text();
 
         @Override
-        public void map(LongWritable key, Text value, OutputCollector<Text, LongWritable> output, Reporter reporter)
+        public void map(Text key, Text value, OutputCollector<Text, LongWritable> output, Reporter reporter)
                 throws IOException
         {
+            //TODO: ignore certain elements, like BASE64-encoded images
             String line = value.toString();
             StringTokenizer st = new StringTokenizer(line);
             while(st.hasMoreTokens())
@@ -46,7 +47,7 @@ public class FB2KeywordsExtractor extends Configured implements Tool
         JobConf conf = new JobConf(getConf(), FB2KeywordsExtractor.class);
         conf.setJobName("FB2KeywordsExtractor");
 
-        conf.setInputFormat(FB2TextInputFormat.class);
+        conf.setInputFormat(XMLTextInputFormat.class);
         conf.setOutputFormat(TextOutputFormat.class);
 
         conf.setOutputKeyClass(Text.class);
