@@ -14,20 +14,26 @@ public class XMLTextReader implements RecordReader<Text, Text>
 {
     private CompressionCodecFactory compressionCodecs;
     InputStream                     in;
+    private long                    start;
+    private long                    end;
 
     public XMLTextReader(JobConf job, FileSplit split) throws IOException
     {
         final Path file = split.getPath();
+        start = split.getStart();
+        end = start + split.getLength();
+
         compressionCodecs = new CompressionCodecFactory(job);
         final CompressionCodec codec = compressionCodecs.getCodec(file);
 
         FileSystem fs = file.getFileSystem(job);
         FSDataInputStream fileIn = fs.open(split.getPath());
+
+        fileIn.seek(start);
         if(codec != null)
             in = codec.createInputStream(fileIn);
         else
-            this.in = fileIn;
-
+            in = fileIn;
     }
 
     @Override
@@ -39,29 +45,28 @@ public class XMLTextReader implements RecordReader<Text, Text>
     @Override
     public Text createKey()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return new Text();
     }
 
     @Override
     public Text createValue()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return new Text();
     }
 
     @Override
     public long getPos() throws IOException
     {
-        // TODO Auto-generated method stub
-        return 0;
+        return start; // TODO: implement
     }
 
     @Override
     public float getProgress() throws IOException
     {
-        // TODO Auto-generated method stub
-        return 0;
+        if(start == end)
+            return 0.0f;
+        else
+            return Math.min(1.0f, (getPos() - start) / (float) (end - start));
     }
 
     @Override
