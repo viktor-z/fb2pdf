@@ -11,6 +11,10 @@
 	<classpathentry kind="lib" path="lib/itext-hyph-xml.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/commons-logging-1.0.4.jar"/>
-	<classpathentry kind="lib" path="lib/hadoop-0.18.3-core.jar"/>
+	<classpathentry kind="lib" path="lib/hadoop-0.18.3-core.jar" sourcepath="/Users/lord/java/hadoop-0.18.3/src/">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/Users/lord/java/hadoop-0.18.3/docs/api/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="build"/>
 </classpath>
