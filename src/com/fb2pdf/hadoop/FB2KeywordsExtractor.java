@@ -22,15 +22,20 @@ public class FB2KeywordsExtractor extends Configured implements Tool
     private static final Log          logger = LogFactory.getLog("com.fb2pdf.hadoop.FB2KeywordsExtractor");
     private final static LongWritable one    = new LongWritable(1);
 
-    static Set<String> excluded;
+    static Set<String>                excluded;
     static
     {
         excluded = new HashSet<String>();
         excluded.add("FictionBook/binary");
     }
 
-    class ExtractKeywordsMapper extends MapReduceBase implements Mapper<Text, Text, Text, LongWritable>
+    static class ExtractKeywordsMapper extends MapReduceBase implements Mapper<Text, Text, Text, LongWritable>
     {
+        public ExtractKeywordsMapper()
+        {
+            super();
+        }
+
         private Text word = new Text();
 
         @Override
@@ -39,13 +44,17 @@ public class FB2KeywordsExtractor extends Configured implements Tool
         {
             if(excluded.contains(key.toString()))
                 return;
-            
+
             String line = value.toString().trim();
-            StringTokenizer st = new StringTokenizer(line);
+            TextTokenizer st = new TextTokenizer(line);
             while(st.hasMoreTokens())
             {
-                word.set(st.nextToken());
-                output.collect(word, one);
+                String k = st.nextToken().trim();
+                if(k.length()>1)
+                {
+                    word.set(k);
+                    output.collect(word, one);
+                }
             }
         }
     };
@@ -68,7 +77,7 @@ public class FB2KeywordsExtractor extends Configured implements Tool
         conf.setNumReduceTasks(1);
 
         Path inpath = new Path(args[0]);
-        Path outpath = new Path(args[0]);
+        Path outpath = new Path(args[1]);
         FileInputFormat.addInputPath(conf, inpath);
         FileOutputFormat.setOutputPath(conf, outpath);
 
@@ -84,7 +93,12 @@ public class FB2KeywordsExtractor extends Configured implements Tool
      */
     public static void main(String[] args) throws Exception
     {
-        System.exit(ToolRunner.run(new Configuration(), new FB2KeywordsExtractor(), args));
+        if(args.length != 2)
+        {
+            System.err.println("Usage FB2KeywordsExtractor <src> <dst>");
+            System.exit(1);
+        } else
+            System.exit(ToolRunner.run(new Configuration(), new FB2KeywordsExtractor(), args));
     }
 
 }
