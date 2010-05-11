@@ -2,7 +2,7 @@
 package com.fb2pdf.hadoop;
 
 import java.io.IOException;
-import java.util.StringTokenizer;
+import java.util.*;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -22,6 +22,13 @@ public class FB2KeywordsExtractor extends Configured implements Tool
     private static final Log          logger = LogFactory.getLog("com.fb2pdf.hadoop.FB2KeywordsExtractor");
     private final static LongWritable one    = new LongWritable(1);
 
+    static Set<String> excluded;
+    static
+    {
+        excluded = new HashSet<String>();
+        excluded.add("FictionBook/binary");
+    }
+
     class ExtractKeywordsMapper extends MapReduceBase implements Mapper<Text, Text, Text, LongWritable>
     {
         private Text word = new Text();
@@ -30,8 +37,10 @@ public class FB2KeywordsExtractor extends Configured implements Tool
         public void map(Text key, Text value, OutputCollector<Text, LongWritable> output, Reporter reporter)
                 throws IOException
         {
-            //TODO: ignore certain elements, like BASE64-encoded images
-            String line = value.toString();
+            if(excluded.contains(key.toString()))
+                return;
+            
+            String line = value.toString().trim();
             StringTokenizer st = new StringTokenizer(line);
             while(st.hasMoreTokens())
             {
