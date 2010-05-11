@@ -22,6 +22,11 @@ class OnDemandSAXParser extends DefaultHandler implements Runnable
 
     class StringPair
     {
+        @Override
+        public String toString()
+        {
+            return ""+a+","+b;
+        }
         public String a;
         public String b;
     };
@@ -29,71 +34,14 @@ class OnDemandSAXParser extends DefaultHandler implements Runnable
     private InputStream  in;
     private Thread       thread;
     private SAXParser    saxParser;
-    private Exception    exception;
-    private Object       mutex;
     private List<String> path;
     StringBuffer         text;
+
+    private Object       mutex;     // protects following fields
     private boolean      done;
-
-    @Override
-    public void endDocument() throws SAXException
-    {
-        done = true;
-        exception = null;
-    }
-
-    @Override
-    public void error(SAXParseException e) throws SAXException
-    {
-        done = true;
-        exception = e;
-        synchronized(mutex)
-        {
-            mutex.notifyAll();
-        }
-    }
-
-    @Override
-    public void fatalError(SAXParseException e) throws SAXException
-    {
-        done = true;
-        exception = e;
-        synchronized(mutex)
-        {
-            mutex.notifyAll();
-        }
-    }
-
-    @Override
-    public void characters(char[] ch, int start, int length) throws SAXException
-    {
-        text.append(ch, start, length);
-    }
-
-    @Override
-    public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException
-    {
-        text.append(ch, start, length);
-    }
-
-    @Override
-    public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException
-    {
-        text.delete(0, text.length() - 1);
-        path.add(localName);
-    }
-
-    @Override
-    public void endElement(String uri, String localName, String name) throws SAXException
-    {
-        if(path.size() == 0)
-            throw new SAXException("Non matching start/end element");
-        path.remove(path.size() - 1);
-        synchronized(mutex)
-        {
-            mutex.notifyAll();
-        }
-    }
+    private boolean      data_ready;
+    private Exception    exception;
+    private StringPair   pair;
 
     public OnDemandSAXParser(InputStream in) throws IOException
     {
@@ -113,6 +61,7 @@ class OnDemandSAXParser extends DefaultHandler implements Runnable
         this.path = new LinkedList<String>();
         this.text = new StringBuffer();
         this.done = false;
+        this.data_ready = false;
         this.mutex = new Object();
         this.thread = new Thread(this);
         thread.start();
@@ -128,7 +77,108 @@ class OnDemandSAXParser extends DefaultHandler implements Runnable
         {
             synchronized(mutex)
             {
-                this.exception = e;
+                waitForSpace();
+                done = true;
+                exception = e;
+                pair = null;
+                data_ready = true;
+                mutex.notifyAll();
+            }
+        }
+    }
+
+    @Override
+    public void endDocument() throws SAXException
+    {
+        synchronized(mutex)
+        {
+            waitForSpace();
+            done = true;
+            exception = null;
+            pair = null;
+            data_ready = true;
+            mutex.notifyAll();
+        }
+    }
+
+    @Override
+    public void error(SAXParseException e) throws SAXException
+    {
+        synchronized(mutex)
+        {
+            waitForSpace();
+            done = true;
+            pair = null;
+            exception = e;
+            data_ready = true;
+            mutex.notifyAll();
+        }
+    }
+
+    @Override
+    public void fatalError(SAXParseException e) throws SAXException
+    {
+        synchronized(mutex)
+        {
+            waitForSpace();
+            done = true;
+            pair = null;
+            exception = e;
+            data_ready = true;
+            mutex.notifyAll();
+        }
+    }
+
+    @Override
+    public void characters(char[] ch, int start, int length) throws SAXException
+    {
+        text.append(ch, start, length);
+    }
+
+    @Override
+    public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException
+    {
+        text.append(ch, start, length);
+    }
+
+    @Override
+    public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException
+    {
+        path.add(name);
+        //System.err.println("Start element : " + StringUtils.join(path, XML_PATH_SEPARATOR));
+    }
+
+    @Override
+    public void endElement(String uri, String localName, String name) throws SAXException
+    {
+        //System.err.println("End element : " + StringUtils.join(path, XML_PATH_SEPARATOR));
+        if(path.size() == 0)
+            throw new SAXException("Non matching start/end element");
+
+        synchronized(mutex)
+        {
+            waitForSpace();
+            pair = new StringPair();
+            pair.a = StringUtils.join(path, XML_PATH_SEPARATOR);
+            pair.b = text.toString();
+            text = new StringBuffer();
+            data_ready = true;
+            mutex.notifyAll();
+        }
+        path.remove(path.size() - 1);
+
+    }
+
+    private void waitForSpace()
+    {
+        // we are synchronized(mutex) here
+        while(data_ready)
+        {
+            try
+            {
+                mutex.wait();
+            } catch(InterruptedException e)
+            {
             }
         }
     }
@@ -136,26 +186,27 @@ class OnDemandSAXParser extends DefaultHandler implements Runnable
     public void stop()
     {
         // TODO Auto-generated method stub
-
     }
 
     public StringPair getNext() throws IOException
     {
         synchronized(mutex)
         {
-            while(true)
+            while(!data_ready)
             {
                 try
                 {
                     mutex.wait();
-                    break;
                 } catch(InterruptedException e)
                 {
                 }
             }
 
+            data_ready = false;
+
             if(exception != null)
-            {
+            {            
+                mutex.notifyAll(); // need this?
                 if(exception instanceof IOException)
                     throw (IOException) exception;
                 else
@@ -163,13 +214,14 @@ class OnDemandSAXParser extends DefaultHandler implements Runnable
             }
 
             if(done)
-                return null;
-            else
             {
-                StringPair res = new StringPair();
-                res.a = StringUtils.join(path, XML_PATH_SEPARATOR);
-                res.b = text.toString();
-                return res;
+                mutex.notifyAll(); // need this?
+                return null;
+            } else
+            {
+                StringPair r = pair;
+                mutex.notifyAll();
+                return r;
             }
         }
     }
