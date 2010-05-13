@@ -1,28 +1,30 @@
+
 package com.fb2pdf.hadoop;
 
-
 /**
- * A placeholder class to extract meaningful keywords from string of text.
- * This is clearly unsifficient - we need to handle many cases, such as
- * "hello- " (hello) and "hocus-pocus" (hocus-pocus), "'jazz'" (jazz), etc.
+ * A placeholder class to extract meaningful keywords from string of text. This
+ * is clearly unsufficient.
  * 
  * @author lord
- *
+ * 
  */
 public class TextTokenizer
 {
-    private String[] keywords;
-    private int pos;
-    
+    String[] keywords;
+    int      pos;
+
     public TextTokenizer(String str)
     {
-        keywords = str.split("[^\\p{javaLetter}]");
-        pos = 0;
+        keywords = str.split("[^\\p{javaLetter}]+");
+        if(keywords.length > 0 && keywords[0].isEmpty())
+            pos = 1;
+        else
+            pos = 0;
     }
 
     public boolean hasMoreTokens()
     {
-        return pos!=keywords.length;
+        return pos != keywords.length;
     }
 
     public String nextToken()
