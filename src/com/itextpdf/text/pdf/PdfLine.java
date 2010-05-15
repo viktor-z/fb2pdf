@@ -264,7 +264,9 @@ public class PdfLine {
      */
 
     public boolean hasToBeJustified() {
-        return (alignment == Element.ALIGN_JUSTIFIED || alignment == Element.ALIGN_JUSTIFIED_ALL) && width != 0;
+        // return (alignment == Element.ALIGN_JUSTIFIED || alignment == Element.ALIGN_JUSTIFIED_ALL) && width != 0; //VIKTORZ --
+        return (alignment == Element.ALIGN_JUSTIFIED || alignment == Element.ALIGN_JUSTIFIED_ALL)  //VIKTORZ ++
+            && width != 0 && !newlineSplit; //VIKTORZ ++
     }
 
     /**
