@@ -73,6 +73,21 @@ public class FB2toPDF
         addLine(chunk, currentStyle);
     }
 
+    protected void addCenteredImage(Image image) throws DocumentException {
+        Rectangle pageSize = doc.getPageSize();
+        float dpi = stylesheet.getGeneralSettings().imageDpi;
+        float scaleWidth = pageSize.getWidth() - doc.leftMargin() - doc.rightMargin();
+        float scaleHeight = pageSize.getHeight() - doc.topMargin() - doc.bottomMargin();
+        float imgWidth = image.getWidth() / dpi * 72;
+        float imgHeight = image.getHeight() / dpi * 72;
+        float Y = (scaleHeight - imgHeight) / 2;
+        float X = (scaleWidth - imgWidth) / 2;
+        X = X > 0 ? X : 0;
+        Y = Y > 0 ? Y : 0;
+        image.setAbsolutePosition(X, Y);
+        addImage(image);
+    }
+
     protected void addImage(Image image) throws DocumentException {
         Rectangle pageSize = doc.getPageSize();
         float dpi = stylesheet.getGeneralSettings().imageDpi;
@@ -558,7 +573,7 @@ public class FB2toPDF
                     if (stylesheet.getGeneralSettings().stretchCover) {
                         addStretchedImage(image);
                     } else {
-                        addImage(image);
+                        addCenteredImage(image);
                     }
                     doc.newPage();
                 }
