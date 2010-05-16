@@ -392,7 +392,8 @@ public class PdfChunk {
             return null;
         }
         // otherwise, the string has to be truncated
-        if (splitPosition < 0) {
+        //if (splitPosition < 0 ) {                          //VIKTORZ --
+        if (splitPosition < 0 && hyphenationEvent == null) { //VIKTORZ ++
             String returnValue = value;
             value = "";
             PdfChunk pc = new PdfChunk(returnValue, this);
@@ -400,6 +401,7 @@ public class PdfChunk {
         }
         if (lastSpace > splitPosition && splitCharacter.isSplitCharacter(0, 0, 1, singleSpace, null))
             splitPosition = lastSpace;
+        if(lastSpace < 0) lastSpace = 0;  //VIKTORZ ++
         if (hyphenationEvent != null && lastSpace >= 0 && lastSpace < currentPosition) {
             int wordIdx = getWord(value, lastSpace);
             if (wordIdx > lastSpace) {
