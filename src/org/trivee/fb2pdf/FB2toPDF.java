@@ -73,6 +73,22 @@ public class FB2toPDF
         addLine(chunk, currentStyle);
     }
 
+    protected void addImage(Image image) throws DocumentException {
+        Rectangle pageSize = doc.getPageSize();
+        float dpi = stylesheet.getGeneralSettings().imageDpi;
+        float scaleWidth = (pageSize.getWidth() - doc.leftMargin() - doc.rightMargin()) * 0.95f;
+        float scaleHeight = (pageSize.getHeight() - doc.topMargin() - doc.bottomMargin()) * 0.95f;
+        float imgWidth = image.getWidth() / dpi * 72;
+        float imgHeight = image.getHeight() / dpi * 72;
+        if ((imgWidth <= scaleWidth) && (imgHeight <= scaleHeight)) {
+            scaleWidth = imgWidth;
+            scaleHeight = imgHeight;
+        }
+        image.scaleToFit(scaleWidth, scaleHeight);
+        image.setAlignment(Image.MIDDLE);
+        doc.add(image);
+    }
+
     protected void addInvisibleAnchor(String name) throws FB2toPDFException, DocumentException {
         Anchor anchor = currentStyle.createInvisibleAnchor();
         anchor.setName(name);
@@ -84,6 +100,13 @@ public class FB2toPDF
         Paragraph para = style.createParagraph();
         para.add(chunk);
         doc.add(para);
+    }
+
+    protected void addStretchedImage(Image image) throws DocumentException {
+        Rectangle pageSize = doc.getPageSize();
+        image.scaleToFit(pageSize.getWidth() - doc.leftMargin() - doc.rightMargin(), pageSize.getHeight() - doc.topMargin() - doc.bottomMargin());
+        image.setAlignment(Image.MIDDLE);
+        doc.add(image);
     }
 
     private void addGoToActionToChunk(String refname, Chunk chunk) {
@@ -198,20 +221,7 @@ public class FB2toPDF
         String href = element.getAttributeNS(NS_XLINK, "href");
         Image image = getImage(href);
         if (image != null) {
-            Rectangle pageSize = doc.getPageSize();
-            float dpi = stylesheet.getGeneralSettings().imageDpi;
-
-            float scaleWidth = (pageSize.getWidth() - doc.leftMargin() - doc.rightMargin()) * 0.95f;
-            float scaleHeight = (pageSize.getHeight() - doc.topMargin() - doc.bottomMargin()) * 0.95f;
-            float imgWidth = image.getWidth() / dpi * 72;
-            float imgHeight = image.getHeight() / dpi * 72;
-            if ((imgWidth <= scaleWidth) && (imgHeight <= scaleHeight)) {
-                scaleWidth = imgWidth;
-                scaleHeight = imgHeight;
-            }
-            image.scaleToFit(scaleWidth, scaleHeight);
-            image.setAlignment(Image.MIDDLE);
-            doc.add(image);
+            addImage(image);
         } else {
             System.out.println("Image not found, href: " + href);
         }
@@ -545,12 +555,11 @@ public class FB2toPDF
                 Image image = getImage(href);
                 if (image != null)
                 {
-                    Rectangle pageSize = doc.getPageSize();
-                    image.scaleToFit(
-                        pageSize.getWidth() - doc.leftMargin() - doc.rightMargin(),
-                        pageSize.getHeight() - doc.topMargin() - doc.bottomMargin());
-                    image.setAlignment(Image.MIDDLE);
-                    doc.add(image);
+                    if (stylesheet.getGeneralSettings().stretchCover) {
+                        addStretchedImage(image);
+                    } else {
+                        addImage(image);
+                    }
                     doc.newPage();
                 }
             }
