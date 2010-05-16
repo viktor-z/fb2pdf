@@ -787,15 +787,6 @@ public class FB2toPDF
             String ref = section.getAttribute("id");
             if(isNullOrEmpty(ref))
                 ref = "section" + i;
-            /*
-            Anchor anchor = tocItemStyle.createAnchor();
-            anchor.add(chunk);
-            anchor.setReference("#" + ref);
-            System.out.println("Adding A HREF=#" + ref);
-
-            Paragraph para = tocItemStyle.createParagraph();
-            para.add(anchor);
-             */
             addGoToActionToChunk(ref, chunk);
             Paragraph para = tocItemStyle.createParagraph();
             para.add(chunk);
@@ -845,8 +836,11 @@ public class FB2toPDF
             //doc.newPage();
             if (bodyIndex == 0)
             {
-                currentOutline = writer.getDirectContent().getRootOutline();
-                currentOutline = addBookmark(getTextContentByTagName(section, "title"));
+                String bmk = getTextContentByTagName(section, "title");
+                if (StringUtils.isNotBlank(bmk)) {
+                    currentOutline = writer.getDirectContent().getRootOutline();
+                    currentOutline = addBookmark(bmk);
+                }
             }
         }
         else if (level == 1)
@@ -856,7 +850,10 @@ public class FB2toPDF
             //}
             //writer.setPageEmpty(false);
             if (bodyIndex == 0) {
-                addBookmark(getTextContentByTagName(section, "title"));
+                String bmk = getTextContentByTagName(section, "title");
+                if (StringUtils.isNotBlank(bmk)) {
+                    addBookmark(bmk);
+                }
             }
         }
 
