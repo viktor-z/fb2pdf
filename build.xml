@@ -29,6 +29,7 @@
 
             <include name="org/trivee/**" />
             <include name="com/itextpdf/**" />
+        	<include name="com/fb2pdf/**" />
 
             <classpath>
                  <path refid="lib"/>
