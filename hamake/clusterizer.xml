@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="test">
+
+	<property name="dist" value="dist/" />
+	<property name="lib" value="lib" />
+
+	<fileset id="input" path="test_data/hamake/" mask="*.fb2" />
+	<file id="output" path="build/result" />
+	<file id="vectors" path="build/SparseVectorsFromSequenceFilesOutput/vectors" />
+
+	<foreach name="FB2KeywordsExtractor">
+		<input>
+			<include idref="input" />
+		</input>
+		<output>
+			<file id="FB2KeywordsExtractorOut" path="build/FB2KeywordsExtractorOut/${foreach:filename}" />
+		</output>
+		<mapreduce jar="${dist}/fb2pdf.jar" main="com.fb2pdf.hadoop.FB2KeywordsExtractor">
+			<parameter>
+				<literal value="${foreach:path}" />
+			</parameter>
+			<parameter>
+				<reference idref="FB2KeywordsExtractorOut" />
+			</parameter>
+		</mapreduce>
+	</foreach>
+	<fold name="SequenceFilesFromDirectory">
+		<input>
+			<file id="SequenceFilesFromDirectoryIn" path="build/FB2KeywordsExtractorOut/" />
+		</input>
+		<output>
+			<file id="SequenceFilesFromDirectoryOut" path="build/SequenceFilesFromDirectoryOutput" />
+		</output>
+		<mapreduce jar="${dist}/fb2pdf.jar" main="com.fb2pdf.hadoop.SequenceFilesFromDirectory">
+			<parameter>
+				<reference idref="SequenceFilesFromDirectoryIn" />
+			</parameter>
+			<parameter>
+				<reference idref="SequenceFilesFromDirectoryOut" />
+			</parameter>
+			<parameter>
+				<literal value="part-" />
+			</parameter>
+		</mapreduce>
+	</fold>
+	<fold name="SparseVectorsFromSequenceFiles">
+		<input>
+			<file id="SparseVectorsFromSequenceFilesIn" path="build/SequenceFilesFromDirectoryOutput/" />
+		</input>
+		<output>
+			<file id="SparseVectorsFromSequenceFilesOut" path="build/SparseVectorsFromSequenceFilesOutput/" />
+		</output>
+		<mapreduce jar="${lib}/mahout-0.3/mahout-utils-0.3.jar" main="org.apache.mahout.text.SparseVectorsFromSequenceFiles">
+			<classpath>
+				<fileset path="lib/mahout-0.3" mask="*.jar" />
+			</classpath>
+			<parameter>
+				<literal value="-i" />
+			</parameter>
+			<parameter>
+				<reference idref="SparseVectorsFromSequenceFilesIn" />
+			</parameter>
+			<parameter>
+				<literal value="-o" />
+			</parameter>
+			<parameter>
+				<reference idref="SparseVectorsFromSequenceFilesOut" />
+			</parameter>
+			<parameter>
+				<literal value="-chunk" />
+			</parameter>
+			<parameter>
+				<literal value="64" />
+			</parameter>
+			<parameter>
+				<literal value="-wt" />
+			</parameter>
+			<parameter>
+				<literal value="tf" />
+			</parameter>
+		</mapreduce>
+	</fold>
+	<fold name="MeanShiftCanopy">
+		<input>
+			<include idref="vectors" />
+		</input>
+		<output>
+			<file id="MeanShiftCanopyOut" path="build/MeanShiftCanopyOutput/" />
+		</output>
+		<mapreduce jar="${dist}/fb2pdf.jar" main="com.fb2pdf.hadoop.MeanShiftCanopyDriver">
+			<classpath>
+				<fileset path="lib/mahout-0.3" mask="*.jar" />
+			</classpath>
+			<parameter>
+				<reference idref="vectors" />
+			</parameter>
+			<parameter>
+				<reference idref="MeanShiftCanopyOut" />
+			</parameter>
+		</mapreduce>
+	</fold>
+	<fold name="MeanShiftOutDumper">
+		<input>
+			<file id="MeanShiftOutDumperIn" path="build/MeanShiftCanopyOutput/" />
+		</input>
+		<output>
+			<include idref="output" />
+		</output>
+		<mapreduce jar="${dist}/fb2pdf.jar" main="com.fb2pdf.hadoop.OutputClusterResults">
+			<classpath>
+				<fileset path="lib/mahout-0.3" mask="*.jar" />
+			</classpath>
+			<parameter>
+				<reference idref="MeanShiftOutDumperIn" />
+			</parameter>
+			<parameter>
+				<reference idref="vectors" />
+			</parameter>
+			<parameter>
+				<reference idref="output" />
+			</parameter>
+		</mapreduce>
+	</fold>
+</project>
