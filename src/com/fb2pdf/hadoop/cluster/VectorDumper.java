@@ -1,4 +1,4 @@
-package com.fb2pdf.hadoop;
+package com.fb2pdf.hadoop.cluster;
 
 import java.io.IOException;
 import java.io.PrintWriter;

@@ -1,4 +1,4 @@
-package com.fb2pdf.hadoop;
+package com.fb2pdf.hadoop.cluster;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,6 +7,8 @@ import java.util.UUID;
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
 import org.apache.hadoop.mapred.JobClient;
@@ -25,17 +27,27 @@ import org.slf4j.LoggerFactory;
 
 public final class MeanShiftCanopyDriver {
   
-  private static final Logger log = LoggerFactory.getLogger(MeanShiftCanopyDriver.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MeanShiftCanopyDriver.class);
   
   private MeanShiftCanopyDriver() {}
   
   public static void main(String[] args) {
     
-      String input = args[0];
-      String output = args[1];
+	  if(args.length != 3){
+		  System.err
+			.println("Usage MeanShiftCanopyDriver <t2> <input> <out>");
+	  }
+      String input = args[1];
+      String output = args[2];
       String measureClassName = CosineDistanceMeasure.class.getName();
-      double t1 = 0.08;
       double t2 = 0.02;
+      try{
+    	  t2 = Double.parseDouble(args[0]);
+      }
+      catch(NumberFormatException e){
+    	  LOG.error(e.toString());
+      }
+      double t1 = t2 * 5;
       double convergenceDelta = 0.001;
       String canopyOut = "/tmp/" + UUID.randomUUID().toString();
       createCanopyFromVectors(input, canopyOut);
@@ -84,6 +96,8 @@ public final class MeanShiftCanopyDriver {
     conf.setNumReduceTasks(1);
     conf.setInputFormat(SequenceFileInputFormat.class);
     conf.setOutputFormat(SequenceFileOutputFormat.class);
+    conf.setBoolean("mapred.output.compress", true);
+    conf.setClass("mapred.output.compression.codec", GzipCodec.class,  CompressionCodec.class);
     conf.set(MeanShiftCanopyConfigKeys.DISTANCE_MEASURE_KEY, measureClassName);
     conf.set(MeanShiftCanopyConfigKeys.CLUSTER_CONVERGENCE_KEY, String.valueOf(convergenceDelta));
     conf.set(MeanShiftCanopyConfigKeys.T1_KEY, String.valueOf(t1));
@@ -94,7 +108,7 @@ public final class MeanShiftCanopyDriver {
     try {
       JobClient.runJob(conf);
     } catch (IOException e) {
-      log.warn(e.toString(), e);
+    	LOG.warn(e.toString(), e);
     }
   }
   
@@ -122,12 +136,14 @@ public final class MeanShiftCanopyDriver {
     conf.setNumReduceTasks(0);
     conf.setInputFormat(SequenceFileInputFormat.class);
     conf.setOutputFormat(SequenceFileOutputFormat.class);
+    conf.setBoolean("mapred.output.compress", true);
+    conf.setClass("mapred.output.compression.codec", GzipCodec.class,  CompressionCodec.class);
     
     client.setConf(conf);
     try {
       JobClient.runJob(conf);
     } catch (IOException e) {
-      log.warn(e.toString(), e);
+      LOG.warn(e.toString(), e);
     }
   }
 }

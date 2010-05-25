@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="test">
+<project name="cluster books">
 
 	<property name="dist" value="dist/" />
 	<property name="lib" value="lib" />
+	<property name="cosine.distance" value="0.02" />
 
-	<fileset id="input" path="test_data/hamake/" mask="*.fb2" />
-	<file id="output" path="build/result" />
+	<fileset id="input" path="${env:BOOKS_TO_CLUSTER}" mask="*.fb2" />
+	<file id="output" path="${env:CATEGORIZED_BOOKS}" />
 	<file id="vectors" path="build/SparseVectorsFromSequenceFilesOutput/vectors" />
 
 	<foreach name="FB2KeywordsExtractor">
@@ -16,7 +17,7 @@
 		<output>
 			<file id="FB2KeywordsExtractorOut" path="build/FB2KeywordsExtractorOut/${foreach:filename}" />
 		</output>
-		<mapreduce jar="${dist}/fb2pdf.jar" main="com.fb2pdf.hadoop.FB2KeywordsExtractor">
+		<mapreduce jar="${dist}/fb2pdf.job" main="com.fb2pdf.hadoop.cluster.FB2KeywordsExtractor">
 			<parameter>
 				<literal value="${foreach:path}" />
 			</parameter>
@@ -32,7 +33,7 @@
 		<output>
 			<file id="SequenceFilesFromDirectoryOut" path="build/SequenceFilesFromDirectoryOutput" />
 		</output>
-		<mapreduce jar="${dist}/fb2pdf.jar" main="com.fb2pdf.hadoop.SequenceFilesFromDirectory">
+		<mapreduce jar="${dist}/fb2pdf.job" main="com.fb2pdf.hadoop.cluster.SequenceFilesFromDirectory">
 			<parameter>
 				<reference idref="SequenceFilesFromDirectoryIn" />
 			</parameter>
@@ -51,9 +52,9 @@
 		<output>
 			<file id="SparseVectorsFromSequenceFilesOut" path="build/SparseVectorsFromSequenceFilesOutput/" />
 		</output>
-		<mapreduce jar="${lib}/mahout-0.3/mahout-utils-0.3.jar" main="org.apache.mahout.text.SparseVectorsFromSequenceFiles">
+		<mapreduce jar="${lib}/cluster/mahout-0.3/mahout-utils-0.3.jar" main="org.apache.mahout.text.SparseVectorsFromSequenceFiles">
 			<classpath>
-				<fileset path="lib/mahout-0.3" mask="*.jar" />
+				<fileset path="lib/cluster/mahout-0.3" mask="*.jar" />
 			</classpath>
 			<parameter>
 				<literal value="-i" />
@@ -88,10 +89,13 @@
 		<output>
 			<file id="MeanShiftCanopyOut" path="build/MeanShiftCanopyOutput/" />
 		</output>
-		<mapreduce jar="${dist}/fb2pdf.jar" main="com.fb2pdf.hadoop.MeanShiftCanopyDriver">
+		<mapreduce jar="${dist}/fb2pdf.job" main="com.fb2pdf.hadoop.cluster.MeanShiftCanopyDriver">
 			<classpath>
-				<fileset path="lib/mahout-0.3" mask="*.jar" />
+				<fileset path="lib/cluster/mahout-0.3" mask="*.jar" />
 			</classpath>
+			<parameter>
+				<literal value="${cosine.distance}" />
+			</parameter>
 			<parameter>
 				<reference idref="vectors" />
 			</parameter>
@@ -107,10 +111,13 @@
 		<output>
 			<include idref="output" />
 		</output>
-		<mapreduce jar="${dist}/fb2pdf.jar" main="com.fb2pdf.hadoop.OutputClusterResults">
+		<mapreduce jar="${dist}/fb2pdf.job" main="com.fb2pdf.hadoop.cluster.OutputClusterResults">
 			<classpath>
-				<fileset path="lib/mahout-0.3" mask="*.jar" />
+				<fileset path="lib/cluster/mahout-0.3" mask="*.jar" />
 			</classpath>
+			<parameter>
+				<literal value="${cosine.distance}" />
+			</parameter>
 			<parameter>
 				<reference idref="MeanShiftOutDumperIn" />
 			</parameter>

@@ -1,5 +1,5 @@
 
-package com.fb2pdf.hadoop;
+package com.fb2pdf.hadoop.cluster;
 
 import java.io.IOException;
 import java.util.*;
@@ -16,6 +16,9 @@ import org.apache.hadoop.util.ToolRunner;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.fb2pdf.hadoop.TextTokenizer;
+import com.fb2pdf.hadoop.XMLTextInputFormat;
 
 public class FB2KeywordsExtractor extends Configured implements Tool
 {

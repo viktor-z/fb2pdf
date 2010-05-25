@@ -1,95 +1,101 @@
 <project name="v3pdftools" default="all" basedir=".">
 
-	
-    <property environment="env"/>
 
-    <property name="build_tools" location="${env.BUILD_TOOLS}"/>
+	<property environment="env" />
 
-    <property name="build" location="build"/>
-    <property name="lib" location="lib"/>
-    <property name="src" location="src"/>
-    <property name="dist" location="dist"/>
-	<property name="mahout.version" value="0.3"/>
+	<property name="build_tools" location="${env.BUILD_TOOLS}" />
 
-    <path id="lib">
-        <fileset dir="${lib}">
-            <include name="*.jar"/>
-        </fileset>
-    	<fileset dir="${lib}/mahout-${mahout.version}">
-    	    <include name="*.jar"/>
-    	</fileset>    	
-    </path>
+	<property name="build" location="build" />
+	<property name="build-cluster" location="build-cluster" />
+	<property name="lib" location="lib" />
+	<property name="src" location="src" />
+	<property name="dist" location="dist" />
+	<property name="mahout.version" value="0.3" />
 
-    <target name="clean">
-    	<delete dir="${build}" />
-    	<delete dir="${dist}" />
-    </target>
+	<path id="lib">
+		<fileset dir="${lib}">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${lib}/cluster/">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${lib}/cluster/mahout-${mahout.version}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
 
-    <target name="compile" description="compile the source">
-        <mkdir dir="${build}"/>
-        <javac destdir="${build}" source="1.5" target="1.5" deprecation="on" fork="yes" debug="true" encoding="Cp1251">
-            <compilerarg value="-Xlint:unchecked"/>
-            <src path="${src}"/>
+	<target name="clean">
+		<delete dir="${build}" />
+		<delete dir="${dist}" />
+	</target>
 
-            <include name="org/trivee/**" />
-            <include name="com/itextpdf/**" />
-        	<include name="com/fb2pdf/**" />
+	<target name="compile" description="compile the source">
+			<mkdir dir="${build}" />
+			<javac destdir="${build}" source="1.5" target="1.5" deprecation="on" fork="yes" debug="true" encoding="Cp1251">
+				<compilerarg value="-Xlint:unchecked" />
+				<src path="${src}" />
 
-            <classpath>
-                 <path refid="lib"/>
-            </classpath>
-        </javac>
-    </target>
+				<include name="org/trivee/**" />
+				<include name="com/itextpdf/**" />
+				<include name="com/fb2pdf/**" />
 
-    <target name="all" depends="compile" />
+				<classpath>
+					<path refid="lib" />
+				</classpath>
+			</javac>
+		</target>
 
-    <target name="testStylesheet" depends="compile">
-        <java classname="org.trivee.fb2pdf.Stylesheet" fork="yes" >
-            <classpath>
-                <pathelement path="${build}"/>
-                <path refid="lib"/>
-            </classpath>
-        </java>        
-    </target>
+	<target name="all" depends="compile" />
 
-    <target name="testDimension" depends="compile">
-        <java classname="org.trivee.fb2pdf.Dimension" fork="yes" >
-            <classpath>
-                <pathelement path="${build}"/>
-                <path refid="lib"/>
-            </classpath>
-        </java>        
-    </target>
+	<target name="testStylesheet" depends="compile">
+		<java classname="org.trivee.fb2pdf.Stylesheet" fork="yes">
+			<classpath>
+				<pathelement path="${build}" />
+				<path refid="lib" />
+			</classpath>
+		</java>
+	</target>
 
-    <target name="jar" depends="compile">
-    	<copy todir="${build}/lib">
-    		<path refid="lib" />
-    	</copy>
-        <mkdir dir="${dist}"/>
-        <jar destfile="${dist}/fb2pdf.jar" compress="true" level="9">
-            <fileset dir="${build}"
-                excludes="**/Test.class"/>
-            <manifest>
-                <attribute name="Main-Class" value="org.trivee.fb2pdf.CLIDriver"/>
-                <attribute name="Class-Path" value="iText.jar itext-hyph-xml.jar commons-codec-1.3.jar commons-lang-2.4.jar commons-cli-1.2.jar gson-1.3.jar"/>
-            </manifest>
-        </jar>
-    </target>
+	<target name="testDimension" depends="compile">
+		<java classname="org.trivee.fb2pdf.Dimension" fork="yes">
+			<classpath>
+				<pathelement path="${build}" />
+				<path refid="lib" />
+			</classpath>
+		</java>
+	</target>
 
-    <target name="compile-nodebug" description="compile the source">
-        <mkdir dir="${build}"/>
-        <javac destdir="${build}" source="1.5" target="1.5" deprecation="on" fork="yes" debug="false" encoding="Cp1251">
-            <compilerarg value="-Xlint:unchecked"/>
-            <src path="${src}"/>
+	<target name="jar" depends="compile">
+		<mkdir dir="${dist}" />
+		<jar destfile="${dist}/fb2pdf.jar" compress="true" level="9">
+			<fileset dir="${build}" excludes="**/Test.class, lib/**" />
+			<manifest>
+				<attribute name="Main-Class" value="org.trivee.fb2pdf.CLIDriver" />
+				<attribute name="Class-Path" value="iText.jar itext-hyph-xml.jar commons-codec-1.3.jar commons-lang-2.4.jar commons-cli-1.2.jar gson-1.3.jar" />
+			</manifest>
+		</jar>
+		<copy todir="${build}/lib">
+			<path refid="lib" />
+		</copy>
+		<jar destfile="${dist}/fb2pdf.job" compress="true" level="9">
+			<fileset dir="${build}" excludes="**/Test.class" />
+		</jar>
+	</target>
 
-            <include name="org/trivee/**" />
-            <include name="com/itextpdf/**" />
+	<target name="compile-nodebug" description="compile the source">
+		<mkdir dir="${build}" />
+		<javac destdir="${build}" source="1.5" target="1.5" deprecation="on" fork="yes" debug="false" encoding="Cp1251">
+			<compilerarg value="-Xlint:unchecked" />
+			<src path="${src}" />
 
-            <classpath>
-                 <path refid="lib"/>
-            </classpath>
-        </javac>
-    </target>
+			<include name="org/trivee/**" />
+			<include name="com/itextpdf/**" />
 
-    <target name="jar-nodebug" depends="compile-nodebug,jar" />
+			<classpath>
+				<path refid="lib" />
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="jar-nodebug" depends="compile-nodebug,jar" />
 </project>
