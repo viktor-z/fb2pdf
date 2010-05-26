@@ -18,6 +18,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.SequenceFile.CompressionType;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.GzipCodec;
+import org.apache.hadoop.io.compress.LzoCodec;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,7 @@ public final class SequenceFilesFromDirectory extends Configured implements
 			fs = FileSystem.get(conf);
 			currentChunkID = 0;
 			conf.setClass("mapred.output.compression.codec", GzipCodec.class, CompressionCodec.class);
-			CompressionCodec codec = new GzipCodec();
+			CompressionCodec codec = new LzoCodec();
 			writer = SequenceFile.createWriter(fs, conf, getPath(currentChunkID), Text.class, Text.class, CompressionType.RECORD, codec);
 		}
 
