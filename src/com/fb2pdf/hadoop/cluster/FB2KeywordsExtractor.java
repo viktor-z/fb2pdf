@@ -9,6 +9,9 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.GzipCodec;
+import org.apache.hadoop.io.compress.LzoCodec;
 import org.apache.hadoop.mapred.*;
 import org.apache.hadoop.mapred.lib.LongSumReducer;
 import org.apache.hadoop.util.Tool;
@@ -69,7 +72,7 @@ public class FB2KeywordsExtractor extends Configured implements Tool
         conf.setJobName("FB2KeywordsExtractor");
 
         conf.setInputFormat(XMLTextInputFormat.class);
-        conf.setOutputFormat(TextOutputFormat.class);
+        conf.setOutputFormat(SequenceFileOutputFormat.class);
 
         conf.setOutputKeyClass(Text.class);
         conf.setOutputValueClass(LongWritable.class);
@@ -78,6 +81,8 @@ public class FB2KeywordsExtractor extends Configured implements Tool
         conf.setCombinerClass(LongSumReducer.class);
         conf.setReducerClass(LongSumReducer.class);
         conf.setNumReduceTasks(1);
+        conf.setBoolean("mapred.output.compress", true);
+        conf.setClass("mapred.output.compression.codec", GzipCodec.class,  CompressionCodec.class);
 
         Path inpath = new Path(args[0]);
         Path outpath = new Path(args[1]);

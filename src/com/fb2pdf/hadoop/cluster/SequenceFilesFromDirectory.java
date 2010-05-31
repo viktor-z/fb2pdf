@@ -13,8 +13,10 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.PathFilter;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.io.SequenceFile.CompressionType;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.GzipCodec;
@@ -51,9 +53,12 @@ public final class SequenceFilesFromDirectory extends Configured implements
 			this.outputDir = outputDir;
 			fs = FileSystem.get(conf);
 			currentChunkID = 0;
-			conf.setClass("mapred.output.compression.codec", GzipCodec.class, CompressionCodec.class);
+			conf.setClass("mapred.output.compression.codec", GzipCodec.class,
+					CompressionCodec.class);
 			CompressionCodec codec = new LzoCodec();
-			writer = SequenceFile.createWriter(fs, conf, getPath(currentChunkID), Text.class, Text.class, CompressionType.RECORD, codec);
+			writer = SequenceFile.createWriter(fs, conf,
+					getPath(currentChunkID), Text.class, Text.class,
+					CompressionType.RECORD, codec);
 		}
 
 		private Path getPath(int chunkID) {
@@ -110,24 +115,22 @@ public final class SequenceFilesFromDirectory extends Configured implements
 				} else {
 					try {
 						StringBuilder file = new StringBuilder();
-						BufferedReader fileReader = new BufferedReader(
-								new InputStreamReader(fs.open(current)));
-						String line = null;
-						while ((line = fileReader.readLine()) != null) {
-							String[] tokenized = line.split("\t");
-							if (tokenized.length == 2) {
-								try {
-									long amountOfWords = Math.abs(Long
-											.parseLong(tokenized[1]));
-									for (int i = 0; i < amountOfWords; i++) {
-										file.append(tokenized[0]).append(" ");
-									}
-								} catch (NumberFormatException e) {
-									// do nothing
+						SequenceFile.Reader reader = new SequenceFile.Reader(
+								fs, current, conf);
+						Text key = new Text();
+						LongWritable value = new LongWritable();
+						while (reader.next(key, value)) {
+							try {
+								long amountOfWords = Math.abs(value.get());
+								for (int i = 0; i < amountOfWords; i++) {
+									file.append(key.toString()).append(" ");
 								}
+							} catch (NumberFormatException e) {
+								// do nothing
 							}
 						}
-						writer.write(current.getParent().getName(), file.toString());
+						writer.write(current.getParent().getName(), file
+								.toString());
 
 					} catch (FileNotFoundException e) {
 						// Skip file.

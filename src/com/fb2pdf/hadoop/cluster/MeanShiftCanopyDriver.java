@@ -98,7 +98,7 @@ public final class MeanShiftCanopyDriver {
     conf.setInputFormat(SequenceFileInputFormat.class);
     conf.setOutputFormat(SequenceFileOutputFormat.class);
     conf.setBoolean("mapred.output.compress", true);
-    conf.setClass("mapred.output.compression.codec", LzoCodec.class,  CompressionCodec.class);
+    conf.setClass("mapred.output.compression.codec", GzipCodec.class,  CompressionCodec.class);
     conf.set(MeanShiftCanopyConfigKeys.DISTANCE_MEASURE_KEY, measureClassName);
     conf.set(MeanShiftCanopyConfigKeys.CLUSTER_CONVERGENCE_KEY, String.valueOf(convergenceDelta));
     conf.set(MeanShiftCanopyConfigKeys.T1_KEY, String.valueOf(t1));
@@ -138,7 +138,7 @@ public final class MeanShiftCanopyDriver {
     conf.setInputFormat(SequenceFileInputFormat.class);
     conf.setOutputFormat(SequenceFileOutputFormat.class);
     conf.setBoolean("mapred.output.compress", true);
-    conf.setClass("mapred.output.compression.codec", LzoCodec.class,  CompressionCodec.class);
+    conf.setClass("mapred.output.compression.codec", GzipCodec.class,  CompressionCodec.class);
     
     client.setConf(conf);
     try {

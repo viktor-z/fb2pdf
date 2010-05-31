@@ -45,7 +45,7 @@
 			</parameter>
 		</mapreduce>
 	</fold>
-	<fold name="SparseVectorsFromSequenceFiles">
+	<foreach name="SparseVectorsFromSequenceFiles">
 		<input>
 			<file id="SparseVectorsFromSequenceFilesIn" path="build/SequenceFilesFromDirectoryOutput/" />
 		</input>
@@ -81,8 +81,8 @@
 				<literal value="tf" />
 			</parameter>
 		</mapreduce>
-	</fold>
-	<fold name="MeanShiftCanopy">
+	</foreach>
+	<foreach name="MeanShiftCanopy">
 		<input>
 			<include idref="vectors" />
 		</input>
@@ -103,8 +103,8 @@
 				<reference idref="MeanShiftCanopyOut" />
 			</parameter>
 		</mapreduce>
-	</fold>
-	<fold name="MeanShiftOutDumper">
+	</foreach>
+	<foreach name="MeanShiftOutDumper">
 		<input>
 			<file id="MeanShiftOutDumperIn" path="build/MeanShiftCanopyOutput/" />
 		</input>
@@ -128,5 +128,5 @@
 				<reference idref="output" />
 			</parameter>
 		</mapreduce>
-	</fold>
+	</foreach>
 </project>

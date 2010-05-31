@@ -96,7 +96,13 @@ public class OutputClusterResults extends Configured implements Tool {
 		public void reduce(Text key, Iterator<Text> values,
 				OutputCollector<Text, Text> output, Reporter arg3)
 				throws IOException {
-			output.collect(key, new Text(StringUtils.join(values, ", ")));
+			List<String> strings = new ArrayList<String>();
+			while(values.hasNext()){
+				strings.add(values.next().toString());
+			}
+			if(strings.size() > 1){
+				output.collect(key, new Text(StringUtils.join(strings, ", ")));
+			}
 		}
 		
 	}
