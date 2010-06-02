@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="cluster books">
+
+	<property name="dist" value="dist/" />
+	<property name="lib" value="lib" />
+	<property name="cosine.distance" value="0.02" />
+
+	<fileset id="input" path="data" mask="*.fb2" />
+	<file id="output" path="out" />
+	<file id="stopwords" path="stopwords" />
+	<file id="vectors" path="build/SparseVectorsFromSequenceFilesOutput/vectors" />
+	<file id="FB2MetaExtractorOut" path="build/FB2MetaExtractorOut/${foreach:filename}" />
+
+        <foreach name="FB2MetaExtractor">
+                <input>
+                        <include idref="input" />
+                </input>
+                <output>
+                        <include idref="FB2MetaExtractorOut" />
+                </output>
+                <mapreduce jar="${dist}/fb2pdf.job" main="com.fb2pdf.hadoop.cluster.FB2MetaExtractor">
+                        <parameter>
+                                <literal value="${foreach:path}" />
+                        </parameter>
+                        <parameter>
+                                <reference idref="FB2MetaExtractorOut" />
+                        </parameter>
+                </mapreduce>
+        </foreach>
+
+
+	<foreach name="FB2KeywordsExtractor">
+		<input>
+			<include idref="input" />
+		</input>
+		<output>
+			<file id="FB2KeywordsExtractorOut" path="build/FB2KeywordsExtractorOut/${foreach:filename}" />
+		</output>
+		<!-- dependencies>
+			<include idref="FB2MetaExtractorOut" />
+		</dependencies -->
+
+		<mapreduce jar="${dist}/fb2pdf.job" main="com.fb2pdf.hadoop.cluster.FB2KeywordsExtractor">
+			<parameter>
+				<literal value="${foreach:path}" />
+			</parameter>
+			<parameter>
+				<reference idref="FB2KeywordsExtractorOut" />
+			</parameter>
+                        <parameter>
+                                <reference idref="stopwords" />
+                        </parameter>
+			<parameter>
+                                <reference idref="FB2MetaExtractorOut"/>
+                        </parameter>
+		</mapreduce>
+	</foreach>
+
+	<fold name="SequenceFilesFromDirectory">
+		<input>
+			<file id="SequenceFilesFromDirectoryIn" path="build/FB2KeywordsExtractorOut/" />
+		</input>
+		<output>
+			<file id="SequenceFilesFromDirectoryOut" path="build/SequenceFilesFromDirectoryOutput" />
+		</output>
+		<mapreduce jar="${dist}/fb2pdf.job" main="com.fb2pdf.hadoop.cluster.SequenceFilesFromDirectory">
+			<parameter>
+				<reference idref="SequenceFilesFromDirectoryIn" />
+			</parameter>
+			<parameter>
+				<reference idref="SequenceFilesFromDirectoryOut" />
+			</parameter>
+			<parameter>
+				<literal value="part-" />
+			</parameter>
+		</mapreduce>
+	</fold>
+	<foreach name="SparseVectorsFromSequenceFiles">
+		<input>
+			<file id="SparseVectorsFromSequenceFilesIn" path="build/SequenceFilesFromDirectoryOutput/" />
+		</input>
+		<output>
+			<file id="SparseVectorsFromSequenceFilesOut" path="build/SparseVectorsFromSequenceFilesOutput/" />
+		</output>
+		<mapreduce jar="${lib}/mahout-utils-0.3.jar" main="org.apache.mahout.text.SparseVectorsFromSequenceFiles">
+			<classpath>
+				<fileset path="lib" mask="*.jar" />
+			</classpath>
+			<parameter>
+				<literal value="-i" />
+			</parameter>
+			<parameter>
+				<reference idref="SparseVectorsFromSequenceFilesIn" />
+			</parameter>
+			<parameter>
+				<literal value="-o" />
+			</parameter>
+			<parameter>
+				<reference idref="SparseVectorsFromSequenceFilesOut" />
+			</parameter>
+			<parameter>
+				<literal value="-chunk" />
+			</parameter>
+			<parameter>
+				<literal value="64" />
+			</parameter>
+			<parameter>
+				<literal value="-wt" />
+			</parameter>
+			<parameter>
+				<literal value="tf" />
+			</parameter>
+		</mapreduce>
+	</foreach>
+	<foreach name="MeanShiftCanopy">
+		<input>
+			<include idref="vectors" />
+		</input>
+		<output>
+			<file id="MeanShiftCanopyOut" path="build/MeanShiftCanopyOutput/" />
+		</output>
+		<mapreduce jar="${dist}/fb2pdf.job" main="com.fb2pdf.hadoop.cluster.MeanShiftCanopyDriver">
+			<classpath>
+				<fileset path="lib" mask="*.jar" />
+			</classpath>
+			<parameter>
+				<literal value="${cosine.distance}" />
+			</parameter>
+			<parameter>
+				<reference idref="vectors" />
+			</parameter>
+			<parameter>
+				<reference idref="MeanShiftCanopyOut" />
+			</parameter>
+		</mapreduce>
+	</foreach>
+	<foreach name="MeanShiftOutDumper">
+		<input>
+			<file id="MeanShiftOutDumperIn" path="build/MeanShiftCanopyOutput/" />
+		</input>
+		<output>
+			<include idref="output" />
+		</output>
+		<mapreduce jar="${dist}/fb2pdf.job" main="com.fb2pdf.hadoop.cluster.OutputClusterResults">
+			<classpath>
+				<fileset path="lib" mask="*.jar" />
+			</classpath>
+			<parameter>
+				<literal value="${cosine.distance}" />
+			</parameter>
+			<parameter>
+				<reference idref="MeanShiftOutDumperIn" />
+			</parameter>
+			<parameter>
+				<reference idref="vectors" />
+			</parameter>
+			<parameter>
+				<reference idref="output" />
+			</parameter>
+		</mapreduce>
+	</foreach>
+
+</project>

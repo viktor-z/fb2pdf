@@ -11,11 +11,11 @@
 	<classpathentry kind="lib" path="lib/itext-hyph-xml.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/commons-logging-1.0.4.jar"/>
-	<classpathentry kind="lib" path="lib/hadoop-0.18.3-core.jar" sourcepath="/Users/lord/java/hadoop-0.18.3/src/">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/Users/lord/java/hadoop-0.18.3/docs/api/"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="lib/cluster/hadoop-0.18.3-core.jar" sourcepath="/opt/hadoop-0.18.3/src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/mahout"/>
+	<classpathentry kind="lib" path="lib/commons-io-1.4.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/hadoop-0.18.3"/>
+	<classpathentry kind="lib" path="/opt/hadoop-0.18.3/conf"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

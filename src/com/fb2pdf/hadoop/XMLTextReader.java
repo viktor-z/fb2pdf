@@ -4,6 +4,7 @@ package com.fb2pdf.hadoop;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.CompressionCodec;
@@ -47,7 +48,7 @@ public class XMLTextReader implements RecordReader<Text, Text>
     public void close() throws IOException
     {
         parser.stop();
-        in.close();
+        IOUtils.closeQuietly(in);
     }
 
     @Override
