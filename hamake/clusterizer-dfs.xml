@@ -31,15 +31,16 @@
 
 
 	<foreach name="FB2KeywordsExtractor">
+                <dependencies>
+                        <include idref="FB2MetaExtractorOut" />
+                </dependencies>
+
 		<input>
 			<include idref="input" />
 		</input>
 		<output>
 			<file id="FB2KeywordsExtractorOut" path="build/FB2KeywordsExtractorOut/${foreach:filename}" />
 		</output>
-		<!-- dependencies>
-			<include idref="FB2MetaExtractorOut" />
-		</dependencies -->
 
 		<mapreduce jar="${dist}/fb2pdf.job" main="com.fb2pdf.hadoop.cluster.FB2KeywordsExtractor">
 			<parameter>
@@ -57,6 +58,7 @@
 		</mapreduce>
 	</foreach>
 
+<!--
 	<fold name="SequenceFilesFromDirectory">
 		<input>
 			<file id="SequenceFilesFromDirectoryIn" path="build/FB2KeywordsExtractorOut/" />
@@ -160,5 +162,5 @@
 			</parameter>
 		</mapreduce>
 	</foreach>
-
+-->
 </project>
