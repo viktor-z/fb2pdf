@@ -200,13 +200,13 @@ public class FB2KeywordsExtractor extends Configured implements Tool
 			{
 				if (!s.isDir())
 				{
-					metaConf.addResource(s.getPath().toUri().toURL());
+					metaConf.addResource(s.getPath().toString());
 				}
 			}
 		}
 		else
 		{
-			metaConf.addResource(metaFilePath.toUri().toURL());
+			metaConf.addResource(metaFilePath.toString());
 		}
 		
 		return metaConf;
