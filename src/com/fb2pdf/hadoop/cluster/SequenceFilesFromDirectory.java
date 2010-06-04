@@ -1,11 +1,9 @@
 package com.fb2pdf.hadoop.cluster;
 
-import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
 import org.apache.hadoop.conf.Configuration;
@@ -16,11 +14,9 @@ import org.apache.hadoop.fs.PathFilter;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.io.SequenceFile.CompressionType;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.GzipCodec;
-import org.apache.hadoop.io.compress.LzoCodec;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.slf4j.LoggerFactory;
@@ -55,7 +51,7 @@ public final class SequenceFilesFromDirectory extends Configured implements
 			currentChunkID = 0;
 			conf.setClass("mapred.output.compression.codec", GzipCodec.class,
 					CompressionCodec.class);
-			CompressionCodec codec = new LzoCodec();
+			CompressionCodec codec = new GzipCodec();
 			writer = SequenceFile.createWriter(fs, conf,
 					getPath(currentChunkID), Text.class, Text.class,
 					CompressionType.RECORD, codec);
@@ -107,36 +103,42 @@ public final class SequenceFilesFromDirectory extends Configured implements
 				if (fs.getFileStatus(current).isDir()) {
 					try {
 						fs.listStatus(current, new PrefixAdditionFilter(fs,
-								prefix + File.separator + current.getName(),
+								prefix,
 								writer, charset));
 					} catch (IOException e) {
 						LOG.error(e.getMessage());
 					}
 				} else {
-					try {
-						StringBuilder file = new StringBuilder();
-						SequenceFile.Reader reader = new SequenceFile.Reader(
-								fs, current, conf);
-						Text key = new Text();
-						LongWritable value = new LongWritable();
-						while (reader.next(key, value)) {
-							try {
-								long amountOfWords = Math.abs(value.get());
-								for (int i = 0; i < amountOfWords; i++) {
-									file.append(key.toString()).append(" ");
+					if(current.getName().startsWith(prefix)){
+						LOG.info("processing file " + current.getName());
+						try {
+							StringBuilder file = new StringBuilder();
+							SequenceFile.Reader reader = new SequenceFile.Reader(
+									fs, current, conf);
+							Text key = new Text();
+							LongWritable value = new LongWritable();
+							while (reader.next(key, value)) {
+								try {
+									long amountOfWords = Math.abs(value.get());
+									for (int i = 0; i < amountOfWords; i++) {
+										file.append(key.toString()).append(" ");
+									}
+								} catch (NumberFormatException e) {
+									// do nothing
 								}
-							} catch (NumberFormatException e) {
-								// do nothing
 							}
+							writer.write(current.getParent().getName(), file
+									.toString());
+	
+						} catch (FileNotFoundException e) {
+							// Skip file.
+						} catch (IOException e) {
+							// TODO: report exceptions and continue;
+							throw new IllegalStateException(e);
 						}
-						writer.write(current.getParent().getName(), file
-								.toString());
-
-					} catch (FileNotFoundException e) {
-						// Skip file.
-					} catch (IOException e) {
-						// TODO: report exceptions and continue;
-						throw new IllegalStateException(e);
+					}
+					else{
+						LOG.info("Skipping file " + current.getName() + ". It doesn't start with prefix " + prefix);
 					}
 				}
 			} catch (IOException e) {
@@ -155,6 +157,7 @@ public final class SequenceFilesFromDirectory extends Configured implements
 	public void createSequenceFiles(Path parentDir, String outputDir,
 			String prefix, int chunkSizeInMB, Charset charset)
 			throws IOException {
+		LOG.info("Using prefix " + prefix);
 		ChunkedWriter writer = createNewChunkedWriter(chunkSizeInMB, outputDir);
 		FileSystem fs = FileSystem.get(conf);
 		fs.listStatus(parentDir, new PrefixAdditionFilter(fs, prefix, writer,

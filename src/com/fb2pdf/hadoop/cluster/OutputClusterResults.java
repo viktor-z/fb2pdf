@@ -54,13 +54,15 @@ public class OutputClusterResults extends Configured implements Tool {
 				throws IOException {
 			Vector v1 = canopy.getCenter();
 			for(Path vectorPath : vectorPaths){
-				SequenceFile.Reader reader = new SequenceFile.Reader(fs, vectorPath, conf);
-				VectorWritable v2 = new VectorWritable();
-				Text vkey = new Text();
-				while(reader.next(vkey, v2)){
-					if(v2 != null){
-						if(measure.distance(v1, v2.get()) < t){
-							output.collect(key, new Text(v2.get().getName()));
+				if(vectorPath.getName().startsWith("part-")){
+					SequenceFile.Reader reader = new SequenceFile.Reader(fs, vectorPath, conf);
+					VectorWritable v2 = new VectorWritable();
+					Text vkey = new Text();
+					while(reader.next(vkey, v2)){
+						if(v2 != null){
+							if(measure.distance(v1, v2.get()) < t){
+								output.collect(key, new Text(v2.get().getName()));
+							}
 						}
 					}
 				}
