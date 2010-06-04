@@ -415,6 +415,7 @@ public class PdfChunk {
                 }
             }
         }
+        if(splitPosition < 0) splitPosition = 0;  //VIKTORZ ++
         String returnValue = value.substring(splitPosition);
         value = trim(value.substring(0, splitPosition));
         PdfChunk pc = new PdfChunk(returnValue, this);
