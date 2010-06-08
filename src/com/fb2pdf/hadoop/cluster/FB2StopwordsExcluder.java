@@ -72,12 +72,12 @@ public class FB2StopwordsExcluder extends Configured implements Tool
             try
             {
                 String metaFile = conf.get("fb2pdf.metafile", null);
-                logger.info("metaFile: " + metaFile);
+                logger.debug("metaFile: " + metaFile);
                 
                 Configuration metaConf = getMetadataConfiguration(conf, metaFile);
                                 
                 String lang = metaConf.get("lang");
-                logger.info("lang: " + lang);
+                logger.debug("lang: " + lang);
 
                 Path stopwordsFilePath = null;
                 String stopwordsCache = conf.get("fb2pdf.stopwords", null);
@@ -87,7 +87,7 @@ public class FB2StopwordsExcluder extends Configured implements Tool
 
                     if (!isLocalMode)
                     {
-                        logger.info("cacheFilePath: " + stopwordsFile);
+                        logger.debug("cacheFilePath: " + stopwordsFile);
                         Path[] cacheFiles = DistributedCache.getLocalCacheFiles(conf);
                         if (cacheFiles != null)
                             for (Path p:cacheFiles)
@@ -99,7 +99,7 @@ public class FB2StopwordsExcluder extends Configured implements Tool
                         stopwordsFilePath = new Path(stopwordsCache, stopwordsFile);
                     }
 
-                    logger.info("stopwordsFilePath: " + stopwordsFilePath);
+                    logger.debug("stopwordsFilePath: " + stopwordsFilePath);
 
                     if (stopwordsFilePath != null)
                     {
