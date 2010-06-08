@@ -44,6 +44,8 @@ public class FB2MetaExtractor extends Configured implements Tool
         public void map(Text key, Text value, OutputCollector<Text, Text> output, Reporter reporter)
                 throws IOException
         {
+            System.out.println("ExtractMetaMapper key:" + key.toString());
+            
             if(!includeKeys.containsKey(key.toString()))
                 return;
             
@@ -53,13 +55,14 @@ public class FB2MetaExtractor extends Configured implements Tool
             output.collect(metaKey, metaVal);
         }
 
-    };
+    }
     
     @Override
     public int run(String[] args) throws Exception
     {
         JobConf conf = new JobConf(getConf(), FB2MetaExtractor.class);
         conf.setJobName("FB2MetaExtractor");
+        conf.set("fb2.xmlreader.stopelement", "FictionBook/description");
 
         conf.setInputFormat(XMLTextInputFormat.class);
         conf.setOutputFormat(ConfigurationOutputFormat.class);
@@ -83,9 +86,6 @@ public class FB2MetaExtractor extends Configured implements Tool
         return 0;
     }
 
-    /**
-     * @param args
-     */
     public static void main(String[] args) throws Exception
     {
         if(args.length != 2)

@@ -22,9 +22,13 @@ public class XMLTextReader implements RecordReader<Text, Text>
     private long                    start;
     private long                    end;
     private OnDemandSAXParser       parser;
+    private String                  stopElement = null;
+    private boolean                 stopElementFound = false;
 
     public XMLTextReader(JobConf job, FileSplit split) throws IOException
     {
+        this.stopElement = job.get("fb2.xmlreader.stopelement", null);
+
         final Path file = split.getPath();
         start = split.getStart();
         end = start + split.getLength();
@@ -84,6 +88,14 @@ public class XMLTextReader implements RecordReader<Text, Text>
         StringPair n = parser.getNext();
         if(n != null)
         {
+            if (stopElement != null && n.a != null)
+            {
+                if (!stopElementFound)
+                    stopElementFound = n.a.startsWith(stopElement);
+                else if (!n.a.startsWith(stopElement))
+                    return false;
+            }
+
             key.set(n.a);
             value.set(n.b);
             return true;
