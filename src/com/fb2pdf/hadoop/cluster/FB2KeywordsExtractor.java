@@ -34,12 +34,6 @@ public class FB2KeywordsExtractor extends Configured implements Tool
     {
         excluded = new HashSet<String>();
         excluded.add("FictionBook/binary");
-        
-        try {
-        	new URL("hdfs://localhost:9000/");
-        } catch (MalformedURLException e) {
-        	URL.setURLStreamHandlerFactory(new FsUrlStreamHandlerFactory());
-		}        
     }
 
     static class ExtractKeywordsMapper extends MapReduceBase implements Mapper<Text, Text, Text, LongWritable>

@@ -10,6 +10,8 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.fs.FileUtil;
+import org.apache.hadoop.fs.FsUrlStreamHandlerFactory;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileStatus;
@@ -19,14 +21,25 @@ import org.apache.commons.logging.LogFactory;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class FB2StopwordsExcluder extends Configured implements Tool
 {
 
     private static final Log logger = LogFactory.getLog("com.fb2pdf.hadoop.FB2StopwordsExcluder");
-
+    static
+    {
+        try {
+        	new URL("hdfs://localhost:9000/");
+        } catch (MalformedURLException e) {
+        	URL.setURLStreamHandlerFactory(new FsUrlStreamHandlerFactory());
+		}        
+    }
+    
     static class ExcluderMapper extends MapReduceBase implements Mapper<Text, LongWritable, Text, LongWritable>
     {
         private JobConf conf;
@@ -59,10 +72,12 @@ public class FB2StopwordsExcluder extends Configured implements Tool
             try
             {
                 String metaFile = conf.get("fb2pdf.metafile", null);
-
+                logger.info("metaFile: " + metaFile);
+                
                 Configuration metaConf = getMetadataConfiguration(conf, metaFile);
+                                
                 String lang = metaConf.get("lang");
-                logger.debug("lang: " + metaConf.get("lang"));
+                logger.info("lang: " + lang);
 
                 Path stopwordsFilePath = null;
                 String stopwordsCache = conf.get("fb2pdf.stopwords", null);
@@ -72,7 +87,7 @@ public class FB2StopwordsExcluder extends Configured implements Tool
 
                     if (!isLocalMode)
                     {
-                        logger.debug("cacheFilePath: " + stopwordsFile);
+                        logger.info("cacheFilePath: " + stopwordsFile);
                         Path[] cacheFiles = DistributedCache.getLocalCacheFiles(conf);
                         if (cacheFiles != null)
                             for (Path p:cacheFiles)
@@ -100,14 +115,13 @@ public class FB2StopwordsExcluder extends Configured implements Tool
                             if (in != null) in.close();
                         }
                     }
-
-                    logger.info((stopwords==null)?"no stopwords":"stopwords size: " + stopwords.size());
                 }
             } catch (IOException e)	{
                 logger.error("loading stopwords has failed", e);
             }
+            
+            logger.info((stopwords==null)?"no stopwords":"stopwords size: " + stopwords.size());
         }
-
     }
 
     @Override
@@ -156,6 +170,7 @@ public class FB2StopwordsExcluder extends Configured implements Tool
         }
 
         conf.set("fb2pdf.metafile", args[3]);
+        logger.info("Launched in " + (isLocalMode?"local":"distributed") + " mode");
         logger.info("Using stopwords from " + srcStopwords);
         logger.info("Using meta from " + args[3]);
 
@@ -172,6 +187,7 @@ public class FB2StopwordsExcluder extends Configured implements Tool
 		if (metaFile == null) return null;
 
 		Configuration metaConf = new Configuration();
+		metaConf.setQuietMode(false);
 		Path metaFilePath = new Path(metaFile);
 
 		FileSystem fs = FileSystem.get(metaFilePath.toUri(), conf);
@@ -183,13 +199,18 @@ public class FB2StopwordsExcluder extends Configured implements Tool
 			{
 				if (!s.isDir())
 				{
-					metaConf.addResource(s.getPath().toString());
+					Path resourcePath = s.getPath();
+					File tmpResFile = FileUtil.createLocalTempFile(new File(resourcePath.getName()), "-tmp", true);
+					FileUtil.copy(fs, resourcePath, tmpResFile, false, conf);
+					metaConf.addResource(tmpResFile.toURL());
 				}
 			}
 		}
 		else
-		{
-			metaConf.addResource(metaFilePath.toString());
+		{			
+			File tmpResFile = FileUtil.createLocalTempFile(new File(metaFilePath.getName()), "-tmp", true);
+			FileUtil.copy(fs, metaFilePath, tmpResFile, false, conf);
+			metaConf.addResource(tmpResFile.toURL());
 		}
 
 		return metaConf;
