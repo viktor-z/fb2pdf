@@ -22,19 +22,35 @@ if [ -z $CATEGORIZED_BOOKS ]; then
         exit 1;
 fi
 
-IS_LOCAL=""
+#local mode
 if [ x$1 = xlocal ]; then
 	echo "Running in local mode"
-	IS_LOCAL="-j 1"
+	hadoop jar $PROJECT_HOME/hamake/lib/hamake-2.0b-2.jar -f file://$PROJECT_HOME/hamake/clusterizer.xml -j 1 
 else
-	echo "Copying resources to HDFS..."
-	hadoop fs -rmr $BOOKS_TO_CLUSTER
-	hadoop fs -put $BOOKS_TO_CLUSTER $BOOKS_TO_CLUSTER
-	hadoop fs -rmr dist
-	hadoop fs -put $PROJECT_HOME/dist/fb2pdf.job dist/fb2pdf.job
-	hadoop fs -rmr lib/cluster/mahout-0.3/
-	hadoop fs -mkdir lib/cluster/mahout-0.3/
-	hadoop fs -copyFromLocal $PROJECT_HOME/lib/cluster/mahout-0.3/mahout-utils-0.3.jar lib/cluster/mahout-0.3/
-fi
+	#Distributed mode
+	if [ x$1 = xdfs ]; then
+		echo "Copying resources to HDFS..."
+		hadoop fs -rmr dist/
+		hadoop fs -rmr stopwords/
+		hadoop fs -rmr build/
+		hadoop fs -rmr lib/
+		hadoop fs -rmr $BOOKS_TO_CLUSTER
 
-hadoop jar $PROJECT_HOME/hamake/lib/hamake-2.0b-2.jar -f file://$PROJECT_HOME/hamake/clusterizer.xml $IS_LOCAL
+		hadoop fs -mkdir stopwords/
+		hadoop fs -mkdir lib/cluster/mahout-0.3/
+
+		hadoop fs -put $BOOKS_TO_CLUSTER $BOOKS_TO_CLUSTER
+		hadoop fs -put $PROJECT_HOME/dist/fb2pdf.job dist/fb2pdf.job
+		hadoop fs -copyFromLocal $PROJECT_HOME/lib/cluster/mahout-0.3/mahout-utils-0.3.jar lib/cluster/mahout-0.3/
+		hadoop jar $PROJECT_HOME/hamake/lib/hamake-2.0b-2.jar -f file://$PROJECT_HOME/hamake/clusterizer.xml -j 10
+	else
+		#Elastic Map Reduce mode
+		if [ x$1 = xs3 ]; then
+		        echo S3
+			THREADS="-j 10"
+		else
+			echo please specify one of 'local', 'dfs' or 's3' modes
+			exit 1
+		fi
+	fi
+fi

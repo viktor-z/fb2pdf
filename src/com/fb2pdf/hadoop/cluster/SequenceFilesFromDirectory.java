@@ -54,7 +54,7 @@ public final class SequenceFilesFromDirectory extends Configured implements
 			CompressionCodec codec = new GzipCodec();
 			writer = SequenceFile.createWriter(fs, conf,
 					getPath(currentChunkID), Text.class, Text.class,
-					CompressionType.RECORD, codec);
+					CompressionType.BLOCK, codec);
 		}
 
 		private Path getPath(int chunkID) {
@@ -131,10 +131,9 @@ public final class SequenceFilesFromDirectory extends Configured implements
 									.toString());
 	
 						} catch (FileNotFoundException e) {
-							// Skip file.
+							LOG.error(e.getMessage());
 						} catch (IOException e) {
-							// TODO: report exceptions and continue;
-							throw new IllegalStateException(e);
+							LOG.error(e.getMessage());
 						}
 					}
 					else{

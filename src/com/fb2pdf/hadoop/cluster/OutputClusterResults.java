@@ -13,6 +13,8 @@ import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
 import org.apache.hadoop.mapred.JobClient;
@@ -55,7 +57,9 @@ public class OutputClusterResults extends Configured implements Tool {
 			Vector v1 = canopy.getCenter();
 			for(Path vectorPath : vectorPaths){
 				if(vectorPath.getName().startsWith("part-")){
-					SequenceFile.Reader reader = new SequenceFile.Reader(fs, vectorPath, conf);
+					conf.setClass("mapred.output.compression.codec", GzipCodec.class,
+							CompressionCodec.class);
+					SequenceFile.Reader reader = new SequenceFile.Reader( fs, vectorPath, conf);
 					VectorWritable v2 = new VectorWritable();
 					Text vkey = new Text();
 					while(reader.next(vkey, v2)){

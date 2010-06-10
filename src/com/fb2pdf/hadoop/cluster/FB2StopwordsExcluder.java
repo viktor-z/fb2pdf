@@ -146,12 +146,13 @@ public class FB2StopwordsExcluder extends Configured implements Tool
         FileInputFormat.addInputPath(conf, inpath);
         FileOutputFormat.setOutputPath(conf, outpath);
         conf.setBoolean("mapred.output.compress", true);
+        conf.set("mapred.output.compression.type", "BLOCK");
         conf.setClass("mapred.output.compression.codec", GzipCodec.class,  CompressionCodec.class);
 
         boolean isLocalMode = "local".equals(conf.get("mapred.job.tracker", "local"));
 
         Path srcStopwords = new Path(args[2]);
-        FileSystem fs = isLocalMode?FileSystem.getLocal(conf):FileSystem.get(conf);
+        FileSystem fs = isLocalMode?FileSystem.getLocal(conf):srcStopwords.getFileSystem(conf);
 
         if (fs.exists(srcStopwords))
         {

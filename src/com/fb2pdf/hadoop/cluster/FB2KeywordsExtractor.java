@@ -83,6 +83,7 @@ public class FB2KeywordsExtractor extends Configured implements Tool
         conf.setReducerClass(LongSumReducer.class);
         conf.setNumReduceTasks(1);
         conf.setBoolean("mapred.output.compress", true);
+        conf.set("mapred.output.compression.type", "BLOCK");
         conf.setClass("mapred.output.compression.codec", GzipCodec.class,  CompressionCodec.class);
         
         Path inpath = new Path(args[0]);
