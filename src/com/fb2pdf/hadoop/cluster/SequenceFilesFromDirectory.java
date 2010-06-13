@@ -47,7 +47,7 @@ public final class SequenceFilesFromDirectory extends Configured implements
 			}
 			maxChunkSizeInBytes = chunkSizeInMB * 1024 * 1024;
 			this.outputDir = outputDir;
-			fs = FileSystem.get(conf);
+			fs = getPath(currentChunkID).getFileSystem(conf);
 			currentChunkID = 0;
 			conf.setClass("mapred.output.compression.codec", GzipCodec.class,
 					CompressionCodec.class);
@@ -158,7 +158,7 @@ public final class SequenceFilesFromDirectory extends Configured implements
 			throws IOException {
 		LOG.info("Using prefix " + prefix);
 		ChunkedWriter writer = createNewChunkedWriter(chunkSizeInMB, outputDir);
-		FileSystem fs = FileSystem.get(conf);
+		FileSystem fs = parentDir.getFileSystem(conf);
 		fs.listStatus(parentDir, new PrefixAdditionFilter(fs, prefix, writer,
 				charset));
 		writer.close();

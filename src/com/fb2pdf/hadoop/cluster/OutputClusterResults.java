@@ -46,7 +46,6 @@ public class OutputClusterResults extends Configured implements Tool {
 		
 		CosineDistanceMeasure measure;
 		List<Path> vectorPaths = new ArrayList<Path>();
-		FileSystem fs;
 		Configuration conf;
 		float t;
 
@@ -59,6 +58,7 @@ public class OutputClusterResults extends Configured implements Tool {
 				if(vectorPath.getName().startsWith("part-")){
 					conf.setClass("mapred.output.compression.codec", GzipCodec.class,
 							CompressionCodec.class);
+					FileSystem fs = vectorPath.getFileSystem(conf);
 					SequenceFile.Reader reader = new SequenceFile.Reader( fs, vectorPath, conf);
 					VectorWritable v2 = new VectorWritable();
 					Text vkey = new Text();
@@ -77,20 +77,14 @@ public class OutputClusterResults extends Configured implements Tool {
 		@Override
 		public void configure(JobConf job) {
 			conf = job;
-			try{
-				fs = FileSystem.get(job);
-				int i = 0;
-				String vectorPath;
-				while((vectorPath = job.get("cluster.results.vector.files" + i)) != null){
-					vectorPaths.add(new Path(vectorPath));
-					i++;
-				}
-				measure = new CosineDistanceMeasure();
-				t = job.getFloat("cluster.t2.distance", 0.02F);
+			int i = 0;
+			String vectorPath;
+			while((vectorPath = job.get("cluster.results.vector.files" + i)) != null){
+				vectorPaths.add(new Path(vectorPath));
+				i++;
 			}
-			catch(IOException e){
-				LOG.error(e.toString());
-			}
+			measure = new CosineDistanceMeasure();
+			t = job.getFloat("cluster.t2.distance", 0.02F);
 		}
 	}
 	
@@ -125,9 +119,9 @@ public class OutputClusterResults extends Configured implements Tool {
 		Path outPath = new Path(args[3]);
 		FileOutputFormat.setOutputPath(conf, outPath);
 
-		FileSystem fs = FileSystem.get(conf);
-		Path[] vectorFiles = FileUtil.stat2Paths(fs
-				.listStatus(new Path(args[2])));
+		Path vectorParent = new Path(args[2]);
+		FileSystem fs = vectorParent.getFileSystem(conf);
+		Path[] vectorFiles = FileUtil.stat2Paths(fs.listStatus(vectorParent));
 		for (int i = 0; i < vectorFiles.length; i++) {
 			conf.set("cluster.results.vector.files" + i, vectorFiles[i]
 					.toString());

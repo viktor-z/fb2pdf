@@ -31,13 +31,17 @@ public class FB2StopwordsExcluder extends Configured implements Tool
 {
 
     private static final Log logger = LogFactory.getLog("com.fb2pdf.hadoop.FB2StopwordsExcluder");
+    private static boolean urlStreamHandlerFactoryAlreadySet = false;
     static
     {
         try {
         	new URL("hdfs://localhost:9000/");
         } catch (MalformedURLException e) {
-        	URL.setURLStreamHandlerFactory(new FsUrlStreamHandlerFactory());
-		}        
+        	if(urlStreamHandlerFactoryAlreadySet){
+        		URL.setURLStreamHandlerFactory(new FsUrlStreamHandlerFactory());
+        		urlStreamHandlerFactoryAlreadySet = true;
+        	}
+		} 
     }
     
     static class ExcluderMapper extends MapReduceBase implements Mapper<Text, LongWritable, Text, LongWritable>

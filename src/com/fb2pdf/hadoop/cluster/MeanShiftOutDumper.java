@@ -68,7 +68,8 @@ public class MeanShiftOutDumper extends Configured implements Tool {
 	@Override
 	public int run(String[] args) throws Exception {
 		Configuration conf = new Configuration();
-		FileSystem fs = FileSystem.get(conf);
+		Path path = new Path(args[1]);
+		FileSystem fs = path.getFileSystem(conf);
 		fs.delete(new Path(args[1]), true);
 		PrintWriter out = new PrintWriter(fs.create(new Path(args[1])));
 		fs.listStatus(new Path(args[0]), new PrefixAdditionFilter(fs, conf, out));
