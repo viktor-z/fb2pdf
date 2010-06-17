@@ -17,7 +17,7 @@ public class VectorDumper extends MeanShiftOutDumper {
 		Text key = new Text();
 		while(reader.next(key, value)){
 			if(key != null && value != null){
-				writer.print(key.toString() + " : " + value.get().asFormatString());
+				writer.println(key.toString());
 			}
 		}
 	}

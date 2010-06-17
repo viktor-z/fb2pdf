@@ -48,7 +48,8 @@ public final class MeanShiftCanopyDriver {
       catch(NumberFormatException e){
     	  LOG.error(e.toString());
       }
-      double t1 = t2 * 5;
+      if(t2 > 0.5) t2 = 0.5;
+      double t1 = t2 * 2;
       double convergenceDelta = 0.001;
       String canopyOut = "/tmp/" + UUID.randomUUID().toString();
       createCanopyFromVectors(input, canopyOut);
@@ -87,6 +88,7 @@ public final class MeanShiftCanopyDriver {
     
     conf.setOutputKeyClass(Text.class);
     conf.setOutputValueClass(MeanShiftCanopy.class);
+    conf.setJobName("MeanShiftCanopyCluster");
     
     FileInputFormat.setInputPaths(conf, new Path(input));
     Path outPath = new Path(output);
@@ -125,6 +127,7 @@ public final class MeanShiftCanopyDriver {
     
     Configurable client = new JobClient();
     JobConf conf = new JobConf(MeanShiftCanopyDriver.class);
+    conf.setJobName("CreateCanopyFromVectors");
     
     conf.setOutputKeyClass(Text.class);
     conf.setOutputValueClass(MeanShiftCanopy.class);
@@ -137,8 +140,6 @@ public final class MeanShiftCanopyDriver {
     conf.setNumReduceTasks(0);
     conf.setInputFormat(SequenceFileInputFormat.class);
     conf.setOutputFormat(SequenceFileOutputFormat.class);
-    conf.setBoolean("mapred.output.compress", true);
-    conf.setClass("mapred.output.compression.codec", GzipCodec.class,  CompressionCodec.class);
     
     client.setConf(conf);
     try {

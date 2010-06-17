@@ -4,7 +4,7 @@
 
   <property name="dist" value="dist/" />
   <property name="lib" value="lib" />
-  <property name="cosine.distance" value="0.02" />
+  <property name="cosine.distance" value="0.002" />
 
   <fileset id="input" path="${env:BOOKS_TO_CLUSTER}" mask="*.fb2" />
   <file id="output" path="${env:CATEGORIZED_BOOKS}" />
@@ -123,6 +123,12 @@
       </parameter>
       <parameter>
         <literal value="64" />
+      </parameter>
+      <parameter>
+        <literal value="-s"/>
+      </parameter>
+      <parameter>
+        <literal value="100" />
       </parameter>
       <parameter>
         <literal value="-wt" />

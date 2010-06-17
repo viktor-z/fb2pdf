@@ -10,6 +10,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.PathFilter;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.mahout.clustering.meanshift.MeanShiftCanopy;
@@ -33,23 +35,27 @@ public class MeanShiftOutDumper extends Configured implements Tool {
 
 		@Override
 		public boolean accept(Path path) {
-			try {
-				if(fs.getFileStatus(path).isDir()){
-					try {
-						fs.listStatus(path, new PrefixAdditionFilter(fs, conf, os));
-					} catch (IOException e) {
-						e.printStackTrace();
+				try {
+					if(fs.getFileStatus(path).isDir()){
+						System.out.println("listing dir " + path.toString());
+						try {
+							fs.listStatus(path, new PrefixAdditionFilter(fs, conf, os));
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
 					}
+					else{
+						if(path.getName().startsWith("part-")){
+							System.out.println("processing file " + path.toString());
+							SequenceFile.Reader reader = new SequenceFile.Reader(fs, path, conf);
+							dump(reader, os);
+							reader.close();
+						}
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
-				else{
-					SequenceFile.Reader reader = new SequenceFile.Reader(fs, path, conf);
-					dump(reader, os);
-					reader.close();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			return true;
+				return true;
 		}
 		
 	}

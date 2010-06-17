@@ -111,9 +111,10 @@ public final class SequenceFilesFromDirectory extends Configured implements
 				} else {
 					if(current.getName().startsWith(prefix)){
 						LOG.info("processing file " + current.getName());
+						SequenceFile.Reader reader = null;
 						try {
 							StringBuilder file = new StringBuilder();
-							SequenceFile.Reader reader = new SequenceFile.Reader(
+							reader = new SequenceFile.Reader(
 									fs, current, conf);
 							Text key = new Text();
 							LongWritable value = new LongWritable();
@@ -134,6 +135,8 @@ public final class SequenceFilesFromDirectory extends Configured implements
 							LOG.error(e.getMessage());
 						} catch (IOException e) {
 							LOG.error(e.getMessage());
+						} finally{
+							reader.close();
 						}
 					}
 					else{
