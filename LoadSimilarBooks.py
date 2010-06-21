@@ -1,25 +1,51 @@
 #! /usr/bin/env python
 
 import MySQLdb
-import getopt, sys, os, re, time
+import getopt, sys, os, re, time, logging
 import json
 import urllib
 
-def loadClustrersFromURL(url):
-     sock = urllib.urlopen(url)
-     clusters = []
-     try:
-         while 1:
-             line = sock.readline()
-             if not line:
-                 break
-             values = line.split();
-             clusters.append(values[1:])     
-     finally:
-         sock.close()
-     return clusters;
+def loadClustrersFromURL(url, logger):
+    attempts = 0
+    while 1:
+        try:
+            sock = urllib.urlopen(url)
+            try:
+                clusters = []
+                while 1:
+                    line = sock.readline()
+                    if not line:
+                        return []
+                    values = line.split()
+                    clusters.append(values[1:])
+            finally:
+                sock.close() 
+                return clusters
+        except IOError:
+            if attempts > 6:
+                logger.error("Could not download %s" % url)
+                break
+            attempts += 1
+            time.sleep(10 * attempts)
+            continue
+    return [];
  
-def storeBookGroups(mysqlHost, mysqlUser, mysqlPassword, mysqlDB, clusters):       
+def configureLogger(filename = None, levelName = "info"):
+    LEVELS = {'debug': logging.DEBUG,
+          'info': logging.INFO,
+          'warning': logging.WARNING,
+          'error': logging.ERROR,
+          'critical': logging.CRITICAL}
+
+    level = LEVELS.get(levelName, logging.NOTSET)
+    if filename is None:
+        logging.basicConfig(level=level, format="%(asctime)s %(levelname)s - %(message)s")
+    else:
+        logging.basicConfig(filename = filename, level=level, format="%(asctime)s %(levelname)s - %(message)s")
+    
+    return logging.getLogger("LoadSimilarBooks")
+     
+def storeBookGroups(mysqlHost, mysqlUser, mysqlPassword, mysqlDB, clusters, logger):       
     
     bookGroups = []
     conn = MySQLdb.connect (host = mysqlHost or "localhost", user = mysqlUser, passwd = mysqlPassword, db = mysqlDB or "FB2PDF")
@@ -36,18 +62,16 @@ def storeBookGroups(mysqlHost, mysqlUser, mysqlPassword, mysqlDB, clusters):
                 bookGroups.append(bookGroup)
             insertGroups = []
             for bookGroup in bookGroups:
-                for i in range(len(bookGroup)):
-                    for j in range(i, len(bookGroup)):
-                        if(i != j):
-                            insertGroups.append([str(bookGroup[i]), str(bookGroup[j])])
+                if len(bookGroup) > 1:
+                    for i in range(len(bookGroup)):
+                        insertGroups.append([str(bookGroup[0]), str(bookGroup[i])])
             if(insertGroups.__len__() > 0):
-                cursor.executemany('''delete from SimilarBooks where (book_id=%s and similar_book_id=%s) ''', insertGroups)
-                cursor.executemany('''delete from SimilarBooks where (similar_book_id=%s and book_id=%s) ''', insertGroups)
-                cursor.executemany('''insert into SimilarBooks (book_id, similar_book_id)
-                      values (%s, %s)''', insertGroups)                            
+                cursor.executemany('''update OriginalBooks set book_group = %s where id = %s ''', insertGroups)               
+                logger.info("Loaded %i raws" % len(insertGroups))             
         finally:
             cursor.close ()
     finally:
+        conn.commit()
         conn.close ()
     return bookGroups
     
@@ -57,73 +81,88 @@ def loadConfiguration(configurationFile):
         return json.loads(fsock.read())
     finally:
          fsock.close()   
-         
-def startAndWaitEMRJob(elasticMapreduceCommandPath, hamakeJarPath, hamakeFilePath, awsKeyPair):
+
+def startAndWaitEMRJob(elasticMapreduceCommandPath, hamakeJarPath, hamakeFilePath, awsKeyPair, logger):
     if not os.path.isfile(elasticMapreduceCommandPath):
-        print ''' can't find %s ''' % elasticMapreduceCommandPath
+        logger.error(''' can't find %s ''' % elasticMapreduceCommandPath)
         return
     command = ''' %s --create --JAR %s --wait-for-step --main-class com.codeminders.hamake.Main --args -f,%s,-j,10 --key-pair %s --name FB2PDF_CLUSTERER --step-name FB2PDF_CLUSTERER''' % \
             (elasticMapreduceCommandPath,\
             hamakeJarPath,\
             hamakeFilePath,\
             awsKeyPair)
-    print "Starting EMR job " + command
+    logger.info("Starting EMR job " + command)
     result = os.popen(command).read()
     jobId = re.search(r'\bj-(\w)+\b', result).group(0)
     if not jobId == None:
         status = None
-        print "Successfully started job " + jobId
+        logger.info("Successfully started job " + jobId + ". Waiting for its completion...")
         attempts = 0
         while 1:            
             result = os.popen(''' %s --list -j %s ''' % (elasticMapreduceCommandPath, jobId)).read()
-            if str(result).strip().split() > 2 and str(result).strip().split()[-1] == "COMPLETED":
-                attempts = 0
-                if str(result).strip().split()[-1] != "PENDING" and result.split()[-1] != "RUNNING":
-                    status = str(result).strip().split()[-1]
-                    break
-                else:
-                    time.sleep(10)
-            else:
-                if attempts > 60:
-                    print "Contact with AWS lost for more than 10 minutes"
-                    return 0
-                attempts += 1
-                time.sleep(10);
-        print "Job finished with status " + status
+            if str(result).strip().split() > 1:
+                status = str(result).strip().split()[-2]
+                if status in ("COMPLETED", "RUNNING", "PENDING", "TERMINATED", "FAILED", "SHUTTING_DOWN", "WAITING"):
+                    attempts = 0
+                    if status not in ("PENDING", "RUNNING", "WAITING", "SHUTTING_DOWN"):
+                        break
+                    else:
+                        time.sleep(60)
+                        continue
+            if attempts > 60:
+                logger.error("Contact with AWS lost for more than 10 minutes")
+                return 0
+            attempts += 1
+            time.sleep(10);
+        logger.info("Job finished with status " + status)
         if status == 'COMPLETED':
             return 1
         else:
             return 0
     else:
-        print "Failed to start job " + result
+        logger.error("Failed to start job " + result)
         return 0
  
-def main(configurationFile, clustersFile):     
+def main(configurationFile, logFile, logLevel, runJob):     
     
-    configuration = loadConfiguration(configurationFile or "configuration.json")    
+    configuration = loadConfiguration(configurationFile or "configuration.json")
+    logger = configureLogger(logFile, logLevel)
     
-    #clusters = loadClustrersFromURL(configuration["aws_similar_books_url"] or "http://s3.amazonaws.com/fb2pdf-hadoop/clusters/part-00000")
-    #storeBookGroups(configuration["mysql_host"], configuration["mysql_user"], configuration["mysql_pass"], configuration["mysql_db"],  clusters)    
-    if startAndWaitEMRJob(configuration["elastic_mapreduce_command"], configuration["hamake_jar"], configuration["hamake_file"], configuration["aws_key"]):
-        print "Loading similar books in database"
+    
+    if runJob:
+        if not startAndWaitEMRJob(configuration["elastic_mapreduce_command"], configuration["hamake_jar"], configuration["hamake_file"], configuration["aws_key"], logger):
+            exit(1)
+    logger.info("Loading similar books in database")
+    clusters = loadClustrersFromURL(configuration["aws_similar_books_url"] or "http://s3.amazonaws.com/fb2pdf-hamake/clusters/part-00000", logger)
+    if len(clusters) > 0:
+        storeBookGroups(configuration["mysql_host"], configuration["mysql_user"], configuration["mysql_pass"], configuration["mysql_db"],  clusters, logger)
     
     sys.exit(0);
         
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "hc:f:", ["help", "configuration=", "file="])
+    opts, args = getopt.getopt(sys.argv[1:], "hc:f:l:r", ["help", "configuration=", "log_file=", "log_level=", "run_job"])
 except getopt.GetoptError, err:
     print str(err)
     sys.exit(1)
 configurationFile = None;
-clustersFile = None;
+logFile = None
+logLevel = 'info'
+runJob = 0
 for o, a in opts:
     if o in ("-h", "--help"):
         usage()
         sys.exit(0);
     elif o in ("-c", "--configuration"):
         configurationFile = a
-    elif o in ("-f", "--file"):
-        clustersFile = a
-main(configurationFile, clustersFile)
+    elif o in ("-f", "--log_file"):
+        logFile = a
+    elif o in ("-l", "--log_level"):
+        if a in ('debug', 'info', 'warning', 'error', 'critical'):
+            logLevel = a
+        else:
+            print "log level should be one of 'debug', 'info', 'warning', 'error' or 'critical'"
+    elif o in ("-r", "--run_job"):
+        runJob = 1
+main(configurationFile, logFile, logLevel, runJob)
 
 #select b.title, b.storage_key from SimilarBooks sb, OriginalBooks b where sb.book_id = '72350' and sb.similar_book_id=b.id union select b.title, b.storage_key from SimilarBooks sb, OriginalBooks b where sb.similar_book_id = '72350' and sb.book_id=b.id;
