@@ -16,8 +16,9 @@ def loadClustrersFromURL(url, logger):
                     line = sock.readline()
                     if not line:
                         return []
-                    values = line.split()
-                    clusters.append(values[1:])
+                    values = re.findall(r'\b\w{32}.fb2\b', line)
+                    if len(values) > 0:
+                        clusters.append(values[1:])
             finally:
                 sock.close() 
                 return clusters
@@ -136,7 +137,8 @@ def main(configurationFile, logFile, logLevel, runJob):
     clusters = loadClustrersFromURL(configuration["aws_similar_books_url"] or "http://s3.amazonaws.com/fb2pdf-hamake/clusters/part-00000", logger)
     if len(clusters) > 0:
         storeBookGroups(configuration["mysql_host"], configuration["mysql_user"], configuration["mysql_pass"], configuration["mysql_db"],  clusters, logger)
-    
+    else:
+        logger.warning("No similar books found")
     sys.exit(0);
         
 try:

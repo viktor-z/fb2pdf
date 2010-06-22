@@ -25,7 +25,7 @@ fi
 #local mode
 if [ x$1 = xlocal ]; then
 	echo "Running in local mode"
-	hadoop jar $PROJECT_HOME/hamake/lib/hamake-2.0b-2.jar -f file://$PROJECT_HOME/hamake/clusterizer.xml -j 1 
+	hadoop jar $PROJECT_HOME/hamake/lib/hamake-2.0b-3.jar -f file://$PROJECT_HOME/hamake/clusterizer.xml -j 1 
 else
 	#Distributed mode
 	if [ x$1 = xdfs ]; then

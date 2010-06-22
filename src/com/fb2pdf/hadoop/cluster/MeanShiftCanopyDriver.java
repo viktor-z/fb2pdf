@@ -1,6 +1,5 @@
 package com.fb2pdf.hadoop.cluster;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -9,7 +8,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.GzipCodec;
-import org.apache.hadoop.io.compress.LzoCodec;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
 import org.apache.hadoop.mapred.JobClient;
@@ -22,7 +20,6 @@ import org.apache.mahout.clustering.meanshift.MeanShiftCanopyCreatorMapper;
 import org.apache.mahout.clustering.meanshift.MeanShiftCanopyMapper;
 import org.apache.mahout.clustering.meanshift.MeanShiftCanopyReducer;
 import org.apache.mahout.common.distance.CosineDistanceMeasure;
-import org.apache.mahout.common.distance.ManhattanDistanceMeasure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,10 +48,8 @@ public final class MeanShiftCanopyDriver {
       if(t2 > 0.5) t2 = 0.5;
       double t1 = t2 * 2;
       double convergenceDelta = 0.001;
-      String canopyOut = "/tmp/" + UUID.randomUUID().toString();
-      createCanopyFromVectors(input, canopyOut);
-      runJob(canopyOut, output, canopyOut + File.separator + MeanShiftCanopyConfigKeys.CONTROL_PATH_KEY,
-        measureClassName, t1, t2, convergenceDelta);
+      Path canopyOut = createCanopyFromVectors(input);
+      runJob(canopyOut, output, measureClassName, t1, t2, convergenceDelta);
   }
   
   /**
@@ -75,9 +70,8 @@ public final class MeanShiftCanopyDriver {
    * @param convergenceDelta
    *          the double convergence criteria
    */
-  public static void runJob(String input,
+  public static void runJob(Path input,
                             String output,
-                            String control,
                             String measureClassName,
                             double t1,
                             double t2,
@@ -90,10 +84,10 @@ public final class MeanShiftCanopyDriver {
     conf.setOutputValueClass(MeanShiftCanopy.class);
     conf.setJobName("MeanShiftCanopyCluster");
     
-    FileInputFormat.setInputPaths(conf, new Path(input));
+    FileInputFormat.setInputPaths(conf, input);
     Path outPath = new Path(output);
+    Path controlPath = new Path(input.getParent(), UUID.randomUUID().toString());
     FileOutputFormat.setOutputPath(conf, outPath);
-    
     conf.setMapperClass(MeanShiftCanopyMapper.class);
     conf.setReducerClass(MeanShiftCanopyReducer.class);
     conf.setNumReduceTasks(1);
@@ -105,11 +99,11 @@ public final class MeanShiftCanopyDriver {
     conf.set(MeanShiftCanopyConfigKeys.CLUSTER_CONVERGENCE_KEY, String.valueOf(convergenceDelta));
     conf.set(MeanShiftCanopyConfigKeys.T1_KEY, String.valueOf(t1));
     conf.set(MeanShiftCanopyConfigKeys.T2_KEY, String.valueOf(t2));
-    conf.set(MeanShiftCanopyConfigKeys.CONTROL_PATH_KEY, control);
-    
+    conf.set(MeanShiftCanopyConfigKeys.CONTROL_PATH_KEY, controlPath.toString());
     client.setConf(conf);
     try {
       JobClient.runJob(conf);
+      input.getFileSystem(conf).delete(input.getParent(), true);
     } catch (IOException e) {
     	LOG.warn(e.toString(), e);
     }
@@ -123,7 +117,7 @@ public final class MeanShiftCanopyDriver {
    * @param output
    *          the output pathname String
    */
-  public static void createCanopyFromVectors(String input, String output) {
+  public static Path createCanopyFromVectors(String input) {
     
     Configurable client = new JobClient();
     JobConf conf = new JobConf(MeanShiftCanopyDriver.class);
@@ -133,7 +127,8 @@ public final class MeanShiftCanopyDriver {
     conf.setOutputValueClass(MeanShiftCanopy.class);
     
     FileInputFormat.setInputPaths(conf, new Path(input));
-    Path outPath = new Path(output);
+    Path tmpDir = new Path(new Path(conf.get("hadoop.tmp.dir")), UUID.randomUUID().toString());
+    Path outPath = new Path(tmpDir, UUID.randomUUID().toString());
     FileOutputFormat.setOutputPath(conf, outPath);
     
     conf.setMapperClass(MeanShiftCanopyCreatorMapper.class);
@@ -144,9 +139,11 @@ public final class MeanShiftCanopyDriver {
     client.setConf(conf);
     try {
       JobClient.runJob(conf);
+      return outPath;
     } catch (IOException e) {
       LOG.warn(e.toString(), e);
     }
+    return null;
   }
 }
 

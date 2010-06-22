@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -116,7 +117,8 @@ public class OutputClusterResults extends Configured implements Tool {
 		conf.setOutputValueClass(Text.class);
 
 		FileInputFormat.setInputPaths(conf, new Path(args[1]));
-		Path outPath = new Path(args[3]);
+		Path tmpDir = new Path(new Path(conf.get("hadoop.tmp.dir")), UUID.randomUUID().toString());
+		Path outPath = new Path(tmpDir, UUID.randomUUID().toString());
 		FileOutputFormat.setOutputPath(conf, outPath);
 
 		Path vectorParent = new Path(args[2]);
@@ -134,13 +136,18 @@ public class OutputClusterResults extends Configured implements Tool {
 		conf.set("cluster.t2.distance", args[0]);
 
 		JobClient.runJob(conf);
+		FileSystem tmpFs = outPath.getFileSystem(conf);
+		Path resultedFile = new Path(args[3]);
+		FileSystem OutputFs = resultedFile.getFileSystem(conf);
+		FileUtil.copy(tmpFs, new Path(outPath, "part-00000"), OutputFs, resultedFile, true, conf);
+		tmpFs.delete(outPath, true);
 		return 0;
 	}
 
 	public static void main(String[] args) throws Exception {
 		if (args.length != 4) {
 			System.err
-					.println("Usage OutputClusterResults <t2> <clusters> <vectors> <out>");
+					.println("Usage OutputClusterResults <t2> <clusters> <vectors> <out_file>");
 			System.exit(1);
 		} else {
 			Configuration conf = new Configuration();
