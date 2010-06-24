@@ -1,0 +1,14 @@
+{
+	"aws_similar_books_url": "http://s3.amazonaws.com/<fb2pdf.hamake.bucket>/similar_books/clusters",
+	"elastic_mapreduce_command": "s3://<fb2pdf.hamake.bucket>/clusterizer-s3.xml",
+	"hamake_jar": "s3://<fb2pdf.hamake.bucket>/hamake-2.0b-3.jar",
+	"hamake_file": "s3://<fb2pdf.hamake.bucket>/clusterizer-s3.xml",
+	"access_id":   "<your_AWS_access_id>",
+    "private_key": "<your_AWS_private_key>",
+    "keypair":     "<your_AWS_keypair>",
+    "log_uri":     "s3://<fb2pdf.hamake.bucket>/log",
+	"mysql_host": "localhost",
+	"mysql_user": "<your_mysql_user>",
+	"mysql_pass": "<your_mysql_password>",
+	"mysql_db": "<your_mysql_database>"
+}
