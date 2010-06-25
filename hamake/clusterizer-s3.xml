@@ -12,7 +12,7 @@
   <file id="output" path="s3://${fb2pdf.hamake.bucket}/similar_books/clusters" />
   <file id="stopwords" path="s3://${fb2pdf.hamake.bucket}/stopwords" />
 
-  <file id="vectors" path="${data}/SparseVectorsFromSequenceFilesOutput/vectors" />
+  <file id="vectors" path="SparseVectorsFromSequenceFilesOutput/vectors" />
   <file id="FB2MetaExtractorOut" path="${data}/FB2MetaExtractorOut/${foreach:filename}" />
 
   <foreach name="FB2MetaExtractor">
@@ -102,7 +102,7 @@
       <file id="SparseVectorsFromSequenceFilesIn" path="${data}/SequenceFilesFromDirectoryOutput/" />
     </input>
     <output>
-      <file id="SparseVectorsFromSequenceFilesOut" path="${data}/SparseVectorsFromSequenceFilesOutput/" />
+      <file id="SparseVectorsFromSequenceFilesOut" path="SparseVectorsFromSequenceFilesOutput/" />
     </output>
     <mapreduce jar="${lib}/mahout/mahout-utils-0.3.jar" main="org.apache.mahout.text.SparseVectorsFromSequenceFiles">
       <classpath>

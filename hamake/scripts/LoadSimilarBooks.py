@@ -18,7 +18,7 @@ def loadClustrersFromURL(url, logger):
                         return []
                     values = re.findall(r'\b\w{32}.fb2\b', line)
                     if len(values) > 0:
-                        clusters.append(values[1:])
+                        clusters.append(values)
             finally:
                 sock.close() 
                 return clusters
@@ -129,7 +129,7 @@ def startAndWaitEMRJob(elasticMapreduceCommandPath, hamakeJarPath, hamakeFilePat
         logger.error("Failed to start job " + result)
         return 0
  
-def main(configurationFile, logFile, logLevel, runJob):     
+def main(configurationFile, logFile, logLevel, runJob, instances = 2):     
     
     configuration = loadConfiguration(configurationFile or "configuration.json")
     logger = configureLogger(logFile, logLevel)
@@ -144,7 +144,7 @@ def main(configurationFile, logFile, logLevel, runJob):
                                   configuration["keypair"], \
                                   configuration["log_uri"], \
                                   logger,
-                                  2):
+                                  instances):
             exit(1)
     logger.info("Loading similar books in database")
     clusters = loadClustrersFromURL(configuration["aws_similar_books_url"] or "http://s3.amazonaws.com/fb2pdf-hamake/clusters/part-00000", logger)
@@ -180,7 +180,5 @@ for o, a in opts:
     elif o in ("-r", "--run_job"):
         runJob = 1
     elif o in ("-i", "--instances"):
-        instances = a
-main(configurationFile, logFile, logLevel, runJob)
-
-#select b.title, b.storage_key from SimilarBooks sb, OriginalBooks b where sb.book_id = '72350' and sb.similar_book_id=b.id union select b.title, b.storage_key from SimilarBooks sb, OriginalBooks b where sb.similar_book_id = '72350' and sb.book_id=b.id;
+        instances = int(a)
+main(configurationFile, logFile, logLevel, runJob, instances)

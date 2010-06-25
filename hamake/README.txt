@@ -14,9 +14,9 @@ Also set 'book.storage.bucket' to the name of backet where books in fb2 are loca
 
 4) open configuration.json file and set following configuration parameters:
 
-aws_similar_books_url - http://s3.amazonaws.com/<fb2pdf.hamake.bucket>/clusters
+aws_similar_books_url - http://s3.amazonaws.com/<fb2pdf.hamake.bucket>/similar_books/clusters
 elastic_mapreduce_command - path to the directory where you've unpacked  Elastic Map Reduce tools
-hamake_jar - s3://<fb2pdf.hamake.bucket>/similar_books/hamake-2.0b-3.jar
+hamake_jar - s3://<fb2pdf.hamake.bucket>/lib/hamake-2.0b-3.jar
 hamake_file -s3://<fb2pdf.hamake.bucket>/clusterizer-s3.xml
 access_id - AWS Access ID
 private_key - AWS Private Key
@@ -37,6 +37,8 @@ s3cmd put clusterizer-s3.xml s3://<fb2pdf.hamake.bucket>/
 s3cmd put configuration.json s3://<fb2pdf.hamake.bucket>/  
 
 7) set public access to s3://<fb2pdf.hamake.bucket>/similar_books/
+
+s3cmd setacl --recursive --acl-public s3://<fb2pdf.hamake.bucket>/similar_books/
 
 7) chmod 755 LoadSimilarBooks.py   
 
