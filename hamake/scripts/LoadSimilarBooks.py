@@ -1,14 +1,24 @@
 #! /usr/bin/env python
 
 import MySQLdb
-import getopt, sys, os, re, time, logging
+import getopt, sys, os, re, time, logging, string
 import json
 import urllib
+from boto.s3.connection import S3Connection
 
-def loadClustrersFromURL(url, logger):
+def loadClustrersFromURL(clustersFilePath, logger, awsKey, awsSecretKey):
     attempts = 0
     while 1:
         try:
+            urlComponents = re.findall(r'[^/]+', clustersFilePath)
+            if len(urlComponents) < 3 or urlComponents[0] != "s3:":
+                logger.error(url % ' does not point to correct S3 key')
+                return []
+            bucketName = urlComponents[1].encode('utf-8')
+            keyName = string.join(urlComponents[2:], "/").encode('utf-8') 
+            connection = S3Connection(awsKey.encode('utf-8'), awsSecretKey.encode('utf-8'))
+            key = connection.get_bucket(bucketName).get_key(keyName)
+            url = key.generate_url(600)
             sock = urllib.urlopen(url)
             try:
                 clusters = []
@@ -134,7 +144,6 @@ def main(configurationFile, logFile, logLevel, runJob, instances = 2):
     configuration = loadConfiguration(configurationFile or "configuration.json")
     logger = configureLogger(logFile, logLevel)
     
-    
     if runJob:
         if not startAndWaitEMRJob(configuration["elastic_mapreduce_command"], \
                                   configuration["hamake_jar"], \
@@ -147,7 +156,7 @@ def main(configurationFile, logFile, logLevel, runJob, instances = 2):
                                   instances):
             exit(1)
     logger.info("Loading similar books in database")
-    clusters = loadClustrersFromURL(configuration["aws_similar_books_url"] or "http://s3.amazonaws.com/fb2pdf-hamake/clusters/part-00000", logger)
+    clusters = loadClustrersFromURL(configuration["aws_similar_books_url"] or "http://s3.amazonaws.com/fb2pdf-hamake/clusters/part-00000", logger, configuration["access_id"], configuration["private_key"])
     if len(clusters) > 0:
         storeBookGroups(configuration["mysql_host"], configuration["mysql_user"], configuration["mysql_pass"], configuration["mysql_db"],  clusters, logger)
     else:

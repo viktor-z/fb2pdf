@@ -93,6 +93,10 @@
 			<fileset dir="${basedir}/etc" />
 			<fileset file="${basedir}/hamake/README.txt" />
 		</copy>
+		<mkdir dir="${build}/fb2pdf-hamake/boto" />
+		<copy todir="${build}/fb2pdf-hamake/boto">
+			<fileset dir="${basedir}/hamake/scripts/boto"/>
+		</copy>
 		<copy todir="${build}/fb2pdf-hamake/lib">
 			<fileset file="${basedir}/hamake/lib/hamake-2.0b-3.jar"/>
 			<fileset file="${dist}/fb2pdf.job" />

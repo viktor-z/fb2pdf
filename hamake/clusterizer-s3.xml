@@ -4,13 +4,13 @@
 
   <property name="fb2pdf.hamake.bucket" value="fb2pdf-hamake" />
   <property name="book.storage.bucket" value="fb2pdf-hamake-test" />
-  <property name="lib" value="s3://${fb2pdf.hamake.bucket}/lib" />
-  <property name="data" value="s3://${fb2pdf.hamake.bucket}/data" />
+  <property name="lib" value="s3n://${fb2pdf.hamake.bucket}/lib" />
+  <property name="data" value="s3n://${fb2pdf.hamake.bucket}/data" />
   <property name="cosine.distance" value="0.002" />
 
-  <fileset id="input" path="s3://${book.storage.bucket}" mask="*.fb2" />
-  <file id="output" path="s3://${fb2pdf.hamake.bucket}/similar_books/clusters" />
-  <file id="stopwords" path="s3://${fb2pdf.hamake.bucket}/stopwords" />
+  <fileset id="input" path="s3n://${book.storage.bucket}" mask="*.fb2" />
+  <file id="output" path="s3n://${fb2pdf.hamake.bucket}/similar_books/clusters" />
+  <file id="stopwords" path="s3n://${fb2pdf.hamake.bucket}/stopwords" />
 
   <file id="vectors" path="SparseVectorsFromSequenceFilesOutput/vectors" />
   <file id="FB2MetaExtractorOut" path="${data}/FB2MetaExtractorOut/${foreach:filename}" />
