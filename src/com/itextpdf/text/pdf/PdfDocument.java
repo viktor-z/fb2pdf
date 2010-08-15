@@ -978,6 +978,10 @@ public class PdfDocument extends Document {
         return true;
     }
 
+    public void setBottomMargin(float margin) { // VIKTORZ ++
+        this.marginBottom = margin;             // VIKTORZ ++
+    }                                           // VIKTORZ ++
+
 //	[L6] DocListener interface
 
     /**

@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.itextpdf.text.error_messages.MessageLocalization;
+import com.itextpdf.text.pdf.PdfDocument;
 
 /**
  * A generic Document class.
@@ -328,7 +329,7 @@ public class Document implements DocListener {
  * @return	a <CODE>boolean</CODE>
  */
 
-	public boolean setMargins(float marginLeft, float marginRight,
+public boolean setMargins(float marginLeft, float marginRight,
 			float marginTop, float marginBottom) {
         this.marginLeft = marginLeft;
         this.marginRight = marginRight;
@@ -340,6 +341,16 @@ public class Document implements DocListener {
         }
         return true;
     }
+
+    public void setBottomMargin(float margin) {             // VIKTORZ ++
+        this.marginBottom = margin;                         // VIKTORZ ++
+        for (DocListener listener : listeners) {            // VIKTORZ ++
+            if (listener instanceof PdfDocument) {          // VIKTORZ ++
+                PdfDocument pdfdoc = (PdfDocument)listener; // VIKTORZ ++
+		pdfdoc.setBottomMargin(margin);             // VIKTORZ ++
+            }                                               // VIKTORZ ++
+        }                                                   // VIKTORZ ++
+    }                                                       // VIKTORZ ++
 
 	/**
  * Signals that an new page has to be started.
