@@ -20,6 +20,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.trivee.utils.TwoUp;
 
 /**
  *
@@ -57,6 +58,7 @@ public class CLIDriver {
                 .withDescription("Stylesheet file")
                 .create('s'));
         options.addOption("l", "log", true, "Log creation");
+        options.addOption("t", "twoup", false, "Create two-up pdf");
 
         cl = new PosixParser().parse(options, args);
 
@@ -96,6 +98,7 @@ public class CLIDriver {
                     pdfname = pdfname + "/" + (new File(fb2name)).getName() + ".pdf";
                 }
                 translate(fb2name, pdfname, stylesheetName);
+
         }
 
         println(String.format("\nResults: succeeded: %s, failed: %s", succeeded, failed));
@@ -143,6 +146,9 @@ public class CLIDriver {
                         FB2toPDF.translate(fb2name, pdfname, stylesheet);
                         saveOut.print(String.format("Success: %s\n", fb2name));
                         succeeded++;
+                        if (cl.hasOption("t")){
+                            TwoUp.execute(pdfname, pdfname+".booklet.pdf");
+                        }
                 }
                 catch (Exception ex)
                 {
