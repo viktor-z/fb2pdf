@@ -749,52 +749,13 @@ public class FB2toPDF {
 
     private void makeBookInfoPage(org.w3c.dom.Element description)
             throws FB2toPDFException, DocumentException {
-        ParagraphStyle frontMatter = stylesheet.getParagraphStyle("frontMatter");
         ParagraphStyle titleStyle = stylesheet.getParagraphStyle("title");
         ParagraphStyle subtitleStyle = stylesheet.getParagraphStyle("subtitle");
         ParagraphStyle authorStyle = stylesheet.getParagraphStyle("author");
 
-        org.w3c.dom.Element publishInfo = getOptionalChildByTagName(description, "publish-info");
-        if (publishInfo != null) {
-            addLine(
-                    getTextContentByTagName(publishInfo, "book-name", null, " // ")
-                    + getTextContentByTagName(publishInfo, "publisher")
-                    + getTextContentByTagName(publishInfo, "city", ", ")
-                    + getTextContentByTagName(publishInfo, "year", ", "),
-                    frontMatter);
-            String isbn = getTextContentByTagName(publishInfo, "isbn");
-            if (isbn.length() > 0) {
-                addLine("ISBN: " + isbn,
-                        frontMatter);
-            }
+        if (stylesheet.getGeneralSettings().generateFrontMatter) {
+            makeFrontMatter(description);
         }
-
-        org.w3c.dom.Element documentInfo = getOptionalChildByTagName(description, "document-info");
-        ElementCollection documentAuthors = null;
-        if (documentInfo != null) {
-            documentAuthors = ElementCollection.childrenByTagName(documentInfo, "author");
-        }
-        for (int i = 0; documentAuthors != null && i < documentAuthors.getLength(); ++i) {
-            org.w3c.dom.Element documentAuthor = documentAuthors.item(i);
-            addLine(
-                    "FB2: "
-                    + getTextContentByTagName(documentAuthor, "first-name", " ")
-                    + getTextContentByTagName(documentAuthor, "last-name", " ")
-                    + getTextContentByTagName(documentAuthor, "nickname", " \u201C", "\u201D")
-                    + getTextContentByTagName(documentAuthor, "email", " <", ">")
-                    + getTextContentByTagName(documentInfo, "date", ", ")
-                    + getTextContentByTagName(documentInfo, "version", ", version "),
-                    frontMatter);
-        }
-        if (documentInfo != null) {
-            addLine(
-                    "UUID: " + getTextContentByTagName(documentInfo, "id"),
-                    frontMatter);
-        }
-
-        addLine("PDF: org.trivee.fb2pdf.FB2toPDF 1.0, "
-                + java.text.DateFormat.getDateInstance().format(new java.util.Date()),
-                frontMatter);
 
         addLine(" ", titleStyle);
 
@@ -835,6 +796,54 @@ public class FB2toPDF {
         }
 
         doc.newPage();
+    }
+
+    private void makeFrontMatter(org.w3c.dom.Element description)
+            throws FB2toPDFException, DocumentException {
+
+        ParagraphStyle frontMatter = stylesheet.getParagraphStyle("frontMatter");
+        org.w3c.dom.Element publishInfo = getOptionalChildByTagName(description, "publish-info");
+        if (publishInfo != null) {
+            addLine(
+                    getTextContentByTagName(publishInfo, "book-name", null, " // ")
+                    + getTextContentByTagName(publishInfo, "publisher")
+                    + getTextContentByTagName(publishInfo, "city", ", ")
+                    + getTextContentByTagName(publishInfo, "year", ", "),
+                    frontMatter);
+            String isbn = getTextContentByTagName(publishInfo, "isbn");
+            if (isbn.length() > 0) {
+                addLine("ISBN: " + isbn, frontMatter);
+            }
+        }
+
+        org.w3c.dom.Element documentInfo = getOptionalChildByTagName(description, "document-info");
+        ElementCollection documentAuthors = null;
+        if (documentInfo != null) {
+            documentAuthors = ElementCollection.childrenByTagName(documentInfo, "author");
+        }
+
+        for (int i = 0; documentAuthors != null && i < documentAuthors.getLength(); ++i) {
+            org.w3c.dom.Element documentAuthor = documentAuthors.item(i);
+            addLine(
+                    "FB2: "
+                    + getTextContentByTagName(documentAuthor, "first-name", " ")
+                    + getTextContentByTagName(documentAuthor, "last-name", " ")
+                    + getTextContentByTagName(documentAuthor, "nickname", " \u201C", "\u201D")
+                    + getTextContentByTagName(documentAuthor, "email", " <", ">")
+                    + getTextContentByTagName(documentInfo, "date", ", ")
+                    + getTextContentByTagName(documentInfo, "version", ", version "),
+                    frontMatter);
+        }
+
+        if (documentInfo != null) {
+            addLine(
+                "UUID: " + getTextContentByTagName(documentInfo, "id"),
+                frontMatter);
+        }
+
+        addLine("PDF: org.trivee.fb2pdf.FB2toPDF 1.0, "
+                + java.text.DateFormat.getDateInstance().format(new java.util.Date()),
+                frontMatter);
     }
 
     private Image getImage(String href) {

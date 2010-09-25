@@ -1,6 +1,7 @@
 {
     generalSettings: {
         generateTOC:	"true",
+        generateFrontMatter:	"true",
         transliterateMetaInfo:	"true",
         imageDpi: 166,
         stretchCover: "true",

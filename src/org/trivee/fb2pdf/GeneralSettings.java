@@ -17,6 +17,7 @@ public class GeneralSettings {
     public boolean ignoreEmptyLineBeforeImage;
     public boolean ignoreEmptyLineAfterImage;
     public boolean generateTOC;
+    public boolean generateFrontMatter = true;
     public float trackingSpaceCharRatio;
     public boolean strictImageSequence;
     public String hangingPunctuation = ".,;:'-";
