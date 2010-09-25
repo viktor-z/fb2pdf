@@ -134,13 +134,38 @@ public class CLIDriver {
                 FileInputStream stylesheet = new FileInputStream(stylesheetName);
 
                 PrintStream saveOut = System.out;
-                boolean createLog = cl.hasOption('l') ? Boolean.parseBoolean(cl.getOptionValue('l')) : true;
-                if(createLog) {
-                    FileOutputStream log = new FileOutputStream(String.format("%s.fb2pdf.log", fb2name));
+
+                // logging is on by default
+                boolean createLog = true;
+                String logFileName = null;
+
+                if (cl.hasOption('l')) {
+                    String lValue = cl.getOptionValue('l');
+                    // specifying false turns logging off,
+                    // otherwise we use the value as the file name
+                    createLog = !("false".equalsIgnoreCase(lValue));
+
+                    // Protect against user error like this:
+                    // fb2pdf --log book.fb2,
+                    // since book.fb2 would be considered
+                    // a log file and the book will be overridden.
+                    if (!lValue.endsWith(".fb2")) {
+                        logFileName = lValue;
+                    } else {
+                        throw new FileNotFoundException("Wrong log file specified: " + lValue);
+                    }
+                }
+
+                if (createLog) {
+                    if (logFileName == null) {
+                        logFileName = String.format("%s.fb2pdf.log", fb2name);
+                    }
+                    FileOutputStream log = new FileOutputStream(logFileName);
                     PrintStream newOut = new PrintStream(log, true, "cp1251");
                     System.setOut(newOut);
                     System.setErr(newOut);
                 }
+
                 try
                 {
                         FB2toPDF.translate(fb2name, pdfname, stylesheet);
