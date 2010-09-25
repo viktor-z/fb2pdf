@@ -11,7 +11,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import org.apache.commons.cli.CommandLine;
@@ -28,18 +30,24 @@ import org.trivee.utils.TwoUp;
  */
 public class CLIDriver {
 
-    private static String hlpText = "fb2pdf [-h] [-s styles] <input file | directory> [-r] [<output file | directory>]" +
+    private static String hlpText = "fb2pdf [-h] [-s styles] [-l <log name>] [-e <log encoding>] <input file | directory> [-r] [<output file | directory>]" +
             "\n\nExamples:" +
             "\n\n\tfb2pdf test.fb2" +
             "\n\n\tfb2pdf \"c:\\My Books\"" +
             "\n\n\tfb2pdf test.fb2 mybook.pdf" +
-            "\n\n\tfb2pdf -s data\\mystyle.json test.fb2";
+            "\n\n\tfb2pdf -s data\\mystyle.json test.fb2" +
+            "\n\n\tfb2pdf -l my_log.txt -e cp866 test.fb2";
     private static int succeeded = 0;
     private static int failed = 0;
     private static CommandLine cl;
+    private static PrintWriter outWriter = new PrintWriter(System.out, true);
+    private static String logEncoding;
 
+    /**
+     * Prints out the specified string to user-visible output, never to the log.
+     */
     private static void println(String s) {
-        System.out.println(s);
+        outWriter.println(s);
     }
 
     /**
@@ -58,6 +66,7 @@ public class CLIDriver {
                 .withDescription("Stylesheet file")
                 .create('s'));
         options.addOption("l", "log", true, "Log creation");
+        options.addOption("e", "encoding", true, "Log's encoding (default is cp1251)");
         options.addOption("t", "twoup", false, "Create two-up pdf");
 
         cl = new PosixParser().parse(options, args);
@@ -79,6 +88,14 @@ public class CLIDriver {
         //}
 
         String stylesheetName = cl.hasOption('s') ? cl.getOptionValue('s') : new File(new File(getBaseDir()).getParent() + "/data/stylesheet.json").getCanonicalPath();
+
+        logEncoding = cl.hasOption('e') ? cl.getOptionValue('e') : "cp1251";
+        try {
+            outWriter = new PrintWriter(new OutputStreamWriter(System.out, logEncoding), true);
+        } catch (UnsupportedEncodingException e) {
+            System.err.println(String.format(
+                    "Unknown encoding: %s, will use the default one.", logEncoding));
+        }
 
         String fb2name = cl.getArgs()[0].replaceAll("\"", "");
         File fb2file = new File(fb2name);
@@ -133,7 +150,7 @@ public class CLIDriver {
     private static void translate(String fb2name, String pdfname, String stylesheetName) throws FileNotFoundException, UnsupportedEncodingException {
                 FileInputStream stylesheet = new FileInputStream(stylesheetName);
 
-                PrintStream saveOut = System.out;
+                PrintStream saveOut =  System.out;
 
                 // logging is on by default
                 boolean createLog = true;
@@ -161,7 +178,7 @@ public class CLIDriver {
                         logFileName = String.format("%s.fb2pdf.log", fb2name);
                     }
                     FileOutputStream log = new FileOutputStream(logFileName);
-                    PrintStream newOut = new PrintStream(log, true, "cp1251");
+                    PrintStream newOut = new PrintStream(log, true, logEncoding);
                     System.setOut(newOut);
                     System.setErr(newOut);
                 }
@@ -169,7 +186,7 @@ public class CLIDriver {
                 try
                 {
                         FB2toPDF.translate(fb2name, pdfname, stylesheet);
-                        saveOut.print(String.format("Success: %s\n", fb2name));
+                        println(String.format("Success: %s\n", fb2name));
                         succeeded++;
                         if (cl.hasOption("t")){
                             TwoUp.execute(pdfname, pdfname+".booklet.pdf");
@@ -177,8 +194,8 @@ public class CLIDriver {
                 }
                 catch (Exception ex)
                 {
-                        saveOut.print(String.format("Failed:  %s\n", fb2name));
-                        println(ex.toString());
+                        println(String.format("Failed:  %s \n", fb2name));
+                        System.out.println("ERROR: " + ex.toString());
                         failed++;
                 }
                 finally
