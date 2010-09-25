@@ -232,6 +232,20 @@
             firstFirstLineIndent:  "0em",
             dropcapStyle:	  "bodyDropCap"	
         },
+        {
+            name:             "footnote",
+            fontFamily:       "serif",
+            fontSize:         "8pt",
+            alignment:        "left",
+            firstLineIndent:  "0em",
+            leading:          "1em",
+            firstFirstLineIndent:  "0em",
+            dropcapStyle:	  "",	
+            firstSpacingBefore:   "0em",
+            lastSpacingAfter:     "0em",
+            spacingBefore:   "0em",
+            spacingAfter:    "0em"
+        },
        	{
        		name:			"bodyDropCap",
             enabled: 	    "true",

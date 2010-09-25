@@ -30,12 +30,15 @@ import com.itextpdf.text.pdf.PdfAction;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfDestination;
 import com.itextpdf.text.pdf.PdfDocument;
+import com.itextpdf.text.pdf.PdfImportedPage;
 import com.itextpdf.text.pdf.PdfOutline;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
+import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfTemplate;
 import java.awt.Color;
 import java.awt.Toolkit;
 import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.tools.zip.ZipEntry;
@@ -221,11 +224,18 @@ public class FB2toPDF {
         chunk.setAction(action);
     }
 
-    private void addFootnote(String refname) {
+    private void addFootnote(String refname) throws DocumentException, FB2toPDFException {
         refname = refname.substring(1);
         System.out.println("Adding footnote " + refname);
         String body = getNoteBody(refname);
-        System.out.println(body);
+        byte[] noteDoc = FootnoteRenderer.renderNoteDoc(stylesheet, body);
+        List<Image> noteLineImages = getLinesImages(noteDoc);
+        System.out.printf("Footnote has %d lines\n", noteLineImages.size());
+        for (Image image: noteLineImages){
+            image.setSpacingAfter(0);
+            image.setSpacingBefore(0);
+            currentParagraph.add(image);
+        }
     }
 
     private String getNoteBody(String refname) {
@@ -243,7 +253,7 @@ public class FB2toPDF {
                 return text;
             }
         }
-        System.out.printf("WARNING: note %s not found", refname);
+        System.out.printf("WARNING: note %s not found\n", refname);
         return "";
     }
 
@@ -256,6 +266,23 @@ public class FB2toPDF {
         }
         System.out.println("WARNING: notes not found in the document");
         return null;
+    }
+
+    private List<Image> getLinesImages(byte[] noteDoc) {
+        List<Image> result = new ArrayList<Image>();
+        try {
+            PdfReader reader = new PdfReader(noteDoc);
+
+            for (int i=1; i<reader.getNumberOfPages(); i++){
+                PdfImportedPage page = writer.getImportedPage(reader, i);
+                Image image = Image.getInstance(page);
+                result.add(image);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return result;
     }
 
     private class PageEventHandler extends PdfPageEventHelper {
@@ -1249,11 +1276,11 @@ public class FB2toPDF {
                     if (currentReference.length() == 0) {
                         currentReference = child.getAttribute("href");
                     }
+                    processParagraphContent(child);
+                    flushCurrentChunk();
                     //if ("note".equals(child.getAttribute("type"))) {
                     //    addFootnote(currentReference);
                     //}
-                    processParagraphContent(child);
-                    flushCurrentChunk();
                     currentReference = null;
                 } else if (child.getTagName().equals("cite")) {
                     flushCurrentChunk();
