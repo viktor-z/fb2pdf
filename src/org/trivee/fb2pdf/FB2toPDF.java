@@ -711,16 +711,19 @@ public class FB2toPDF {
         if (titleInfo != null) {
             ElementCollection authors = ElementCollection.childrenByTagName(titleInfo, "author");
             StringBuilder allAuthors = new StringBuilder();
+
+            boolean force = stylesheet.getGeneralSettings().forceTransliterateAuthor;
+
             for (int i = 0; i < authors.getLength(); ++i) {
                 org.w3c.dom.Element author = authors.item(i);
-                String authorName = getAuthorFullName(author);
-                System.out.println("Adding author: " + transliterate(authorName));
-                doc.addAuthor(transliterate(authorName));
+                String authorName = transliterate(getAuthorFullName(author), force);
+                System.out.println("Adding author: " + authorName);
+                doc.addAuthor(authorName);
 
                 if (allAuthors.length() > 0) {
                     allAuthors.append(", ");
                 }
-                allAuthors.append(transliterate(authorName));
+                allAuthors.append(authorName);
             }
 
             if (allAuthors.length() > 0) {
@@ -1391,7 +1394,11 @@ public class FB2toPDF {
     }
 
     private String transliterate(String text) {
-        if (!stylesheet.getGeneralSettings().transliterateMetaInfo) {
+        return transliterate(text, false);
+    }
+
+    private String transliterate(String text, boolean force) {
+        if (!stylesheet.getGeneralSettings().transliterateMetaInfo && !force) {
             return text;
         }
 
