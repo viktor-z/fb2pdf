@@ -232,8 +232,6 @@ public class FB2toPDF {
         List<Image> noteLineImages = getLinesImages(noteDoc);
         System.out.printf("Footnote has %d lines\n", noteLineImages.size());
         for (Image image: noteLineImages){
-            image.setSpacingAfter(0);
-            image.setSpacingBefore(0);
             currentParagraph.add(image);
         }
     }
@@ -273,9 +271,12 @@ public class FB2toPDF {
         try {
             PdfReader reader = new PdfReader(noteDoc);
 
-            for (int i=1; i<reader.getNumberOfPages(); i++){
+            for (int i=2; i<reader.getNumberOfPages(); i++){
                 PdfImportedPage page = writer.getImportedPage(reader, i);
                 Image image = Image.getInstance(page);
+                image.setSpacingBefore(0);
+                image.setSpacingAfter(0);
+                image.setAlignment(Image.TEXTWRAP);
                 result.add(image);
             }
         } catch (Exception ex) {
@@ -990,7 +991,9 @@ public class FB2toPDF {
             addBacklink(id);
         }
 
-        currentOutline = previousOutline;
+        if (previousOutline != null) {
+            currentOutline = previousOutline;
+        }
     }
 
     private void addEmptyLine()
