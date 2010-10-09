@@ -4,6 +4,8 @@ import java.io.*;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipEntry;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -41,12 +43,18 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
-import org.apache.tools.zip.ZipEntry;
-import org.apache.tools.zip.ZipFile;
 
-public class FB2toPDF {
+public class FB2toPDF
+{
+    public static String FB2PDF_HOME = ".";
 
-    private static final String BASE_PATH = ".";
+    static
+    {
+        String fb2pdf_home = System.getenv("FB2PDF_HOME");
+        if (fb2pdf_home != null)
+            FB2PDF_HOME = fb2pdf_home;
+    }
+
     private static final String NS_XLINK = "http://www.w3.org/1999/xlink";
     private static final String[][] TRANSTABLE = {
         // верхний регистр
@@ -132,6 +140,7 @@ public class FB2toPDF {
         {"\u0407", "YI"},
         {"\u0491", "g"},
         {"\u0490", "G"},};
+
     private String fromName;
     private String toName;
     private org.w3c.dom.Document fb2;
@@ -420,7 +429,7 @@ public class FB2toPDF {
     private void loadData(InputStream stylesheetInputStream)
             throws DocumentException, IOException, FB2toPDFException {
         if (stylesheetInputStream == null) {
-            stylesheet = Stylesheet.readStylesheet(BASE_PATH + "/data/stylesheet.json");
+            stylesheet = Stylesheet.readStylesheet(FB2PDF_HOME + "/data/stylesheet.json");
         } else {
             stylesheet = Stylesheet.readStylesheet(stylesheetInputStream);
         }
@@ -453,11 +462,14 @@ public class FB2toPDF {
         if (fromName.toLowerCase().endsWith(".fb2")) {
             fb2 = builder.parse(new File(fromName));
         } else if (fromName.toLowerCase().endsWith(".zip")) {
-            ZipFile fromZip = new ZipFile(fromName);
-            ZipEntry entry = (ZipEntry) fromZip.getEntries().nextElement();
-            if (entry.getName().toLowerCase().endsWith(".fb2")) {
-                fb2 = builder.parse(fromZip.getInputStream(entry));
-            } else {
+            ZipInputStream fromZip = new ZipInputStream(new FileInputStream(fromName));
+            ZipEntry entry = fromZip.getNextEntry();
+            if (entry.getName().toLowerCase().endsWith(".fb2"))
+            {
+                fb2 = builder.parse(fromZip);
+            }
+            else
+            {
                 System.err.println("First archive entry " + entry.getName() + " is not an FB2 file.");
                 System.exit(-1);
             }
