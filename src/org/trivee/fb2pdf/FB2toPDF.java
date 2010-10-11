@@ -4,8 +4,6 @@ import java.io.*;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipEntry;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -43,6 +41,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
+import org.apache.tools.zip.ZipEntry;
+import org.apache.tools.zip.ZipFile;
 
 public class FB2toPDF
 {
@@ -462,14 +462,11 @@ public class FB2toPDF
         if (fromName.toLowerCase().endsWith(".fb2")) {
             fb2 = builder.parse(new File(fromName));
         } else if (fromName.toLowerCase().endsWith(".zip")) {
-            ZipInputStream fromZip = new ZipInputStream(new FileInputStream(fromName));
-            ZipEntry entry = fromZip.getNextEntry();
-            if (entry.getName().toLowerCase().endsWith(".fb2"))
-            {
-                fb2 = builder.parse(fromZip);
-            }
-            else
-            {
+            ZipFile fromZip = new ZipFile(fromName);
+            ZipEntry entry = (ZipEntry) fromZip.getEntries().nextElement();
+            if (entry.getName().toLowerCase().endsWith(".fb2")) {
+                fb2 = builder.parse(fromZip.getInputStream(entry));
+            } else {
                 System.err.println("First archive entry " + entry.getName() + " is not an FB2 file.");
                 System.exit(-1);
             }
