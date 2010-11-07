@@ -161,6 +161,13 @@ public class FB2toPDF
         this.toName = toName;
     }
 
+    private void addAnchor(Element element) throws FB2toPDFException, DocumentException {
+        String id = element.getAttribute("id");
+        if (id.length() > 0) {
+            addAnchor(id);
+        }
+    }
+
     protected void addAnchor(String id) throws DocumentException, FB2toPDFException {
         Anchor anchor = currentStyle.createInvisibleAnchor();
         anchor.setName(id);
@@ -396,10 +403,11 @@ public class FB2toPDF
         return ignore;
     }
 
-    private void addImage(Element element) throws DocumentException, DOMException {
+    private void addImage(Element element) throws DocumentException, DOMException, FB2toPDFException {
         String href = element.getAttributeNS(NS_XLINK, "href");
         Image image = getImage(href);
         if (image != null) {
+            addAnchor(element);
             addImage(image);
         } else {
             System.out.println("Image not found, href: " + href);
@@ -1107,11 +1115,13 @@ public class FB2toPDF
 
     private void processEpigraph(org.w3c.dom.Element epigraph)
             throws DocumentException, FB2toPDFException {
+        addAnchor(epigraph);
         processTextWithAuthor(epigraph, "epigraph", "epigraphAuthor");
     }
 
     private void processCite(org.w3c.dom.Element cite)
             throws DocumentException, FB2toPDFException {
+        addAnchor(cite);
         processTextWithAuthor(cite, "cite", "citeAuthor");
     }
 
@@ -1150,6 +1160,7 @@ public class FB2toPDF
 
     private void processPoem(org.w3c.dom.Element poem)
             throws DocumentException, FB2toPDFException {
+        addAnchor(poem);
         ElementCollection nodes = ElementCollection.children(poem);
         for (int i = 0; i < nodes.getLength(); ++i) {
             org.w3c.dom.Element element = nodes.item(i);
@@ -1185,6 +1196,7 @@ public class FB2toPDF
             throws DocumentException, FB2toPDFException {
         currentParagraph = currentStyle.createParagraph(bFirst, bLast);
 
+        addAnchor(paragraph);
         processParagraphContent(paragraph, bFirst);
         flushCurrentChunk();
 
