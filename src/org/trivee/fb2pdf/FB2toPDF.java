@@ -170,7 +170,7 @@ public class FB2toPDF
 
     protected void addBacklink(String id) throws DocumentException, FB2toPDFException {
         Chunk chunk = currentStyle.createChunk();
-        chunk.append("^");
+        chunk.append("[^^^]");
         addGoToActionToChunk(id + "_backlink", chunk);
         addEmptyLine();
         addLine(chunk, currentStyle);
