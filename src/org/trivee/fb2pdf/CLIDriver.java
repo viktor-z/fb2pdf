@@ -16,6 +16,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.regex.Pattern;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
@@ -110,9 +111,9 @@ public class CLIDriver {
         if(fb2file.isDirectory()) {
                 processDirectory(fb2file, stylesheetName);
         } else {
-                String pdfname = cl.getArgs().length == 1 ? fb2name + ".pdf" : cl.getArgs()[1];
+                String pdfname = cl.getArgs().length == 1 ? getPdfName(fb2name) : cl.getArgs()[1];
                 if ((new File(pdfname)).isDirectory()) {
-                    pdfname = pdfname + "/" + (new File(fb2name)).getName() + ".pdf";
+                    pdfname = pdfname + "/" + getPdfName((new File(fb2name)).getName());
                 }
                 translate(fb2name, pdfname, stylesheetName);
 
@@ -120,6 +121,13 @@ public class CLIDriver {
 
         println(String.format("\nResults: succeeded: %s, failed: %s", succeeded, failed));
 
+    }
+
+    private static String getPdfName(String srcName) {
+        srcName =  Pattern.compile("\\.fbz$", Pattern.CASE_INSENSITIVE).matcher(srcName).replaceAll("");
+        srcName =  Pattern.compile("\\.zip$", Pattern.CASE_INSENSITIVE).matcher(srcName).replaceAll("");
+        srcName =  Pattern.compile("\\.fb2$", Pattern.CASE_INSENSITIVE).matcher(srcName).replaceAll("");
+        return srcName + ".pdf";
     }
 
     private static void processDirectory(File dir, String stylesheetName) throws FileNotFoundException, UnsupportedEncodingException {
@@ -131,7 +139,7 @@ public class CLIDriver {
                     }
                 });
                 for (File file: files){
-                    translate(file.getPath(), file.getPath() + ".pdf", stylesheetName);
+                    translate(file.getPath(), getPdfName(file.getPath()), stylesheetName);
                 }
 
                 if(cl.hasOption('r')) {
