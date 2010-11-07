@@ -199,7 +199,8 @@
             fontSize:         "11.0pt",
             fontStyle:        "italic",
             leftIndent:       "5.0em",
-            firstLineIndent:  "-2.5em",
+            firstLineIndent:  "0em",
+            firstFirstLineIndent:  "0em",
             firstSpacingBefore:   "0.5em",
             lastSpacingAfter:     "0.5em"
         },
