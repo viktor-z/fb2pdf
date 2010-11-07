@@ -1392,6 +1392,7 @@ public class FB2toPDF
                     String dropcap = text.substring(0, idx);
                     text = text.substring(idx);
                     if (dropcap != null && dropcap.trim().length() > 0) {
+                        dropcap = dropcap.replaceAll("^\u2014", "\u2013");
                         addDropCap(dropcap, doc);
                     }
                 }
