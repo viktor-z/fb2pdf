@@ -205,6 +205,18 @@
             lastSpacingAfter:     "0.5em"
         },
         {
+            name:             "poemAuthor",
+            baseStyle:        "poem"
+        },
+        {
+            name:             "poemTitle",
+            baseStyle:        "poem"
+        },
+        {
+            name:             "poemDate",
+            baseStyle:        "poem"
+        },
+        {
             name:             "epigraph",
             fontFamily:       "serif",
             fontSize:         "11.0pt",

@@ -1221,16 +1221,41 @@ public class FB2toPDF
     private void processPoem(org.w3c.dom.Element poem)
             throws DocumentException, FB2toPDFException {
         addAnchor(poem);
+        ParagraphStyle previousStyle = currentStyle;
+
+        ParagraphStyle mainStyle = stylesheet.getParagraphStyle("poem");
+        ParagraphStyle authorStyle = stylesheet.getParagraphStyle("poemAuthor");
+        ParagraphStyle titleStyle = stylesheet.getParagraphStyle("poemTitle");
+        ParagraphStyle dateStyle = stylesheet.getParagraphStyle("poemDate");
+
+        currentStyle = mainStyle;
+
         ElementCollection nodes = ElementCollection.children(poem);
         for (int i = 0; i < nodes.getLength(); ++i) {
             org.w3c.dom.Element element = nodes.item(i);
 
             if (element.getTagName().equals("stanza")) {
                 processStanza(element);
+            } else if (element.getTagName().equals("title")) {
+                currentStyle = titleStyle;
+                processParagraph(element, true, true);
+                currentStyle = mainStyle;
+            } else if (element.getTagName().equals("date")) {
+                currentStyle = dateStyle;
+                processParagraph(element, true, true);
+                currentStyle = mainStyle;
+            } else if (element.getTagName().equals("epigraph")) {
+                processEpigraph(element);
+            } else if (element.getTagName().equals("text-author")) {
+                currentStyle = authorStyle;
+                processParagraph(element, true, true);
+                currentStyle = mainStyle;
             } else {
                 System.out.println("Unhandled poem tag " + element.getTagName());
             }
         }
+
+        currentStyle = previousStyle;
     }
 
     private void processStanza(org.w3c.dom.Element stanza)
