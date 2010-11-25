@@ -39,6 +39,7 @@ import java.awt.Color;
 import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.tools.zip.ZipEntry;
@@ -155,12 +156,14 @@ public class FB2toPDF
     private boolean subscript;
     private HyphenationAuto hyphenation;
     private Stylesheet stylesheet;
+    private Stack<String> anchorStack = new Stack<String>();
 
     private FB2toPDF(String fromName, String toName) {
         this.fromName = fromName;
         this.toName = toName;
     }
 
+    /*
     private void addAnchor(Element element) throws FB2toPDFException, DocumentException {
         String id = element.getAttribute("id");
         if (id.length() > 0) {
@@ -173,6 +176,24 @@ public class FB2toPDF
         anchor.setName(id);
         doc.add(anchor);
         System.out.println("Adding A NAME=" + id);
+    }
+     */
+    
+    private void addInvisibleAnchor(Element child) throws FB2toPDFException, DocumentException {
+        String id = child.getAttribute("id");
+        if (id.length() > 0) {
+            addInvisibleAnchor(id);
+        }
+    }
+
+    protected void addInvisibleAnchor(String name) {
+        /*
+        Anchor anchor = currentStyle.createInvisibleAnchor();
+        anchor.setName(name);
+        currentParagraph.add(anchor);
+        System.out.println("Adding A NAME=" + name);
+         */
+        anchorStack.push(name);
     }
 
     protected void addBacklink(String id) throws DocumentException, FB2toPDFException {
@@ -212,13 +233,6 @@ public class FB2toPDF
         image.scaleToFit(scaleWidth, scaleHeight);
         image.setAlignment(Image.MIDDLE);
         doc.add(image);
-    }
-
-    protected void addInvisibleAnchor(String name) throws FB2toPDFException, DocumentException {
-        Anchor anchor = currentStyle.createInvisibleAnchor();
-        anchor.setName(name);
-        currentParagraph.add(anchor);
-        System.out.println("Adding A NAME=" + name);
     }
 
     protected void addLine(Chunk chunk, ParagraphStyle style) throws FB2toPDFException, DocumentException {
@@ -407,7 +421,7 @@ public class FB2toPDF
         String href = element.getAttributeNS(NS_XLINK, "href");
         Image image = getImage(href);
         if (image != null) {
-            addAnchor(element);
+            addInvisibleAnchor(element);
             addImage(image);
         } else {
             System.out.println("Image not found, href: " + href);
@@ -1034,7 +1048,7 @@ public class FB2toPDF
         }
 
         if (id.length() > 0) {
-            addAnchor(id);
+            addInvisibleAnchor(id);
         }
 
         processSectionContent(section, level);
@@ -1176,7 +1190,7 @@ public class FB2toPDF
 
     private void processEpigraph(org.w3c.dom.Element epigraph)
             throws DocumentException, FB2toPDFException {
-        addAnchor(epigraph);
+        addInvisibleAnchor(epigraph);
 
         ParagraphStyle previousStyle = currentStyle;
 
@@ -1213,7 +1227,7 @@ public class FB2toPDF
 
     private void processCite(org.w3c.dom.Element cite)
             throws DocumentException, FB2toPDFException {
-        addAnchor(cite);
+        addInvisibleAnchor(cite);
 
         ParagraphStyle previousStyle = currentStyle;
 
@@ -1253,7 +1267,7 @@ public class FB2toPDF
 
     private void processPoem(org.w3c.dom.Element poem)
             throws DocumentException, FB2toPDFException {
-        addAnchor(poem);
+        addInvisibleAnchor(poem);
         ParagraphStyle previousStyle = currentStyle;
 
         ParagraphStyle mainStyle = stylesheet.getParagraphStyle("poem");
@@ -1314,7 +1328,7 @@ public class FB2toPDF
             throws DocumentException, FB2toPDFException {
         currentParagraph = currentStyle.createParagraph(bFirst, bLast);
 
-        addAnchor(paragraph);
+        addInvisibleAnchor(paragraph);
         processParagraphContent(paragraph, bFirst);
         flushCurrentChunk();
 
@@ -1372,25 +1386,33 @@ public class FB2toPDF
     private void flushCurrentChunk()
             throws DocumentException, FB2toPDFException {
         if (currentChunk != null) {
+            String currentAnchorName = anchorStack.isEmpty() ? null : anchorStack.pop();
             if (!isNullOrEmpty(currentReference)) {
+                Anchor anchor = currentStyle.createAnchor();
+                anchor.add(currentChunk);
                 if (currentReference.charAt(0) == '#') {
                     //Unlike Anchor, Action won't fail even when local destination does not exist
                     String refname = currentReference.substring(1); //getting rid of "#" at the begin of the reference
                     addGoToActionToChunk(refname, currentChunk);
-                    //currentParagraph.add(currentChunk);
-                    Anchor anchor = currentStyle.createAnchor();
-                    anchor.add(currentChunk);
-                    anchor.setName(refname + "_backlink");
-                    currentParagraph.add(anchor);
+                    currentAnchorName = refname + "_backlink";
                 } else {
-                    Anchor anchor = currentStyle.createAnchor();
-                    anchor.add(currentChunk);
                     anchor.setReference(currentReference);
                     System.out.println("Adding A HREF=" + currentReference);
-                    currentParagraph.add(anchor);
                 }
+                if (currentAnchorName != null) {
+                    anchor.setName(currentAnchorName);
+                    System.out.println("Adding A NAME=" + currentAnchorName);
+                }
+                currentParagraph.add(anchor);
             } else {
-                currentParagraph.add(currentChunk);
+                if (currentAnchorName != null) {
+                    Anchor anchor = currentStyle.createAnchor();
+                    anchor.add(currentChunk);
+                    anchor.setName(currentAnchorName);
+                    currentParagraph.add(anchor);
+                } else {
+                    currentParagraph.add(currentChunk);
+                }
             }
             currentChunk = null;
         }
@@ -1438,10 +1460,7 @@ public class FB2toPDF
                     currentReference = null;
                 } else if (child.getTagName().equals("cite")) {
                     flushCurrentChunk();
-                    String citeId = child.getAttribute("id");
-                    if (citeId.length() > 0) {
-                        addInvisibleAnchor(citeId);
-                    }
+                    addInvisibleAnchor(child);
                     processParagraphContent(child);
                     flushCurrentChunk();
                     currentReference = null;
@@ -1478,25 +1497,7 @@ public class FB2toPDF
                     subscript = false;
                 } else {
                     /*
-                    elif s.tagName == "strikethrough":
-                    res += u'\\sout{' + par(s,intitle) + u'}'
-                    elif s.tagName == "sub":
-                    res += u'$_{\\textrm{' + par(s,intitle) + '}}$'
-                    elif s.tagName == "sup":
-                    res += u'$^{\\textrm{' + par(s,intitle) + '}}$'
                     elif s.tagName == "code":
-                    res += u'{\\sc' + par(s,intitle) + u'}'
-                    elif s.tagName == "image":
-                    if not intitle:
-                    res += processInlineImage(s)
-                    else:
-                    # TODO: nicer workaround for issue #44
-                    res += "[...]"
-                    elif s.tagName == "l":
-                    logging.getLogger('fb2pdf').warning("Unsupported element: %s" % s.tagName)
-                    res += "" #TODO
-                    else:
-                    logging.getLogger('fb2pdf').error("Unknown paragraph element: %s" % s.tagName)
                      */
                     System.out.println("Unhandled paragraph tag " + child.getTagName());
                     processParagraphContent(child);
