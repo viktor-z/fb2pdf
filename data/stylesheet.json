@@ -222,6 +222,11 @@
             baseStyle:        "epigraph"
         },
         {
+            name:             "citeSubtitle",
+            baseStyle:        "cite",
+            fontStyle:        "boldItalic"
+        },
+        {
             name:             "citeAuthor",
             baseStyle:        "epigraphAuthor"
         },

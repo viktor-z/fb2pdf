@@ -467,13 +467,14 @@ public class FB2toPDF
             }
         });
 
+        InputStream is = null;
         if (fromName.toLowerCase().endsWith(".fb2")) {
-            fb2 = builder.parse(new File(fromName));
+            is = new FileInputStream(new File(fromName));
         } else if (fromName.toLowerCase().endsWith(".zip")) {
             ZipFile fromZip = new ZipFile(fromName);
             ZipEntry entry = (ZipEntry) fromZip.getEntries().nextElement();
             if (entry.getName().toLowerCase().endsWith(".fb2")) {
-                fb2 = builder.parse(fromZip.getInputStream(entry));
+                is = fromZip.getInputStream(entry);
             } else {
                 System.err.println("First archive entry " + entry.getName() + " is not an FB2 file.");
                 System.exit(-1);
@@ -482,6 +483,33 @@ public class FB2toPDF
             System.err.println("Unrecognized file extension: " + fromName + ", only FB2 or ZIP supported.");
             System.exit(-1);
         }
+
+        /*
+        try {
+            nu.xom.Document xdoc = new nu.xom.Builder().build(is);
+            String query = "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\";";
+            String morpher = "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\";";
+            morpher += "declare namespace l = \"http://www.w3.org/1999/xlink\";";
+            //query += "//cite//emphasis";
+            //morpher += "./text()";
+            query += "//a[@type='note']";
+            morpher += "declare variable $hid := ./@l:href; <emphasis> [{//body[@name='notes']//section[@id=substring($hid,2)]/*[local-name()!='title']/text()}]</emphasis>";
+            nux.xom.xquery.XQuery xselect = nux.xom.pool.XQueryPool.GLOBAL_POOL.getXQuery(query, null);
+            nux.xom.xquery.XQuery xmorpher = nux.xom.pool.XQueryPool.GLOBAL_POOL.getXQuery(morpher, null);
+            nux.xom.xquery.XQueryUtil.update(xselect.execute(xdoc).toNodes(), xmorpher, null);
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            nu.xom.Serializer ser = new nu.xom.Serializer(out);
+            ser.write(xdoc);
+            out.close();
+            is = new ByteArrayInputStream(out.toByteArray());
+        } catch(Exception ex) {
+            System.err.println(ex);
+            System.exit(-1);
+        }
+        */
+
+        fb2 = builder.parse(is);
     }
 
     private void createPDFDoc()
@@ -1116,30 +1144,62 @@ public class FB2toPDF
     private void processEpigraph(org.w3c.dom.Element epigraph)
             throws DocumentException, FB2toPDFException {
         addAnchor(epigraph);
-        processTextWithAuthor(epigraph, "epigraph", "epigraphAuthor");
-    }
 
-    private void processCite(org.w3c.dom.Element cite)
-            throws DocumentException, FB2toPDFException {
-        addAnchor(cite);
-        processTextWithAuthor(cite, "cite", "citeAuthor");
-    }
-
-    private void processTextWithAuthor(org.w3c.dom.Element textWithAuthor, String mainStyleName, String authorStyleName)
-            throws DocumentException, FB2toPDFException {
         ParagraphStyle previousStyle = currentStyle;
 
-        ParagraphStyle mainStyle = stylesheet.getParagraphStyle(mainStyleName);
-        ParagraphStyle authorStyle = stylesheet.getParagraphStyle(authorStyleName);
+        ParagraphStyle mainStyle = stylesheet.getParagraphStyle("epigraph");
+        ParagraphStyle authorStyle = stylesheet.getParagraphStyle("epigraphAuthor");
 
         currentStyle = mainStyle;
 
-        ElementCollection nodes = ElementCollection.children(textWithAuthor);
+        ElementCollection nodes = ElementCollection.children(epigraph);
         for (int i = 0; i < nodes.getLength(); ++i) {
             org.w3c.dom.Element element = nodes.item(i);
 
             if (element.getTagName().equals("p")) {
                 processParagraph(element, i == 0, i == nodes.getLength() - 1);
+            } else if (element.getTagName().equals("poem")) {
+                processPoem(element);
+            } else if (element.getTagName().equals("cite")) {
+                processCite(element);
+            } else if (element.getTagName().equals("text-author")) {
+                currentStyle = authorStyle;
+                processParagraph(element, true, true);
+                currentStyle = mainStyle;
+            } else if (element.getTagName().equals("empty-line")) {
+                if (!isIgnoreEmptyLine(element)) {
+                    addEmptyLine();
+                }
+            } else {
+                System.out.println("Unhandled tag '" + element.getTagName() + "' inside 'epigraph'");
+            }
+        }
+
+        currentStyle = previousStyle;
+    }
+
+    private void processCite(org.w3c.dom.Element cite)
+            throws DocumentException, FB2toPDFException {
+        addAnchor(cite);
+
+        ParagraphStyle previousStyle = currentStyle;
+
+        ParagraphStyle mainStyle = stylesheet.getParagraphStyle("cite");
+        ParagraphStyle authorStyle = stylesheet.getParagraphStyle("citeAuthor");
+        ParagraphStyle subtitleStyle = stylesheet.getParagraphStyle("citeSubtitle");
+
+        currentStyle = mainStyle;
+
+        ElementCollection nodes = ElementCollection.children(cite);
+        for (int i = 0; i < nodes.getLength(); ++i) {
+            org.w3c.dom.Element element = nodes.item(i);
+
+            if (element.getTagName().equals("p")) {
+                processParagraph(element, i == 0, i == nodes.getLength() - 1);
+            } else if (element.getTagName().equals("subtitle")) {
+                currentStyle = subtitleStyle;
+                processParagraph(element, true, true);
+                currentStyle = mainStyle;
             } else if (element.getTagName().equals("poem")) {
                 processPoem(element);
             } else if (element.getTagName().equals("text-author")) {
@@ -1151,7 +1211,7 @@ public class FB2toPDF
                     addEmptyLine();
                 }
             } else {
-                System.out.println("Unhandled tag " + element.getTagName() + " inside " + textWithAuthor.getTagName());
+                System.out.println("Unhandled tag '" + element.getTagName() + "' inside 'cite'");
             }
         }
 
