@@ -1,5 +1,5 @@
 /*
- * $Id: PdfStamperImp.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: PdfStamperImp.java 4600 2010-10-17 18:25:13Z psoares33 $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -206,8 +206,15 @@ class PdfStamperImp extends PdfWriter {
         }
         // metadata
         int skipInfo = -1;
-        PRIndirectReference iInfo = (PRIndirectReference)reader.getTrailer().get(PdfName.INFO);
-        PdfDictionary oldInfo = (PdfDictionary)PdfReader.getPdfObject(iInfo);
+        PdfObject oInfo = reader.getTrailer().get(PdfName.INFO);
+        PRIndirectReference iInfo = null;
+        PdfDictionary oldInfo = null;
+        if (oInfo instanceof PRIndirectReference)
+            iInfo = (PRIndirectReference)oInfo;
+        if (iInfo != null)
+            oldInfo = (PdfDictionary)PdfReader.getPdfObject(iInfo);
+        else if (oInfo instanceof PdfDictionary)
+            oldInfo = (PdfDictionary)oInfo;
         String producer = null;
         if (iInfo != null)
             skipInfo = iInfo.getNumber();
@@ -659,7 +666,7 @@ class PdfStamperImp extends PdfWriter {
             return;
         if (page > reader.getNumberOfPages())
             return;
-        HashMap<String, Item> fields = acroFields.getFields();
+        Map<String, Item> fields = acroFields.getFields();
         for (AcroFields.Item item: fields.values()) {
             for (int k = 0; k < item.size(); ++k) {
                 int p = item.getPage(k).intValue();
@@ -808,7 +815,7 @@ class PdfStamperImp extends PdfWriter {
         if (append)
             throw new IllegalArgumentException(MessageLocalization.getComposedMessage("field.flattening.is.not.supported.in.append.mode"));
         getAcroFields();
-        HashMap<String, Item> fields = acroFields.getFields();
+        Map<String, Item> fields = acroFields.getFields();
         if (fieldsAdded && partialFlattening.isEmpty()) {
             for (String s: fields.keySet()) {
                 partialFlattening.add(s);

@@ -146,7 +146,6 @@ import com.itextpdf.text.error_messages.MessageLocalization;
 /**
  * Converts a PFM file into an AFM file.
  */
-@SuppressWarnings("unused")
 public final class Pfm2afm {
     private RandomAccessFileOrArray in;
     private PrintWriter out;

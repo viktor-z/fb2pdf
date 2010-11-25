@@ -159,7 +159,6 @@ public class Jpeg2000 extends Image {
         originalType = ORIGINAL_JPEG2000;
         inp = null;
         try {
-            @SuppressWarnings("unused")
             String errorID;
             if (rawData == null){
                 inp = url.openStream();

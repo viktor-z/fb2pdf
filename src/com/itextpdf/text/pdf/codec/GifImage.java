@@ -1,5 +1,5 @@
 /*
- * $Id: GifImage.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: GifImage.java 4604 2010-10-27 16:06:50Z mstorer $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -260,13 +260,9 @@ public class GifImage {
         blockSize = in.read();
         if (blockSize <= 0)
             return blockSize = 0;
-        for (int k = 0; k < blockSize; ++k) {
-            int v = in.read();
-            if (v < 0) {
-                return blockSize = k;
-            }
-            block[k] = (byte)v;
-        }
+
+        blockSize = in.read(block, 0, blockSize);
+
         return blockSize;
     }
 

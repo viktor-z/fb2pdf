@@ -1,5 +1,5 @@
 /*
- * $Id: PdfLine.java 4457 2010-04-09 08:21:21Z blowagie $
+ * $Id: PdfLine.java 4491 2010-04-25 11:04:50Z blowagie $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -264,9 +264,7 @@ public class PdfLine {
      */
 
     public boolean hasToBeJustified() {
-        // return (alignment == Element.ALIGN_JUSTIFIED || alignment == Element.ALIGN_JUSTIFIED_ALL) && width != 0; //VIKTORZ --
-        return (alignment == Element.ALIGN_JUSTIFIED || alignment == Element.ALIGN_JUSTIFIED_ALL)  //VIKTORZ ++
-            && width != 0 && !isNewlineSplit(); //VIKTORZ ++
+        return (alignment == Element.ALIGN_JUSTIFIED || alignment == Element.ALIGN_JUSTIFIED_ALL) && width != 0;
     }
 
     /**
@@ -367,9 +365,9 @@ public class PdfLine {
     /**
      * Returns the length of a line in UTF32 characters
      * @return	the length in UTF32 characters
-     * @since	2.1.2
+     * @since	2.1.2; Get changed into get in 5.0.2
      */
-    public int GetLineLengthUtf32() {
+    public int getLineLengthUtf32() {
         int total = 0;
         for (Object element : line) {
             total += ((PdfChunk)element).lengthUtf32();

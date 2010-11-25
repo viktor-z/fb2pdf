@@ -1,5 +1,5 @@
 /*
- * $Id: PdfImportedPage.java 4141 2009-12-05 19:01:18Z psoares33 $
+ * $Id: PdfImportedPage.java 4574 2010-08-12 15:15:30Z blowagie $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -56,6 +56,11 @@ public class PdfImportedPage extends com.itextpdf.text.pdf.PdfTemplate {
 
     PdfReaderInstance readerInstance;
     int pageNumber;
+    /**
+     * True if the imported page has been copied to a writer.
+     * @since iText 5.0.4
+     */
+    protected boolean toCopy = true;
     
     PdfImportedPage(PdfReaderInstance readerInstance, PdfWriter writer, int pageNumber) {
         this.readerInstance = readerInstance;
@@ -158,4 +163,21 @@ public class PdfImportedPage extends com.itextpdf.text.pdf.PdfTemplate {
     PdfReaderInstance getPdfReaderInstance() {
         return readerInstance;
     }
+
+	/**
+	 * Checks if the page has to be copied.
+	 * @return true if the page has to be copied.
+	 * @since iText 5.0.4
+	 */
+	public boolean isToCopy() {
+		return toCopy;
+	}
+
+	/**
+	 * Indicate that the resources of the imported page have been copied.
+	 * @since iText 5.0.4
+	 */
+	public void setCopied() {
+		toCopy = false;
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: CMapAwareDocumentFont.java 4320 2010-02-10 05:24:52Z trumpetinc $
+ * $Id: CMapAwareDocumentFont.java 4598 2010-10-02 12:41:44Z psoares33 $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -129,6 +129,15 @@ public class CMapAwareDocumentFont extends DocumentFont {
             // being done in DocumentFont, so I really hate to go down that path without seriously thinking about a change in the organization of the Font class hierarchy
             if (cidbyte2uni[n] == 0)
                 cidbyte2uni[n] = (char)e[k];
+        }
+        IntHashtable diffmap = getDiffmap();
+        if (diffmap != null) {
+            // the difference array overrides the existing encoding
+            e = diffmap.toOrderedKeys();
+            for (int k = 0; k < e.length; ++k) {
+                int n = diffmap.get(e[k]);
+                cidbyte2uni[n] = (char)e[k];
+            }
         }
     }
     

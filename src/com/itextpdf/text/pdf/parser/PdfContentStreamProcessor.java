@@ -1,5 +1,5 @@
 /*
- * $Id: PdfContentStreamProcessor.java 4410 2010-03-29 19:32:12Z trumpetinc $
+ * $Id: PdfContentStreamProcessor.java 4576 2010-08-20 11:37:27Z psoares33 $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -78,7 +78,7 @@ public class PdfContentStreamProcessor {
 	 * @since 5.0.1
 	 */
     public static final String DEFAULTOPERATOR = "DefaultOperator";
-    
+        
 	/** A map with all supported operators operators (PDF syntax). */
     final private Map<String, ContentOperator> operators;
     /** Resources for the content stream. */
@@ -222,7 +222,6 @@ public class PdfContentStreamProcessor {
         ContentOperator op = operators.get(operator.toString());
         if (op == null)
             op = operators.get(DEFAULTOPERATOR);
-
         op.invoke(this, operator, operands);
     }
 
@@ -320,6 +319,10 @@ public class PdfContentStreamProcessor {
         textMatrix = new Matrix(adjustBy, 0).multiply(textMatrix);
     }
 
+
+    
+
+    
     /**
      * Processes PDF syntax
      * @param contentBytes	the bytes of a content stream
@@ -334,50 +337,13 @@ public class PdfContentStreamProcessor {
             ArrayList<PdfObject> operands = new ArrayList<PdfObject>();
             while (ps.parse(operands).size() > 0){
                 PdfLiteral operator = (PdfLiteral)operands.get(operands.size()-1);
-                
-                // special handling for embedded images.  If we hit an ID operator, we need
-                // to skip all content until we reach an EI operator surrounded by whitespace.
-                // The following algorithm has one potential issue: what if the image stream 
-                // contains <ws>EI<ws> ?
-                // it sounds like we would have to actually decode the content stream, which
-                // I'd rather avoid right now.
-                if ("ID".equals(operator.toString())){
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    ByteArrayOutputStream accumulated = new ByteArrayOutputStream();
-                    int ch;
-                    int found = 0;
-                    while ((ch = tokeniser.read()) != -1){
-                        if (found == 0 && PRTokeniser.isWhitespace(ch)){
-                            found++;
-                            accumulated.write(ch);
-                        } else if (found == 1 && ch == 'E'){
-                            found++;
-                            accumulated.write(ch);
-                        } else if (found == 2 && ch == 'I'){ 
-                            found++;
-                            accumulated.write(ch);
-                        } else if (found == 3 && PRTokeniser.isWhitespace(ch)){
-                            operands = new ArrayList<PdfObject>();
-                            operands.add(new PdfLiteral("ID"));
-                            invokeOperator((PdfLiteral)operands.get(operands.size()-1), operands);
-                            
-                            // we should probably eventually do something to make the accumulated image content stream available
-                            
-                            operands = new ArrayList<PdfObject>();
-                            operands.add(new PdfLiteral("EI"));
-                            invokeOperator((PdfLiteral)operands.get(operands.size()-1), operands);
-                            
-                            break;
-                        } else {
-                            baos.write(accumulated.toByteArray());
-                            accumulated.reset();
-                            
-                            baos.write(ch);
-                            found = 0;
-                        }
-                    }
+                if ("BI".equals(operator.toString())){
+                    // we don't call invokeOperator for embedded images - this is one area of the PDF spec that is particularly nasty and inconsistent
+                    ImageRenderInfo renderInfo = ImageRenderInfo.createdForEmbeddedImage(gs().ctm, InlineImageUtils.parseInlineImage(ps));
+                    renderListener.renderImage(renderInfo);
+                } else {
+                    invokeOperator(operator, operands);
                 }
-                invokeOperator(operator, operands);
             }
 
         }
@@ -849,7 +815,7 @@ public class PdfContentStreamProcessor {
     private static class ImageXObjectDoHandler implements XObjectDoHandler{
 
         public void handleXObject(PdfContentStreamProcessor processor, PdfStream xobjectStream, PdfIndirectReference ref) {
-            ImageRenderInfo renderInfo = new ImageRenderInfo(processor.gs().ctm, ref);
+            ImageRenderInfo renderInfo = ImageRenderInfo.createForXObject(processor.gs().ctm, ref);
             processor.renderListener.renderImage(renderInfo);
         }
     }

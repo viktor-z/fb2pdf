@@ -1,5 +1,5 @@
 /*
- * $Id: AcroFields.java 4462 2010-04-11 18:05:16Z psoares33 $
+ * $Id: AcroFields.java 4599 2010-10-10 17:11:24Z psoares33 $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -76,7 +76,7 @@ public class AcroFields {
 
     PdfReader reader;
     PdfWriter writer;
-    HashMap<String, Item> fields;
+    Map<String, Item> fields;
     private int topFirst;
     private HashMap<String, int[]> sigNames;
     private boolean append;
@@ -1488,7 +1488,7 @@ public class AcroFields {
      *
      * @return all the fields
      */
-    public HashMap<String, Item> getFields() {
+    public Map<String, Item> getFields() {
         return fields;
     }
 
@@ -2018,6 +2018,38 @@ public class AcroFields {
     }
 
     /**
+     * Clears a signed field.
+     * @param name the field name
+     * @return true if the field was signed, false if the field was not signed or not found
+     * @since 5.0.5
+     */
+    public boolean clearSignatureField(String name) {
+        sigNames = null;
+        getSignatureNames();
+        if (!sigNames.containsKey(name))
+            return false;
+        Item sig = fields.get(name);
+        sig.markUsed(this, Item.WRITE_VALUE | Item.WRITE_WIDGET);
+        int n = sig.size();
+        for (int k = 0; k < n; ++k) {
+            clearSigDic(sig.getMerged(k));
+            clearSigDic(sig.getWidget(k));
+            clearSigDic(sig.getValue(k));
+        }
+        return true;
+    }
+
+    private static void clearSigDic(PdfDictionary dic) {
+        dic.remove(PdfName.AP);
+        dic.remove(PdfName.AS);
+        dic.remove(PdfName.V);
+        dic.remove(PdfName.DV);
+        dic.remove(PdfName.SV);
+        dic.remove(PdfName.FF);
+        dic.put(PdfName.F, new PdfNumber(PdfAnnotation.FLAGS_PRINT));
+    }
+
+    /**
      * Gets the field names that have signatures and are signed.
      *
      * @return the field names that have signatures and are signed
@@ -2187,6 +2219,8 @@ public class AcroFields {
             PdfPKCS7 pk = null;
             if (sub.equals(PdfName.ADBE_X509_RSA_SHA1)) {
                 PdfString cert = v.getAsString(PdfName.CERT);
+                if (cert == null)
+                    cert = v.getAsArray(PdfName.CERT).getAsString(0);
                 pk = new PdfPKCS7(contents.getOriginalBytes(), cert.getBytes(), provider);
             }
             else

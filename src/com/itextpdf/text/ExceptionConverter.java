@@ -1,5 +1,5 @@
 /*
- * $Id: ExceptionConverter.java 4113 2009-12-01 11:08:59Z blowagie $
+ * $Id: ExceptionConverter.java 4596 2010-09-30 19:20:49Z trumpetinc $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -69,6 +69,7 @@ public class ExceptionConverter extends RuntimeException {
      * @param ex the exception that has to be turned into a RuntimeException
      */
     public ExceptionConverter(Exception ex) {
+        super(ex);
         this.ex = ex;
         prefix = (ex instanceof RuntimeException) ? "" : "ExceptionConverter: ";
     }

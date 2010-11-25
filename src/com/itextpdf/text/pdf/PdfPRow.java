@@ -1,5 +1,5 @@
 /*
- * $Id: PdfPRow.java 4281 2010-01-28 13:26:39Z blowagie $
+ * $Id: PdfPRow.java 4575 2010-08-15 14:01:17Z psoares33 $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -609,7 +609,7 @@ public class PdfPRow {
 	                    y = setColumn(ct, bottom, left, top, right);
 	                    break;
 	                default:
-	                    y = setColumn(ct, left, bottom, cell.isNoWrap() ? RIGHT_LIMIT : right, top);
+	                    y = setColumn(ct, left, bottom + 0.00001f, cell.isNoWrap() ? RIGHT_LIMIT : right, top);
 	                    break;
 	            }
 	            int status;
@@ -633,7 +633,7 @@ public class PdfPRow {
 				allEmpty = (allEmpty && thisEmpty);
 			}
 			newCells[k] = newCell;
-			cell.setFixedHeight(newHeight - cell.getEffectivePaddingBottom());
+            cell.setFixedHeight(newHeight);
 		}
 		if (allEmpty) {
 			for (int k = 0; k < cells.length; ++k) {

@@ -166,10 +166,8 @@ public class TSAClientBouncyCastle implements TSAClient {
             if (tsToken == null) {
                 throw new Exception(MessageLocalization.getComposedMessage("tsa.1.failed.to.return.time.stamp.token.2", tsaURL, response.getStatusString()));
             }
-            @SuppressWarnings("unused")
             TimeStampTokenInfo info = tsToken.getTimeStampInfo(); // to view details
             byte[] encoded = tsToken.getEncoded();
-            @SuppressWarnings("unused")
             long stop = System.currentTimeMillis();
             
             // Update our token size estimate for the next call (padded to be safe)

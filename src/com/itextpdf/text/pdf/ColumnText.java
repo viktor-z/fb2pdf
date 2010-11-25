@@ -1,5 +1,5 @@
 /*
- * $Id: ColumnText.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: ColumnText.java 4585 2010-08-24 15:47:36Z blowagie $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -179,6 +179,12 @@ public class ColumnText {
 
     /** The current y line location. Text will be written at this line minus the leading. */
     protected float yLine;
+    
+    /**
+     * The X position after the last line that has been written.
+     * @since 5.0.3
+     */
+    protected float lastX;
 
     /** The leading for the current line. */
     protected float currentLeading = 16;
@@ -793,6 +799,7 @@ public class ColumnText {
             return NO_MORE_TEXT;
         descender = 0;
         linesWritten = 0;
+        lastX = 0;
         boolean dirty = false;
         float ratio = spaceCharRatio;
         Object currentValues[] = new Object[2];
@@ -818,6 +825,13 @@ public class ColumnText {
                 ratio = text.getPdfWriter().getSpaceCharRatio();
             else if (ratio < 0.001f)
                 ratio = 0.001f;
+        }
+        if (!rectangularMode) {
+        	float max = 0;
+        	for (PdfChunk c : bidiLine.chunks) {
+        		max = Math.max(max, c.font.size());
+        	}
+        	currentLeading = fixedLeading + max * multipliedLeading;
         }
         float firstIndent = 0;
         PdfLine line;
@@ -862,7 +876,7 @@ public class ColumnText {
                 x1 = leftX;
         	}
             else {
-               	float yTemp = yLine;
+               	float yTemp = yLine - currentLeading;
                	float xx[] = findLimitsTwoLines();
                	if (xx == null) {
                		status = NO_MORE_COLUMN;
@@ -877,31 +891,31 @@ public class ColumnText {
                		break;
                	}
                	x1 = Math.max(xx[0], xx[2]);
-                    float x2 = Math.min(xx[1], xx[3]);
-                    if (x2 - x1 <= firstIndent + rightIndent)
-                        continue;
-                    if (!simulate && !dirty) {
-                        text.beginText();
-                        dirty = true;
-                    }
-                    line = bidiLine.processLine(x1, x2 - x1 - firstIndent - rightIndent, alignment, localRunDirection, arabicOptions);
-                    if (line == null) {
-                        status = NO_MORE_TEXT;
-                        yLine = yTemp;
-                        break;
-                    }
+                float x2 = Math.min(xx[1], xx[3]);
+                if (x2 - x1 <= firstIndent + rightIndent)
+                    continue;
+                if (!simulate && !dirty) {
+                    text.beginText();
+                    dirty = true;
                 }
-                if (!simulate) {
-                    currentValues[0] = currentFont;
-                    text.setTextMatrix(x1 + (line.isRTL() ? rightIndent : firstIndent) + line.indentLeft(), yLine);
-                    pdf.writeLineToContent(line, text, graphics, currentValues, ratio);
-                    currentFont = (PdfFont)currentValues[0];
+                line = bidiLine.processLine(x1, x2 - x1 - firstIndent - rightIndent, alignment, localRunDirection, arabicOptions);
+                if (line == null) {
+                    status = NO_MORE_TEXT;
+                    yLine = yTemp;
+                    break;
                 }
-                lastWasNewline = line.isNewlineSplit();
-                yLine -= line.isNewlineSplit() ? extraParagraphSpace : 0;
-                ++linesWritten;
-                descender = line.getDescender();
             }
+            if (!simulate) {
+                currentValues[0] = currentFont;
+                text.setTextMatrix(x1 + (line.isRTL() ? rightIndent : firstIndent) + line.indentLeft(), yLine);
+                lastX = pdf.writeLineToContent(line, text, graphics, currentValues, ratio);
+                currentFont = (PdfFont)currentValues[0];
+            }
+            lastWasNewline = line.isNewlineSplit();
+            yLine -= line.isNewlineSplit() ? extraParagraphSpace : 0;
+            ++linesWritten;
+            descender = line.getDescender();
+        }
         if (dirty) {
             text.endText();
             canvas.add(text);
@@ -986,6 +1000,15 @@ public class ColumnText {
      */
     public int getLinesWritten() {
         return this.linesWritten;
+    }
+    
+    /**
+     * Gets the X position of the end of the last line that has been written
+     * (will not work in simulation mode!).
+     * @since 5.0.3
+     */
+    public float getLastX() {
+    	return lastX;
     }
 
     /**
@@ -1148,7 +1171,6 @@ public class ColumnText {
                     boolean createHere = false;
                     if (compositeColumn == null) {
                         compositeColumn = new ColumnText(canvas);
-                        compositeColumn.setUseAscender(firstPass ? useAscender : false);
                         compositeColumn.setAlignment(para.getAlignment());
                         compositeColumn.setIndent(para.getIndentationLeft() + para.getFirstLineIndent());
                         compositeColumn.setExtraParagraphSpace(para.getExtraParagraphSpace());
@@ -1164,6 +1186,7 @@ public class ColumnText {
                         }
                         createHere = true;
                     }
+                    compositeColumn.setUseAscender(firstPass ? useAscender : false);
                     compositeColumn.leftX = leftX;
                     compositeColumn.rightX = rightX;
                     compositeColumn.yLine = yLine;
@@ -1173,6 +1196,7 @@ public class ColumnText {
                     compositeColumn.maxY = maxY;
                     boolean keepCandidate = para.getKeepTogether() && createHere && !firstPass;
                     status = compositeColumn.go(simulate || keepCandidate && keep == 0);
+                    lastX = compositeColumn.getLastX();
                     updateFilledWidth(compositeColumn.filledWidth);
                     if ((status & NO_MORE_TEXT) == 0 && keepCandidate) {
                         compositeColumn = null;
@@ -1269,6 +1293,7 @@ public class ColumnText {
                     compositeColumn.maxY = maxY;
                     boolean keepCandidate = item.getKeepTogether() && createHere && !firstPass;
                     status = compositeColumn.go(simulate || keepCandidate && keep == 0);
+                    lastX = compositeColumn.getLastX();
                     updateFilledWidth(compositeColumn.filledWidth);
                     if ((status & NO_MORE_TEXT) == 0 && keepCandidate) {
                         compositeColumn = null;

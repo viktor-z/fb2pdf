@@ -1,5 +1,5 @@
 /*
- * $Id: PdfReader.java 4427 2010-03-31 14:39:52Z blowagie $
+ * $Id: PdfReader.java 4588 2010-09-02 13:48:05Z psoares33 $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -74,6 +74,9 @@ import com.itextpdf.text.exceptions.BadPasswordException;
 import com.itextpdf.text.exceptions.InvalidPdfException;
 import com.itextpdf.text.exceptions.UnsupportedPdfException;
 import com.itextpdf.text.pdf.PRTokeniser.TokenType;
+import com.itextpdf.text.pdf.codec.TIFFConstants;
+import com.itextpdf.text.pdf.codec.TIFFFaxDecoder;
+import com.itextpdf.text.pdf.codec.TIFFFaxDecompressor;
 import com.itextpdf.text.pdf.interfaces.PdfViewerPreferences;
 import com.itextpdf.text.pdf.internal.PdfViewerPreferencesImp;
 
@@ -81,7 +84,6 @@ import com.itextpdf.text.pdf.internal.PdfViewerPreferencesImp;
  * @author Paulo Soares
  * @author Kazuya Ujihara
  */
-@SuppressWarnings("deprecation")
 public class PdfReader implements PdfViewerPreferences {
 
 	/**
@@ -1065,7 +1067,17 @@ public class PdfReader implements PdfViewerPreferences {
             if (!ok)
                 throw new InvalidPdfException(MessageLocalization.getComposedMessage("error.reading.objstm"));
             tokens.seek(address);
-            return readPRObject();
+            tokens.nextToken();
+            PdfObject obj;
+            if (tokens.getTokenType() == PRTokeniser.TokenType.NUMBER) {
+                obj = new PdfNumber(tokens.getStringValue());
+            }
+            else {
+                tokens.seek(address);
+                obj = readPRObject();
+            }
+            return obj;
+            //return readPRObject();
         }
         finally {
             tokens = saveTokens;
@@ -1212,7 +1224,15 @@ public class PdfReader implements PdfViewerPreferences {
             for (int k = 0; k < n; ++k) {
                 if (map.containsKey(k)) {
                     tokens.seek(address[k]);
-                    PdfObject obj = readPRObject();
+                    tokens.nextToken();
+                    PdfObject obj;
+                    if (tokens.getTokenType() == PRTokeniser.TokenType.NUMBER) {
+                    	obj = new PdfNumber(tokens.getStringValue());
+                    }
+                    else {
+                    	tokens.seek(address[k]);
+                    	obj = readPRObject();
+                    }
                     xrefObj.set(objNumber[k], obj);
                 }
             }
@@ -2076,15 +2096,17 @@ public class PdfReader implements PdfViewerPreferences {
         xrefObj.set(freeXref, new PRStream(this, content, compressionLevel));
     }
 
-    /** Get the content from a stream applying the required filters.
-     * @param stream the stream
-     * @param file the location where the stream is
-     * @throws IOException on error
-     * @return the stream content
+    /**
+     * Decode a byte[] applying the filters specified in the provided dictionary.
+     * @param b the bytes to decode
+     * @param streamDictionary the dictionary that contains filter information
+     * @return the decoded bytes
+     * @throws IOException if there are any problems decoding the bytes
+     * @since 5.0.4
      */
-    public static byte[] getStreamBytes(PRStream stream, RandomAccessFileOrArray file) throws IOException {
-        PdfObject filter = getPdfObjectRelease(stream.get(PdfName.FILTER));
-        byte[] b = getStreamBytesRaw(stream, file);
+    public static byte[] decodeBytes(byte[] b, PdfDictionary streamDictionary) throws IOException {
+        PdfObject filter = getPdfObjectRelease(streamDictionary.get(PdfName.FILTER));
+
         ArrayList<PdfObject> filters = new ArrayList<PdfObject>();
         if (filter != null) {
             if (filter.isName())
@@ -2093,19 +2115,19 @@ public class PdfReader implements PdfViewerPreferences {
                 filters = ((PdfArray)filter).getArrayList();
         }
         ArrayList<PdfObject> dp = new ArrayList<PdfObject>();
-        PdfObject dpo = getPdfObjectRelease(stream.get(PdfName.DECODEPARMS));
+        PdfObject dpo = getPdfObjectRelease(streamDictionary.get(PdfName.DECODEPARMS));
         if (dpo == null || !dpo.isDictionary() && !dpo.isArray())
-            dpo = getPdfObjectRelease(stream.get(PdfName.DP));
+            dpo = getPdfObjectRelease(streamDictionary.get(PdfName.DP));
         if (dpo != null) {
             if (dpo.isDictionary())
                 dp.add(dpo);
             else if (dpo.isArray())
                 dp = ((PdfArray)dpo).getArrayList();
         }
-        String name;
+        PdfName name;
         for (int j = 0; j < filters.size(); ++j) {
-            name = ((PdfName)getPdfObjectRelease(filters.get(j))).toString();
-            if (name.equals("/FlateDecode") || name.equals("/Fl")) {
+            name = (PdfName)getPdfObjectRelease(filters.get(j));
+            if (PdfName.FLATEDECODE.equals(name) || PdfName.FL.equals(name)) {
                 b = FlateDecode(b);
                 PdfObject dicParam = null;
                 if (j < dp.size()) {
@@ -2113,11 +2135,11 @@ public class PdfReader implements PdfViewerPreferences {
                     b = decodePredictor(b, dicParam);
                 }
             }
-            else if (name.equals("/ASCIIHexDecode") || name.equals("/AHx"))
+            else if (PdfName.ASCIIHEXDECODE.equals(name) || PdfName.AHX.equals(name))
                 b = ASCIIHexDecode(b);
-            else if (name.equals("/ASCII85Decode") || name.equals("/A85"))
+            else if (PdfName.ASCII85DECODE.equals(name) || PdfName.A85.equals(name))
                 b = ASCII85Decode(b);
-            else if (name.equals("/LZWDecode")) {
+            else if (PdfName.LZWDECODE.equals(name)) {
                 b = LZWDecode(b);
                 PdfObject dicParam = null;
                 if (j < dp.size()) {
@@ -2125,12 +2147,79 @@ public class PdfReader implements PdfViewerPreferences {
                     b = decodePredictor(b, dicParam);
                 }
             }
-            else if (name.equals("/Crypt")) {
+            else if (PdfName.CCITTFAXDECODE.equals(name)) {
+                PdfNumber wn = (PdfNumber)getPdfObjectRelease(streamDictionary.get(PdfName.WIDTH));
+                PdfNumber hn = (PdfNumber)getPdfObjectRelease(streamDictionary.get(PdfName.HEIGHT));
+                if (wn == null || hn == null)
+                    throw new UnsupportedPdfException(MessageLocalization.getComposedMessage("filter.ccittfaxdecode.is.only.supported.for.images"));
+                int width = wn.intValue();
+                int height = hn.intValue();
+                PdfDictionary param = null;
+                if (j < dp.size()) {
+                    PdfObject objParam = getPdfObjectRelease((PdfObject)dp.get(j));
+                    if (objParam != null && (objParam instanceof PdfDictionary))
+                        param = (PdfDictionary)objParam;
+                }
+                int k = 0;
+                boolean blackIs1 = false;
+                boolean byteAlign = false;
+                if (param != null) {
+                    PdfNumber kn = param.getAsNumber(PdfName.K);
+                    if (kn != null)
+                        k = kn.intValue();
+                    PdfBoolean bo = param.getAsBoolean(PdfName.BLACKIS1);
+                    if (bo != null)
+                        blackIs1 = bo.booleanValue();
+                    bo = param.getAsBoolean(PdfName.ENCODEDBYTEALIGN);
+                    if (bo != null)
+                        byteAlign = bo.booleanValue();
+                }
+                byte[] outBuf = new byte[(width + 7) / 8 * height];
+                TIFFFaxDecompressor decoder = new TIFFFaxDecompressor();
+                if (k == 0 || k > 0) {
+                    int tiffT4Options = k > 0 ? TIFFConstants.GROUP3OPT_2DENCODING : 0;
+                    tiffT4Options |= byteAlign ? TIFFConstants.GROUP3OPT_FILLBITS : 0;
+                    decoder.SetOptions(1, TIFFConstants.COMPRESSION_CCITTFAX3, tiffT4Options, 0);
+                    decoder.decodeRaw(outBuf, b, width, height);
+                    if (decoder.fails > 0) {
+                        byte[] outBuf2 = new byte[(width + 7) / 8 * height];
+                        int oldFails = decoder.fails;
+                        decoder.SetOptions(1, TIFFConstants.COMPRESSION_CCITTRLE, tiffT4Options, 0);
+                        decoder.decodeRaw(outBuf2, b, width, height);
+                        if (decoder.fails < oldFails) {
+                            outBuf = outBuf2;
+                        }
+                    }
+                }
+                else {
+                    TIFFFaxDecoder deca = new TIFFFaxDecoder(1, width, height);
+                    deca.decodeT6(outBuf, b, 0, height, 0);
+                }
+                if (!blackIs1) {
+                    int len = outBuf.length;
+                    for (int t = 0; t < len; ++t) {
+                        outBuf[t] ^= 0xff;
+                    }
+                }
+                b = outBuf;
+            }
+            else if (PdfName.CRYPT.equals(name)) {
             }
             else
                 throw new UnsupportedPdfException(MessageLocalization.getComposedMessage("the.filter.1.is.not.supported", name));
         }
         return b;
+    }
+    
+    /** Get the content from a stream applying the required filters.
+     * @param stream the stream
+     * @param file the location where the stream is
+     * @throws IOException on error
+     * @return the stream content
+     */
+    public static byte[] getStreamBytes(PRStream stream, RandomAccessFileOrArray file) throws IOException {
+        byte[] b = getStreamBytesRaw(stream, file);
+        return decodeBytes(b, stream);
     }
 
     /** Get the content from a stream applying the required filters.

@@ -1,5 +1,5 @@
 /*
- * $Id: PdfReaderInstance.java 4423 2010-03-31 11:54:39Z blowagie $
+ * $Id: PdfReaderInstance.java 4574 2010-08-12 15:15:30Z blowagie $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -75,7 +75,7 @@ class PdfReaderInstance {
         return reader;
     }
 
-    PdfImportedPage getImportedPage(int pageNumber) {        
+    PdfImportedPage getImportedPage(int pageNumber) {
         if (!reader.isOpenedWithFullPermissions())
             throw new IllegalArgumentException(MessageLocalization.getComposedMessage("pdfreader.not.opened.with.owner.password"));
         if (pageNumber < 1 || pageNumber > reader.getNumberOfPages())
@@ -168,7 +168,10 @@ class PdfReaderInstance {
             file.reOpen();
             for (Object element : importedPages.values()) {
                 PdfImportedPage ip = (PdfImportedPage)element;
-                writer.addToBody(ip.getFormXObject(writer.getCompressionLevel()), ip.getIndirectReference());
+                if (ip.isToCopy()) {
+                	writer.addToBody(ip.getFormXObject(writer.getCompressionLevel()), ip.getIndirectReference());
+                	ip.setCopied();
+                }
             }
             writeAllVisited();
         }

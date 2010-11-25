@@ -1,5 +1,5 @@
 /*
- * $Id: PdfEncryption.java 4330 2010-02-22 23:45:04Z psoares33 $
+ * $Id: PdfEncryption.java 4536 2010-07-11 15:41:28Z psoares33 $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -60,7 +60,6 @@ import java.security.DigestException;
  * @author Paulo Soares
  * @author Kazuya Ujihara
  */
-@SuppressWarnings("unused")
 public class PdfEncryption {
 
 	public static final int STANDARD_ENCRYPTION_40 = 2;
@@ -156,8 +155,8 @@ public class PdfEncryption {
 
 	public void setCryptoMode(int mode, int kl) {
 		cryptoMode = mode;
-		encryptMetadata = (mode & PdfWriter.DO_NOT_ENCRYPT_METADATA) == 0;
-		embeddedFilesOnly = (mode & PdfWriter.EMBEDDED_FILES_ONLY) != 0;
+		encryptMetadata = (mode & PdfWriter.DO_NOT_ENCRYPT_METADATA) != PdfWriter.DO_NOT_ENCRYPT_METADATA;
+		embeddedFilesOnly = (mode & PdfWriter.EMBEDDED_FILES_ONLY) == PdfWriter.EMBEDDED_FILES_ONLY;
 		mode &= PdfWriter.ENCRYPTION_MASK;
 		switch (mode) {
 		case PdfWriter.STANDARD_ENCRYPTION_40:

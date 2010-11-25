@@ -1,5 +1,5 @@
 /*
- * $Id: PdfWriter.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: PdfWriter.java 4574 2010-08-12 15:15:30Z blowagie $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -1167,6 +1167,9 @@ public class PdfWriter extends DocWriter implements
             pdf.close();
             try {
                 addSharedObjectsToBody();
+                for (PdfOCG layer : documentOCG) {
+                    addToBody(layer.getPdfObject(), layer.getRef());
+                }
                 // add the root to the body
                 PdfIndirectReference rootRef = root.writePageTree();
                 // make the catalog-object and add it to the body
@@ -1255,7 +1258,7 @@ public class PdfWriter extends DocWriter implements
             }
         }
         // [F5] add all the dependencies in the imported pages
-        for (PdfReaderInstance element : importedPages.values()) {
+        for (PdfReaderInstance element : readerInstances.values()) {
             currentPdfReaderInstance= element;
             currentPdfReaderInstance.writeAllPages();
         }
@@ -1293,10 +1296,6 @@ public class PdfWriter extends DocWriter implements
             else if (prop instanceof PdfDictionary && !(prop instanceof PdfLayer)){
                 addToBody((PdfDictionary)prop, (PdfIndirectReference)obj[1]);
             }
-        }
-        // [F13] add the OCG layers
-        for (PdfOCG layer : documentOCG) {
-            addToBody(layer.getPdfObject(), layer.getRef());
         }
     }
 
@@ -2188,8 +2187,8 @@ public class PdfWriter extends DocWriter implements
                     // If we got here from PdfCopy we'll have to fill importedPages
                     PdfImportedPage ip = (PdfImportedPage)template;
                     PdfReader r = ip.getPdfReaderInstance().getReader();
-                    if (!importedPages.containsKey(r)) {
-                        importedPages.put(r, ip.getPdfReaderInstance());
+                    if (!readerInstances.containsKey(r)) {
+                        readerInstances.put(r, ip.getPdfReaderInstance());
                     }
                     template = null;
                 }
@@ -2228,7 +2227,11 @@ public class PdfWriter extends DocWriter implements
 
 //  [F5] adding pages imported form other PDF documents
 
-    protected HashMap<PdfReader, PdfReaderInstance> importedPages = new HashMap<PdfReader, PdfReaderInstance>();
+    /**
+     * Instances of PdfReader/PdfReaderInstance that are used to import pages.
+     * @since 5.0.3
+     */
+    protected HashMap<PdfReader, PdfReaderInstance> readerInstances = new HashMap<PdfReader, PdfReaderInstance>();
 
     /**
      * Use this method to get a page from other PDF document.
@@ -2240,14 +2243,26 @@ public class PdfWriter extends DocWriter implements
      * @return the template representing the imported page
      */
     public PdfImportedPage getImportedPage(PdfReader reader, int pageNumber) {
-        PdfReaderInstance inst = importedPages.get(reader);
-        if (inst == null) {
-            inst = reader.getPdfReaderInstance(this);
-            importedPages.put(reader, inst);
-        }
-        return inst.getImportedPage(pageNumber);
+        return getPdfReaderInstance(reader).getImportedPage(pageNumber);
     }
 
+    /**
+     * Returns the PdfReaderInstance associated with the specified reader.
+     * Multiple calls with the same reader object will return the same
+     * PdfReaderInstance.
+     * @param reader the PDF reader that you want an instance for
+     * @return the instance for the provided reader
+     * @since 5.0.3
+     */
+    protected PdfReaderInstance getPdfReaderInstance(PdfReader reader){
+        PdfReaderInstance inst = readerInstances.get(reader);
+        if (inst == null) {
+            inst = reader.getPdfReaderInstance(this);
+            readerInstances.put(reader, inst);
+        }
+        return inst;
+    }
+    
     /**
      * Use this method to writes the reader to the document
      * and free the memory used by it.
@@ -2258,12 +2273,12 @@ public class PdfWriter extends DocWriter implements
      * @throws IOException on error
      */
     public void freeReader(PdfReader reader) throws IOException {
-        currentPdfReaderInstance = importedPages.get(reader);
+        currentPdfReaderInstance = readerInstances.get(reader);
         if (currentPdfReaderInstance == null)
             return;
         currentPdfReaderInstance.writeAllPages();
         currentPdfReaderInstance = null;
-        importedPages.remove(reader);
+        readerInstances.remove(reader);
     }
 
     /**
@@ -2282,7 +2297,10 @@ public class PdfWriter extends DocWriter implements
     protected PdfReaderInstance currentPdfReaderInstance;
 
     protected int getNewObjectNumber(PdfReader reader, int number, int generation) {
-        return currentPdfReaderInstance.getNewObjectNumber(number, generation);
+        if (currentPdfReaderInstance == null) {
+        	currentPdfReaderInstance = getPdfReaderInstance(reader);
+        }
+    	return currentPdfReaderInstance.getNewObjectNumber(number, generation);
     }
 
     RandomAccessFileOrArray getReaderFile(PdfReader reader) {

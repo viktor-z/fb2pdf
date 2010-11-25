@@ -1,5 +1,5 @@
 /*
- * $Id: FontFactory.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: FontFactory.java 4543 2010-07-14 17:25:52Z mstorer $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -329,7 +329,7 @@ public final class FontFactory {
      * @param fullName the font name
      * @param path the font path
      */
-    public void registerFamily(String familyName, String fullName, String path) {
+    public static void registerFamily(String familyName, String fullName, String path) {
         fontImp.registerFamily(familyName, fullName, path);
     }
 

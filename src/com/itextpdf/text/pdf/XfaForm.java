@@ -1,5 +1,5 @@
 /*
- * $Id: XfaForm.java 4351 2010-03-06 08:48:09Z psoares33 $
+ * $Id: XfaForm.java 4591 2010-09-12 23:07:41Z psoares33 $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EmptyStackException;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -266,7 +267,7 @@ public class XfaForm {
      * @return the complete name or <CODE>null</CODE> if not found
      */
     public String findFieldName(String name, AcroFields af) {
-        HashMap<String, AcroFields.Item> items = af.getFields();
+        Map<String, AcroFields.Item> items = af.getFields();
         if (items.containsKey(name))
             return name;
         if (acroFieldsSom == null) {
@@ -1130,7 +1131,20 @@ public class XfaForm {
      * @since	iText 5.0.0
      */
     public void fillXfaForm(Node node) {
-		Node data = datasetsNode.getFirstChild();
+        NodeList allChilds = datasetsNode.getChildNodes();
+        int len = allChilds.getLength();
+        Node data = null;
+        for (int k = 0; k < len; ++k) {
+            Node n = allChilds.item(k);
+            if (n.getNodeType() == Node.ELEMENT_NODE && n.getLocalName().equals("data") && XFA_DATA_SCHEMA.equals(n.getNamespaceURI())) {
+                data = n;
+                break;
+            }
+        }
+        if (data == null) {
+            data = datasetsNode.getOwnerDocument().createElementNS(XFA_DATA_SCHEMA, "xfa:data");
+            datasetsNode.appendChild(data);
+        }
 		NodeList list = data.getChildNodes();
 		if (list.getLength() == 0) {
 			data.appendChild(domDocument.importNode(node, true));

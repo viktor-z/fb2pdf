@@ -1,5 +1,5 @@
 /*
- * $Id: Document.java 4468 2010-04-13 07:36:35Z blowagie $
+ * $Id: Document.java 4607 2010-11-02 09:56:47Z blowagie $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -104,7 +104,7 @@ public class Document implements DocListener {
      * This constant may only be changed by Paulo Soares and/or Bruno Lowagie.
      * @since	2.1.6
      */
-	private static final String RELEASE = "5.0.2";
+	private static final String RELEASE = "5.0.5";
 	/** This constant may only be changed by Paulo Soares and/or Bruno Lowagie. */
 	private static final String ITEXT_VERSION = ITEXT + " " + RELEASE + " (c) 1T3XT BVBA";
 
@@ -329,7 +329,7 @@ public class Document implements DocListener {
  * @return	a <CODE>boolean</CODE>
  */
 
-public boolean setMargins(float marginLeft, float marginRight,
+	public boolean setMargins(float marginLeft, float marginRight,
 			float marginTop, float marginBottom) {
         this.marginLeft = marginLeft;
         this.marginRight = marginRight;

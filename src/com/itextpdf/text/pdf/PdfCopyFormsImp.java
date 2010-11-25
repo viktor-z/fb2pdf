@@ -1,5 +1,5 @@
 /*
- * $Id: PdfCopyFormsImp.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: PdfCopyFormsImp.java 4557 2010-07-25 14:29:12Z psoares33 $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -44,7 +44,7 @@
 package com.itextpdf.text.pdf;
 
 import java.io.OutputStream;
-import java.util.HashMap;
+import java.util.Map;
 
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.error_messages.MessageLocalization;
@@ -96,7 +96,7 @@ class PdfCopyFormsImp extends PdfCopyFieldsImp {
     @Override
     void mergeFields() {
         for (int k = 0; k < fields.size(); ++k) {
-            HashMap<String, Item> fd = (fields.get(k)).getFields();
+            Map<String, Item> fd = (fields.get(k)).getFields();
             mergeWithMaster(fd);
         }
     }

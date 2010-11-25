@@ -1053,7 +1053,6 @@ public final class BidiOrder {
      * Return the start of the run including index that includes only resultTypes in validSet.
      * This assumes the value at index is valid, and does not check it.
      */
-    @SuppressWarnings("unused")
     private int findRunStart(int index, byte[] validSet) {
         loop:
             while (--index >= 0) {

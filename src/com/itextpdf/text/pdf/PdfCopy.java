@@ -1,5 +1,5 @@
 /*
- * $Id: PdfCopy.java 4372 2010-03-20 16:07:38Z psoares33 $
+ * $Id: PdfCopy.java 4574 2010-08-12 15:15:30Z blowagie $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -167,12 +167,13 @@ public class PdfCopy extends PdfWriter {
                 catch (IOException ioe) {
                     // empty on purpose
                 }
-                currentPdfReaderInstance = reader.getPdfReaderInstance(this);
+                currentPdfReaderInstance = super.getPdfReaderInstance(reader);
             }
         }
         else {
-            currentPdfReaderInstance = reader.getPdfReaderInstance(this);
+            currentPdfReaderInstance = super.getPdfReaderInstance(reader);
         }
+        //currentPdfReaderInstance.setOutputToPdf(false);
         return currentPdfReaderInstance.getImportedPage(pageNumber);
     }
 
@@ -360,6 +361,7 @@ public class PdfCopy extends PdfWriter {
         iRef.setCopied();
         PdfDictionary newPage = copyDictionary(thePage);
         root.addPage(newPage);
+        iPage.setCopied();
         ++currentPageNumber;
     }
 
@@ -516,6 +518,7 @@ public class PdfCopy extends PdfWriter {
                 currentPdfReaderInstance = null;
             }
         }
+        super.freeReader(reader);
     }
 
     /**

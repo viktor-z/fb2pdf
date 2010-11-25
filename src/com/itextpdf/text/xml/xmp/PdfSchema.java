@@ -1,5 +1,5 @@
 /*
- * $Id: PdfSchema.java 4113 2009-12-01 11:08:59Z blowagie $
+ * $Id: PdfSchema.java 4517 2010-06-01 14:45:25Z psoares33 $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -57,7 +57,7 @@ public class PdfSchema extends XmpSchema {
 	public static final String DEFAULT_XPATH_URI = "http://ns.adobe.com/pdf/1.3/";
 	
 	/** Keywords. */
-	public static final String KEYWORDS = "pdf:keywords";
+	public static final String KEYWORDS = "pdf:Keywords";
 	/** The PDF file version (for example: 1.0, 1.3, and so on). */
 	public static final String VERSION = "pdf:PDFVersion";
 	/** The Producer. */

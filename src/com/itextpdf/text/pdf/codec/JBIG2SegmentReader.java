@@ -99,8 +99,7 @@ public class JBIG2SegmentReader {
 	private RandomAccessFileOrArray ra;
 	private boolean sequential;
 	private boolean number_of_pages_known;
-	@SuppressWarnings("unused")
-    private int number_of_pages = -1;
+	private int number_of_pages = -1;
 	private boolean read = false;
 
 	/**
@@ -136,11 +135,9 @@ public class JBIG2SegmentReader {
 	 * Inner class that holds information about a JBIG2 page.
 	 * @since	2.1.5
 	 */
-	
 	public static class JBIG2Page {
 		public final int page;
-		@SuppressWarnings("unused")
-        private final JBIG2SegmentReader sr;
+		private final JBIG2SegmentReader sr;
 		private final SortedMap<Integer, JBIG2Segment> segs = new TreeMap<Integer, JBIG2Segment>();
 		public int pageBitmapWidth = -1;
 		public int pageBitmapHeight = -1;

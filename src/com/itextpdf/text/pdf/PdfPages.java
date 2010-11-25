@@ -62,7 +62,6 @@ import com.itextpdf.text.error_messages.MessageLocalization;
  * @see		PdfPage
  */
 
-@SuppressWarnings("deprecation")
 public class PdfPages {
 
     private ArrayList<PdfIndirectReference> pages = new ArrayList<PdfIndirectReference>();

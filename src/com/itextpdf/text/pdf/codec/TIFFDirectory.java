@@ -555,7 +555,6 @@ public class TIFFDirectory extends Object implements Serializable {
         }
     }
 
-    @SuppressWarnings("unused")
     private long readLong(RandomAccessFileOrArray stream)
     throws IOException {
         if (isBigEndian) {

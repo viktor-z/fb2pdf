@@ -495,7 +495,6 @@ class TrueTypeFont extends BaseFont {
      * @throws IOException the font file could not be read
      * @return the Postscript font name
      */
-    @SuppressWarnings("unused")
     String getBaseFont() throws DocumentException, IOException {
         int table_location[];
         table_location = tables.get("name");
@@ -870,7 +869,6 @@ class TrueTypeFont extends BaseFont {
     HashMap<Integer, int[]> readFormat12() throws IOException {
         HashMap<Integer, int[]> h = new HashMap<Integer, int[]>();
         rf.skipBytes(2);
-        @SuppressWarnings("unused")
         int table_lenght = rf.readInt();
         rf.skipBytes(4);
         int nGroups = rf.readInt();

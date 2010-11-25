@@ -1,5 +1,5 @@
 /*
- * $Id: PdfPKCS7.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: PdfPKCS7.java 4602 2010-10-25 21:19:02Z psoares33 $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -119,7 +119,6 @@ import com.itextpdf.text.error_messages.MessageLocalization;
  * <p>
  * It's based in code found at org.bouncycastle.
  */
-@SuppressWarnings("unused")
 public class PdfPKCS7 {
 
     private byte sigAttr[];
@@ -642,12 +641,12 @@ public class PdfPKCS7 {
         if (verified)
             return verifyResult;
         if (sigAttr != null) {
+        	final byte [] msgDigestBytes = messageDigest.digest();
+        	boolean verifyRSAdata = true;
             sig.update(sigAttr);
-            if (RSAdata != null) {
-                byte msd[] = messageDigest.digest();
-                messageDigest.update(msd);
-            }
-            verifyResult = Arrays.equals(messageDigest.digest(), digestAttr) && sig.verify(digest);
+            if (RSAdata != null)
+                verifyRSAdata = Arrays.equals(msgDigestBytes, RSAdata);
+            verifyResult = Arrays.equals(msgDigestBytes, digestAttr) && sig.verify(digest) && verifyRSAdata;
         }
         else {
             if (RSAdata != null)

@@ -1,5 +1,5 @@
 /*
- * $Id: PdfOutline.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: PdfOutline.java 4582 2010-08-23 07:54:46Z blowagie $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -399,7 +399,7 @@ public class PdfOutline extends PdfDictionary {
     /**
      * Returns the PDF representation of this <CODE>PdfOutline</CODE>.
      *
-     * @param writer the encryption information
+     * @param writer the PdfWriter
      * @param os
      * @throws IOException
      */
