@@ -839,7 +839,7 @@ public class FB2toPDF
             if (annotation != null) {
 
                 currentStyle = stylesheet.getParagraphStyle("annotation");
-                processSectionContent(annotation, 0);
+                processAnnotation(annotation, "annotationSubtitle");
                 currentStyle = null;
             }
         }
@@ -929,8 +929,26 @@ public class FB2toPDF
     private void processBody(org.w3c.dom.Element body)
             throws DocumentException, FB2toPDFException {
         currentStyle = stylesheet.getParagraphStyle("body");
-        //processSections(body);
-        processSectionContent(body, -1);
+
+        ElementCollection nodes = ElementCollection.children(body);
+        int subsectionIndex = 0;
+        for (int i = 0; i < nodes.getLength(); ++i) {
+            org.w3c.dom.Element element = nodes.item(i);
+
+            if (element.getTagName().equals("section")) {
+                processSection(element, 0, subsectionIndex);
+                subsectionIndex++;
+            } else if (element.getTagName().equals("image")) {
+                addImage(element);
+            } else if (element.getTagName().equals("title")) {
+                processTitle(element, -1);
+            } else if (element.getTagName().equals("epigraph")) {
+                processEpigraph(element);
+            } else {
+                System.out.println("Unhandled section tag " + element.getTagName());
+            }
+        }
+
         currentStyle = null;
     }
 
@@ -971,20 +989,6 @@ public class FB2toPDF
         doc.newPage();
     }
 
-    /*
-    private void processSections(org.w3c.dom.Element body)
-    throws DocumentException, FB2toPDFException
-    {
-    ElementCollection sections = ElementCollection.childrenByTagName(body, "section");
-    for (int i = 0; i < sections.getLength(); ++i)
-    {
-    org.w3c.dom.Element section = sections.item(i);
-    // XXX TODO if s.getAttribute('id') not in notes],'')
-    processSection(section, 0, i);
-    }
-
-    }
-     */
     private PdfOutline addBookmark(String title) {
         System.out.println("Adding bookmark: " + transliterate(title));
         PdfDestination destination = new PdfDestination(PdfDestination.FITH);
@@ -1062,11 +1066,6 @@ public class FB2toPDF
                 processSection(element, level + 1, subsectionIndex);
                 subsectionIndex++;
             } else if (element.getTagName().equals("p")) {
-                /* XXX TODO
-                pid=x.getAttribute('id')
-                if pid:
-                res+='\\hypertarget{%s}{}\n' % pid
-                 */
                 processParagraph(element, bFirst, i == nodes.getLength() - 1);
                 bFirst = false;
             } else if (element.getTagName().equals("empty-line")) {
@@ -1075,6 +1074,11 @@ public class FB2toPDF
                 }
             } else if (element.getTagName().equals("image")) {
                 addImage(element);
+            } else if (element.getTagName().equals("annotation")) {
+                ParagraphStyle previousStyle = currentStyle;
+                currentStyle = stylesheet.getParagraphStyle("annotation");
+                processAnnotation(element, "annotationSubtitle");
+                currentStyle = previousStyle;
             } else if (element.getTagName().equals("poem")) {
                 processPoem(element);
             } else if (element.getTagName().equals("subtitle")) {
@@ -1085,15 +1089,44 @@ public class FB2toPDF
             } else if (element.getTagName().equals("cite")) {
                 processCite(element);
             } else if (element.getTagName().equals("table")) {
-                // XXX TODO logging.getLogger('fb2pdf').warning("Unsupported element: %s" % x.tagName)
-                // XXX TODO pass # TODO
                 System.out.println("Unhandled section tag " + element.getTagName());
             } else if (element.getTagName().equals("title")) {
                 processTitle(element, level);
             } else if (element.getTagName().equals("epigraph")) {
                 processEpigraph(element);
             } else {
-                // XXX TODO logging.getLogger('fb2pdf').error("Unknown section element: %s" % x.tagName)
+                System.out.println("Unhandled section tag " + element.getTagName());
+            }
+        }
+    }
+
+    private void processAnnotation(org.w3c.dom.Element annotation, String subtitleStyle)
+            throws DocumentException, FB2toPDFException {
+        boolean bFirst = true;
+
+        ElementCollection nodes = ElementCollection.children(annotation);
+        for (int i = 0; i < nodes.getLength(); ++i) {
+            org.w3c.dom.Element element = nodes.item(i);
+
+            if (element.getTagName().equals("p")) {
+                processParagraph(element, bFirst, i == nodes.getLength() - 1);
+                bFirst = false;
+            } else if (element.getTagName().equals("empty-line")) {
+                if (!isIgnoreEmptyLine(element)) {
+                    addEmptyLine();
+                }
+            } else if (element.getTagName().equals("poem")) {
+                processPoem(element);
+            } else if (element.getTagName().equals("subtitle")) {
+                ParagraphStyle previousStyle = currentStyle;
+                currentStyle = stylesheet.getParagraphStyle(subtitleStyle);
+                processParagraph(element, true, true);
+                currentStyle = previousStyle;
+            } else if (element.getTagName().equals("cite")) {
+                processCite(element);
+            } else if (element.getTagName().equals("table")) {
+                System.out.println("Unhandled section tag " + element.getTagName());
+            } else {
                 System.out.println("Unhandled section tag " + element.getTagName());
             }
         }

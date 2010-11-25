@@ -158,6 +158,15 @@
             spacingAfter:     "0.3em"
         },
         {
+            name:             "annotationSubtitle",
+            baseStyle:        "annotation",
+            fontFamily:       "sansSerif",
+            fontStyle:        "bold",
+            alignment:        "center",
+            spacingBefore:    "0.3em",
+            spacingAfter:     "0.3em"
+        },
+        {
             name:             "bodyTitle",
             baseStyle:        "default",
             fontSize:         "16.0pt",
