@@ -4,7 +4,7 @@
  */
 package org.trivee.fb2pdf;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  *
@@ -16,7 +16,7 @@ public class TextPreprocessorSettings {
     public boolean makeReplacements;
     public boolean makeEndUnbreakable;
 
-    public HashMap<String, String> replacementsMap = new HashMap<String, String>();
+    public LinkedHashMap<String, String> replacementsMap = new LinkedHashMap<String, String>();
 
     public TextPreprocessorSettings() {
     }
