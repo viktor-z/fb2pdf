@@ -266,6 +266,13 @@ public class FB2toPDF
         }
     }
 
+    private void appendLF() throws FB2toPDFException, DocumentException {
+        flushCurrentChunk();
+        currentChunk = currentStyle.createChunk();
+        currentChunk.append("\n");
+        flushCurrentChunk();
+    }
+
     private String getNoteBody(String refname) {
         if (StringUtils.isBlank(refname)) return "";
         Element noteBody = getNotesBody();
@@ -1446,6 +1453,16 @@ public class FB2toPDF
                     bFirstTextNode = false;
                     flushCurrentChunk();
                     currentStyle.toggleItalic();
+                } else if (child.getTagName().equals("code")) {
+                    flushCurrentChunk();
+                    appendLF();
+                    ParagraphStyle previousStyle = currentStyle;
+                    currentStyle = stylesheet.getParagraphStyle("code");
+                    processParagraphContent(child, bFirst && bFirstTextNode);
+                    bFirstTextNode = false;
+                    flushCurrentChunk();
+                    currentStyle = previousStyle;
+                    appendLF();
                 } else if (child.getTagName().equals("a")) {
                     flushCurrentChunk();
                     currentReference = child.getAttributeNS(NS_XLINK, "href");
@@ -1457,12 +1474,6 @@ public class FB2toPDF
                     //if ("note".equals(child.getAttribute("type"))) {
                     //    addFootnote(currentReference);
                     //}
-                    currentReference = null;
-                } else if (child.getTagName().equals("cite")) {
-                    flushCurrentChunk();
-                    addInvisibleAnchor(child);
-                    processParagraphContent(child);
-                    flushCurrentChunk();
                     currentReference = null;
                 } else if (child.getTagName().equals("style")) {
                     String styleName = child.getAttribute("name");

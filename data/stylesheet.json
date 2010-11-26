@@ -27,6 +27,13 @@
             bold:         "./data/DroidSerif-Bold.ttf",
             italic:       "./data/DroidSerif-Italic.ttf",
             boldItalic:   "./data/DroidSerif-BoldItalic.ttf"
+        },
+        {
+            name:         "monospaced",
+            regular:      "./data/DroidSansMono.ttf",
+            bold:         "./data/DroidSansMono.ttf",
+            italic:       "./data/DroidSansMono.ttf",
+            boldItalic:   "./data/DroidSansMono.ttf"
         }
     ],
     pageStyle: {
@@ -260,6 +267,12 @@
             leading:          "1.2em",
             firstFirstLineIndent:  "0em",
             dropcapStyle:	  "bodyDropCap"	
+        },
+        {
+            name:             "code",
+            baseStyle:        "body",
+            fontFamily:       "monospaced",
+            fontSize:         "6.0pt"
         },
         {
             name:             "footnote",
