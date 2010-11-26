@@ -291,6 +291,7 @@
        	{
        		name:			"bodyDropCap",
             enabled: 	    "true",
+            color:          "0x000000",
        		fontFamily:		"serif",
        		fontSize:		"26.0pt",
        		fontStyle:		"regular",

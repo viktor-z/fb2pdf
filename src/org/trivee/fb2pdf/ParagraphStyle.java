@@ -4,10 +4,12 @@ import java.lang.reflect.Type;
 import com.google.gson.*;
 
 import com.itextpdf.text.Anchor;
+import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.pdf.BaseFont;
+import java.awt.Color;
 
 public class ParagraphStyle
 {
@@ -161,6 +163,7 @@ public class ParagraphStyle
     private Dimension firstFirstLineIndent;
     private Boolean disableHyphenation;
     private String dropcapStyle;
+    private String color = "0x000000";
 
     private String text;
     
@@ -278,6 +281,10 @@ public class ParagraphStyle
         return "";
     }
 
+    public BaseColor getColor() {
+        return new BaseColor(Color.decode(color));
+    }
+
     public void toggleBold()
     {
         boldToggle = !boldToggle;
@@ -309,6 +316,7 @@ public class ParagraphStyle
         if (strikethroughToggle){
             font.setStyle(Font.STRIKETHRU);
         }
+        font.setColor(getColor());
         return font;
     }
 

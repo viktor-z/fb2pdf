@@ -1374,6 +1374,7 @@ public class FB2toPDF
         //tp.restoreState();
         tp.beginText();
         tp.setFontAndSize(basefont, dropCapSize);
+        tp.setColorFill(dropcapStyle.getColor());
         tp.setTextMatrix(-offsetLeft, 0);
         tp.showText(text);
         tp.endText();
