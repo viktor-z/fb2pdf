@@ -56,6 +56,35 @@
         hyphenate: 	  		"true",
         overrideLanguage:	"false"
     },
+    transformationSettings: {
+        enabled:					"false",
+        queryProlog:                "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\";",
+        morpherProlog:              "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\"; declare namespace l = \"http://www.w3.org/1999/xlink\";",
+        transformationsMap: [
+                /*
+                {   // make note links superscript
+                    "query":   "//a[@type='note']",
+                    "morpher": "<sup>{.}</sup>"
+                },
+                */
+                {   // replace note link with note text 
+                    "query":   "//a[@type='note']",
+                    "morpher": "declare variable $hid := ./@l:href; <emphasis> [{//body[@name='notes']//section[@id=substring($hid,2)]/*[local-name()!='title']/text()}]</emphasis>"
+                }
+                /*
+                {   //replace emphasis inside cite with it's text
+                    "query":   "//cite//emphasis",
+                    "morpher": "./text()"
+                },
+                */
+                /*
+                {   //remove images
+                    "query":   "//image",
+                    "morpher": "()"
+                }
+                */
+        ]
+    },
     textPreprocessorSettings: {
         enabled:					"true",
         makeEndUnbreakable:			"false",

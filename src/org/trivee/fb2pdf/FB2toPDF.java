@@ -505,30 +505,12 @@ public class FB2toPDF
             System.exit(-1);
         }
 
-        /*
         try {
-            nu.xom.Document xdoc = new nu.xom.Builder().build(is);
-            String query = "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\";";
-            String morpher = "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\";";
-            morpher += "declare namespace l = \"http://www.w3.org/1999/xlink\";";
-            //query += "//cite//emphasis";
-            //morpher += "./text()";
-            query += "//a[@type='note']";
-            morpher += "declare variable $hid := ./@l:href; <emphasis> [{//body[@name='notes']//section[@id=substring($hid,2)]/*[local-name()!='title']/text()}]</emphasis>";
-            nux.xom.xquery.XQuery xselect = nux.xom.pool.XQueryPool.GLOBAL_POOL.getXQuery(query, null);
-            nux.xom.xquery.XQuery xmorpher = nux.xom.pool.XQueryPool.GLOBAL_POOL.getXQuery(morpher, null);
-            nux.xom.xquery.XQueryUtil.update(xselect.execute(xdoc).toNodes(), xmorpher, null);
-
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            nu.xom.Serializer ser = new nu.xom.Serializer(out);
-            ser.write(xdoc);
-            out.close();
-            is = new ByteArrayInputStream(out.toByteArray());
+            is = Transformation.transform(is, stylesheet.getTransformationSettings());
         } catch(Exception ex) {
             System.err.println(ex);
             System.exit(-1);
         }
-        */
 
         fb2 = builder.parse(is);
     }

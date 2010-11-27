@@ -17,6 +17,7 @@ public class Stylesheet
     private PageStyle pageStyle = new PageStyle();
     private HyphenationSettings hyphenationSettings = new HyphenationSettings();
     private TextPreprocessorSettings textPreprocessorSettings = new TextPreprocessorSettings();
+    private TransformationSettings transformationSettings = new TransformationSettings();
     private GeneralSettings generalSettings = new GeneralSettings();
     private LinkedList<ParagraphStyle> paragraphStyles = new LinkedList<ParagraphStyle>();
 
@@ -51,6 +52,10 @@ public class Stylesheet
 
     public TextPreprocessorSettings getTextPreprocessorSettings() {
         return textPreprocessorSettings;
+    }
+
+    public TransformationSettings getTransformationSettings() {
+        return transformationSettings;
     }
 
     public GeneralSettings getGeneralSettings()
