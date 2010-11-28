@@ -323,6 +323,23 @@ public class FB2toPDF
         return result;
     }
 
+    private ParagraphStyle getStyleForElement(Element element) {
+        
+        ParagraphStyle result = currentStyle;
+        
+        String elementStyleAttr = element.getAttribute("style");
+        
+        if (isNullOrEmpty(elementStyleAttr)) return result;
+        
+        try {
+            result = stylesheet.getParagraphStyle(elementStyleAttr);
+        } catch (FB2toPDFException ex) {
+            System.out.println("Style not found: " + elementStyleAttr);
+        }
+
+        return result;
+    }
+
     private class PageEventHandler extends PdfPageEventHelper {
 
         public boolean enforcePageSize = false;
@@ -1415,6 +1432,8 @@ public class FB2toPDF
 
     private void processParagraphContent(org.w3c.dom.Element parent, boolean bFirst)
             throws DocumentException, FB2toPDFException {
+        ParagraphStyle previousStyle = currentStyle;
+        currentStyle = getStyleForElement(parent);
         boolean bFirstTextNode = true;
         NodeList nodes = parent.getChildNodes();
         for (int i = 0; i < nodes.getLength(); ++i) {
@@ -1439,12 +1458,12 @@ public class FB2toPDF
                 } else if (child.getTagName().equals("code")) {
                     flushCurrentChunk();
                     appendLF();
-                    ParagraphStyle previousStyle = currentStyle;
+                    ParagraphStyle prevStyle = currentStyle;
                     currentStyle = stylesheet.getParagraphStyle("code");
                     processParagraphContent(child, bFirst && bFirstTextNode);
                     bFirstTextNode = false;
                     flushCurrentChunk();
-                    currentStyle = previousStyle;
+                    currentStyle = prevStyle;
                     appendLF();
                 } else if (child.getTagName().equals("a")) {
                     flushCurrentChunk();
@@ -1526,6 +1545,7 @@ public class FB2toPDF
                 currentChunk.append(TextPreprocessor.process(text, stylesheet.getTextPreprocessorSettings()));
             }
         }
+        currentStyle = previousStyle;
     }
 
     private String transliterate(String text) {
