@@ -16,6 +16,7 @@ public class TransformationSettings {
     public boolean enabled;
     public String queryProlog;
     public String morpherProlog;
+    public boolean outputDebugFile;
 
     public LinkedList<Entry> transformationsMap = new LinkedList<Entry>();
 

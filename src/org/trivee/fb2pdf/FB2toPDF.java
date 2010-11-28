@@ -334,9 +334,10 @@ public class FB2toPDF
         try {
             result = stylesheet.getParagraphStyle(elementStyleAttr);
         } catch (FB2toPDFException ex) {
-            System.out.println("Style not found: " + elementStyleAttr);
+            System.out.println("Element style not found: " + elementStyleAttr);
         }
 
+        System.out.println("Element style found: " + elementStyleAttr);
         return result;
     }
 

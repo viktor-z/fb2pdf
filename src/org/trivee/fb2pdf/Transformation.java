@@ -6,11 +6,12 @@ package org.trivee.fb2pdf;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 import nu.xom.Builder;
 import nu.xom.Document;
+import nu.xom.Nodes;
 import nu.xom.ParsingException;
 import nu.xom.Serializer;
 import nu.xom.ValidityException;
@@ -45,12 +46,17 @@ public class Transformation {
         Serializer ser = new Serializer(out);
         ser.write(xdoc);
         out.close();
+        if (settings.outputDebugFile) {
+            (new FileOutputStream("transformation-result.xml")).write(out.toByteArray());
+        }
         return new ByteArrayInputStream(out.toByteArray());
     }
 
     private static void transform(String query, String morpher, Document xdoc) throws IOException, XQueryException, ParsingException {
         XQuery xselect = XQueryPool.GLOBAL_POOL.getXQuery(query, null);
         XQuery xmorpher = XQueryPool.GLOBAL_POOL.getXQuery(morpher, null);
-        XQueryUtil.update(xselect.execute(xdoc).toNodes(), xmorpher, null);
+        Nodes nodes = xselect.execute(xdoc).toNodes();
+        System.out.println(String.format("Transformation query '%s' returned %d nodes", query, nodes.size()));
+        XQueryUtil.update(nodes, xmorpher, null);
     }
 }

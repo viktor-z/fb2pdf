@@ -58,6 +58,7 @@
     },
     transformationSettings: {
         enabled:					"false",
+        outputDebugFile:            "false",
         queryProlog:                "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\";",
         morpherProlog:              "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\"; declare namespace l = \"http://www.w3.org/1999/xlink\";",
         transformationsMap: [
@@ -67,10 +68,12 @@
                     "morpher": "<sup>{.}</sup>"
                 },
                 */
+                /*
                 {   // replace note link with note text 
                     "query":   "//a[@type='note']",
-                    "morpher": "declare variable $hid := ./@l:href; <emphasis> [{//body[@name='notes']//section[@id=substring($hid,2)]/*[local-name()!='title']/text()}]</emphasis>"
-                }
+                    "morpher": "declare variable $hid := ./@l:href; <emphasis> [{//body[@name='notes']//section[@id=substring($hid,2)]/*[local-name()!='title']}]</emphasis>"
+                },
+                */
                 /*
                 {   //replace emphasis inside cite with it's text
                     "query":   "//cite//emphasis",
@@ -81,6 +84,12 @@
                 {   //remove images
                     "query":   "//image",
                     "morpher": "()"
+                },
+                */
+                /*
+                {   // change style of notes text
+                    "query":   "//body[@name='notes']/section/p",
+                    "morpher": "<p style=\"notes\">{./* | text()}</p>"
                 }
                 */
         ]
@@ -298,6 +307,12 @@
             leading:          "1.2em",
             firstFirstLineIndent:  "0em",
             dropcapStyle:	  "bodyDropCap"	
+        },
+        {
+            name:             "notes",
+            baseStyle:        "body",
+            fontFamily:       "sansSerif",
+            fontSize:         "6.0pt"
         },
         {
             name:             "code",
