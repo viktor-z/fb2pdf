@@ -63,8 +63,20 @@
         morpherProlog:              "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\"; declare namespace l = \"http://www.w3.org/1999/xlink\";",
         transformationsMap: [
                 /*
-                {   // make note links superscript
+                {   // change note links style
                     "query":   "//a[@type='note']",
+                    "morpher": "declare variable $hid := ./@l:href; <a l:href=\"{$hid}\" type=\"note\" style=\"notesLink\">{./* | text()}</a>"
+                },
+                */
+                /*
+                {   // remove square brackets from note link
+                    "query":   "//a[@type='note']/text()",
+                    "morpher": "replace(., '[\\[\\]]', '')"
+                },
+                */
+                /*
+                {   // make note links superscript
+                    "query":   "//a[@type='note']/text()",
                     "morpher": "<sup>{.}</sup>"
                 },
                 */
@@ -307,12 +319,6 @@
             leading:          "1.2em",
             firstFirstLineIndent:  "0em",
             dropcapStyle:	  "bodyDropCap"	
-        },
-        {
-            name:             "notes",
-            baseStyle:        "body",
-            fontFamily:       "sansSerif",
-            fontSize:         "6.0pt"
         },
         {
             name:             "code",
