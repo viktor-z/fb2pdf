@@ -32,12 +32,15 @@ import com.itextpdf.text.pdf.PdfDestination;
 import com.itextpdf.text.pdf.PdfDocument;
 import com.itextpdf.text.pdf.PdfImportedPage;
 import com.itextpdf.text.pdf.PdfOutline;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfTemplate;
 import java.awt.Color;
 import java.awt.Toolkit;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 import org.apache.commons.codec.binary.Base64;
@@ -339,6 +342,46 @@ public class FB2toPDF
 
         System.out.println("Element style found: " + elementStyleAttr);
         return result;
+    }
+
+    private void processTable(Element element) throws DocumentException, FB2toPDFException {
+        List<PdfPCell> cells = new LinkedList<PdfPCell>();
+        NodeList rows = element.getElementsByTagName("tr");
+        int maxcol = 0;
+        for (int i = 0; i < rows.getLength(); i++) {
+            int curcol = 0;
+            Element row = (Element) rows.item(i);
+            NodeList colsH = row.getElementsByTagName("th");
+            NodeList colsD = row.getElementsByTagName("td");
+            List<Element> cols = new LinkedList<Element>();
+            for (int j = 0; j < colsH.getLength(); j++) {
+                cols.add((Element) colsH.item(j));
+            }
+            for (int j = 0; j < colsD.getLength(); j++) {
+                cols.add((Element) colsD.item(j));
+            }
+            for (Element cellElement : cols) {
+
+                currentParagraph = currentStyle.createParagraph();
+                processParagraphContent(cellElement);
+                flushCurrentChunk();
+
+                PdfPCell cell = new PdfPCell(currentParagraph);
+
+                currentParagraph = null;
+                currentReference = null;
+
+                cells.add(cell);
+                curcol++;
+            }
+            maxcol = Math.max(curcol, maxcol);
+        }
+        PdfPTable table = new PdfPTable(maxcol);
+        table.setWidthPercentage(95);
+        for (PdfPCell cell : cells) {
+            table.addCell(cell);
+        }
+        doc.add(table);
     }
 
     private class PageEventHandler extends PdfPageEventHelper {
@@ -1110,7 +1153,7 @@ public class FB2toPDF
             } else if (element.getTagName().equals("cite")) {
                 processCite(element);
             } else if (element.getTagName().equals("table")) {
-                System.out.println("Unhandled section tag " + element.getTagName());
+                processTable(element);
             } else if (element.getTagName().equals("title")) {
                 processTitle(element, level);
             } else if (element.getTagName().equals("epigraph")) {
