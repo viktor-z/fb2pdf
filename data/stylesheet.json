@@ -327,6 +327,15 @@
             fontSize:         "6.0pt"
         },
         {
+            name:             "tableTD",
+            baseStyle:        "body"
+        },
+        {
+            name:             "tableTH",
+            baseStyle:        "body",
+            fontStyle:        "bold"
+        },
+        {
             name:             "footnote",
             fontFamily:       "serif",
             fontSize:         "8pt",

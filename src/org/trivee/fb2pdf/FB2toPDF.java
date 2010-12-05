@@ -353,9 +353,16 @@ public class FB2toPDF
             Element row = (Element) rows.item(i);
             NodeList cols = row.getChildNodes();
             for (int j = 0; j < cols.getLength(); j++) {
-                if (!cols.item(j).getNodeName().equals("th") &&
-                    !cols.item(j).getNodeName().equals("td")) continue;
 
+                String nodeName = cols.item(j).getNodeName();
+                if (!nodeName.equals("th") && !nodeName.equals("td")) continue;
+
+                if (nodeName.equalsIgnoreCase("td")) {
+                    currentStyle = stylesheet.getParagraphStyle("tableTD");
+                }
+                if (nodeName.equalsIgnoreCase("th")) {
+                    currentStyle = stylesheet.getParagraphStyle("tableTH");
+                }
                 Element cellElement = (Element)cols.item(j);
                 currentParagraph = currentStyle.createParagraph();
                 if (i==0 && j==0) addInvisibleAnchor(table);
@@ -1157,7 +1164,9 @@ public class FB2toPDF
             } else if (element.getTagName().equals("cite")) {
                 processCite(element);
             } else if (element.getTagName().equals("table")) {
+                ParagraphStyle previousStyle = currentStyle;
                 processTable(element);
+                currentStyle = previousStyle;
             } else if (element.getTagName().equals("title")) {
                 processTitle(element, level);
             } else if (element.getTagName().equals("epigraph")) {
