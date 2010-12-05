@@ -344,9 +344,9 @@ public class FB2toPDF
         return result;
     }
 
-    private void processTable(Element element) throws DocumentException, FB2toPDFException {
+    private void processTable(Element table) throws DocumentException, FB2toPDFException {
         List<PdfPCell> cells = new LinkedList<PdfPCell>();
-        NodeList rows = element.getElementsByTagName("tr");
+        NodeList rows = table.getElementsByTagName("tr");
         int maxcol = 0;
         for (int i = 0; i < rows.getLength(); i++) {
             int curcol = 0;
@@ -358,6 +358,7 @@ public class FB2toPDF
 
                 Element cellElement = (Element)cols.item(j);
                 currentParagraph = currentStyle.createParagraph();
+                if (i==0 && j==0) addInvisibleAnchor(table);
                 processParagraphContent(cellElement);
                 flushCurrentChunk();
 
@@ -379,12 +380,12 @@ public class FB2toPDF
             }
             maxcol = Math.max(curcol, maxcol);
         }
-        PdfPTable table = new PdfPTable(maxcol);
-        table.setWidthPercentage(95);
+        PdfPTable pdftable = new PdfPTable(maxcol);
+        pdftable.setWidthPercentage(95);
         for (PdfPCell cell : cells) {
-            table.addCell(cell);
+            pdftable.addCell(cell);
         }
-        doc.add(table);
+        doc.add(pdftable);
     }
 
     private class PageEventHandler extends PdfPageEventHelper {
