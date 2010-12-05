@@ -225,6 +225,12 @@ public class FB2toPDF
     }
 
     protected void addImage(Image image) throws DocumentException {
+        rescaleImage(image);
+        image.setAlignment(Image.MIDDLE);
+        doc.add(image);
+    }
+
+    private float rescaleImage(Image image) {
         Rectangle pageSize = doc.getPageSize();
         float dpi = stylesheet.getGeneralSettings().imageDpi;
         float scaleWidth = (pageSize.getWidth() - doc.leftMargin() - doc.rightMargin()) * 0.95f;
@@ -236,8 +242,15 @@ public class FB2toPDF
             scaleHeight = imgHeight;
         }
         image.scaleToFit(scaleWidth, scaleHeight);
-        image.setAlignment(Image.MIDDLE);
-        doc.add(image);
+        return scaleHeight;
+    }
+
+    protected void addInlineImage(Image image) throws DocumentException {
+        float scaleHeight = rescaleImage(image);
+        float leading = currentParagraph.getLeading();
+        float offsetY = (scaleHeight - leading) / 2;
+        Chunk chunk = new Chunk(image, 0, offsetY, true);
+        currentParagraph.add(chunk);
     }
 
     protected void addLine(Chunk chunk, ParagraphStyle style) throws FB2toPDFException, DocumentException {
@@ -528,11 +541,19 @@ public class FB2toPDF
     }
 
     private void addImage(Element element) throws DocumentException, DOMException, FB2toPDFException {
+        addImage(element, false);
+    }
+
+    private void addImage(Element element, boolean inline) throws DocumentException, DOMException, FB2toPDFException {
         String href = element.getAttributeNS(NS_XLINK, "href");
         Image image = getImage(href);
         if (image != null) {
-            addInvisibleAnchor(element);
-            addImage(image);
+            if (inline) {
+                addInlineImage(image);
+            } else {
+                addInvisibleAnchor(element);
+                addImage(image);
+            }
         } else {
             System.out.println("Image not found, href: " + href);
         }
@@ -1570,7 +1591,7 @@ public class FB2toPDF
                     System.out.println("Style tag " + styleName + " ignored.");
                     processParagraphContent(child);
                 } else if (child.getTagName().equals("image")) {
-                    addImage(child);
+                    addImage(child, stylesheet.getGeneralSettings().enableInlineImages);
                 } else if (child.getTagName().equals("strikethrough")) {
                     flushCurrentChunk();
                     currentStyle.toggleStrikethrough();

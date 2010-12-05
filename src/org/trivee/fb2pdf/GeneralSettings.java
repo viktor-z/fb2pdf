@@ -14,6 +14,7 @@ public class GeneralSettings {
     public boolean forceTransliterateAuthor;
     public float imageDpi;
     public boolean stretchCover = true;
+    public boolean enableInlineImages;
     public String overrideImageTransparency;
     public boolean ignoreEmptyLineBeforeImage;
     public boolean ignoreEmptyLineAfterImage;
