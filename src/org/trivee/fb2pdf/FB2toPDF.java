@@ -40,8 +40,10 @@ import com.itextpdf.text.pdf.PdfTemplate;
 import java.awt.Color;
 import java.awt.Toolkit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
@@ -370,14 +372,8 @@ public class FB2toPDF
                 flushCurrentChunk();
 
 
-                String colspanAttr = cellElement.getAttribute("colspan");
-                String rowspanAttr = cellElement.getAttribute("rowspan");
-                int colspan = isNullOrEmpty(colspanAttr) ? 1 : Integer.parseInt(colspanAttr);
-                int rowspan = isNullOrEmpty(rowspanAttr) ? 1 : Integer.parseInt(rowspanAttr);
-
                 PdfPCell cell = new PdfPCell(currentParagraph);
-                cell.setColspan(colspan);
-                cell.setRowspan(rowspan);
+                int colspan = setTableCellAttributes(cellElement, cell);
 
                 currentParagraph = null;
                 currentReference = null;
@@ -393,6 +389,41 @@ public class FB2toPDF
             pdftable.addCell(cell);
         }
         doc.add(pdftable);
+    }
+
+    private int setTableCellAttributes(Element cellElement, PdfPCell cell) throws NumberFormatException {
+
+        Map<String, Integer> hAlignMap = new HashMap<String, Integer> () {
+            {
+                put("center", PdfPCell.ALIGN_CENTER);
+                put("left", PdfPCell.ALIGN_LEFT);
+                put("right", PdfPCell.ALIGN_RIGHT);
+            }
+        };
+        Map<String, Integer> vAlignMap = new HashMap<String, Integer> () {
+            {
+                put("middle", PdfPCell.ALIGN_MIDDLE);
+                put("top", PdfPCell.ALIGN_TOP);
+                put("bottom", PdfPCell.ALIGN_BOTTOM);
+            }
+        };
+
+        String colspanAttr = cellElement.getAttribute("colspan");
+        String rowspanAttr = cellElement.getAttribute("rowspan");
+        String alignAttr = cellElement.getAttribute("align");
+        String valignAttr = cellElement.getAttribute("valign");
+
+        int colspan = isNullOrEmpty(colspanAttr) ? 1 : Integer.parseInt(colspanAttr);
+        int rowspan = isNullOrEmpty(rowspanAttr) ? 1 : Integer.parseInt(rowspanAttr);
+        int hAlign = isNullOrEmpty(alignAttr) ? PdfPCell.ALIGN_CENTER : hAlignMap.get(alignAttr);
+        int vAlign = isNullOrEmpty(valignAttr) ? PdfPCell.ALIGN_MIDDLE : vAlignMap.get(valignAttr);
+
+        cell.setColspan(colspan);
+        cell.setRowspan(rowspan);
+        cell.setHorizontalAlignment(hAlign);
+        cell.setVerticalAlignment(vAlign);
+
+        return colspan;
     }
 
     private class PageEventHandler extends PdfPageEventHelper {
