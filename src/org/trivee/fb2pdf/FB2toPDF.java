@@ -351,28 +351,31 @@ public class FB2toPDF
         for (int i = 0; i < rows.getLength(); i++) {
             int curcol = 0;
             Element row = (Element) rows.item(i);
-            NodeList colsH = row.getElementsByTagName("th");
-            NodeList colsD = row.getElementsByTagName("td");
-            List<Element> cols = new LinkedList<Element>();
-            for (int j = 0; j < colsH.getLength(); j++) {
-                cols.add((Element) colsH.item(j));
-            }
-            for (int j = 0; j < colsD.getLength(); j++) {
-                cols.add((Element) colsD.item(j));
-            }
-            for (Element cellElement : cols) {
+            NodeList cols = row.getChildNodes();
+            for (int j = 0; j < cols.getLength(); j++) {
+                if (!cols.item(j).getNodeName().equals("th") &&
+                    !cols.item(j).getNodeName().equals("td")) continue;
 
+                Element cellElement = (Element)cols.item(j);
                 currentParagraph = currentStyle.createParagraph();
                 processParagraphContent(cellElement);
                 flushCurrentChunk();
 
+
+                String colspanAttr = cellElement.getAttribute("colspan");
+                String rowspanAttr = cellElement.getAttribute("rowspan");
+                int colspan = isNullOrEmpty(colspanAttr) ? 1 : Integer.parseInt(colspanAttr);
+                int rowspan = isNullOrEmpty(rowspanAttr) ? 1 : Integer.parseInt(rowspanAttr);
+
                 PdfPCell cell = new PdfPCell(currentParagraph);
+                cell.setColspan(colspan);
+                cell.setRowspan(rowspan);
 
                 currentParagraph = null;
                 currentReference = null;
 
                 cells.add(cell);
-                curcol++;
+                curcol += colspan;
             }
             maxcol = Math.max(curcol, maxcol);
         }
