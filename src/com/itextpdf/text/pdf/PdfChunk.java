@@ -300,7 +300,8 @@ public class PdfChunk {
                 value = "";
                 attributes = new HashMap<String, Object>();
                 image = null;
-                font = PdfFont.getDefaultFont();
+                //font = PdfFont.getDefaultFont(); // VIKTORZ --
+                font = this.font();                // VIKTORZ ++
                 return pc;
             }
             else

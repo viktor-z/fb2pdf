@@ -245,11 +245,12 @@ public class FB2toPDF
         return scaleHeight;
     }
 
-    protected void addInlineImage(Image image) throws DocumentException {
+    protected void addInlineImage(Image image) throws DocumentException, FB2toPDFException {
         float scaleHeight = rescaleImage(image);
         float leading = currentParagraph.getLeading();
         float offsetY = (scaleHeight - leading) / 2;
         Chunk chunk = new Chunk(image, 0, offsetY, true);
+        chunk.setFont(currentStyle.getFont());
         currentParagraph.add(chunk);
     }
 
@@ -1591,6 +1592,7 @@ public class FB2toPDF
                     System.out.println("Style tag " + styleName + " ignored.");
                     processParagraphContent(child);
                 } else if (child.getTagName().equals("image")) {
+                    flushCurrentChunk();
                     addImage(child, stylesheet.getGeneralSettings().enableInlineImages);
                 } else if (child.getTagName().equals("strikethrough")) {
                     flushCurrentChunk();
