@@ -402,6 +402,10 @@ public class FB2toPDF
         for (PdfPCell cell : cells) {
             pdftable.addCell(cell);
         }
+
+        ParagraphStyle tableStyle = stylesheet.getParagraphStyle("table");
+        pdftable.setSpacingBefore(tableStyle.getSpacingBefore());
+        pdftable.setSpacingAfter(tableStyle.getSpacingAfter());
         doc.add(pdftable);
     }
 
@@ -1255,7 +1259,9 @@ public class FB2toPDF
             } else if (element.getTagName().equals("cite")) {
                 processCite(element);
             } else if (element.getTagName().equals("table")) {
-                System.out.println("Unhandled section tag " + element.getTagName());
+                ParagraphStyle previousStyle = currentStyle;
+                processTable(element);
+                currentStyle = previousStyle;
             } else {
                 System.out.println("Unhandled section tag " + element.getTagName());
             }

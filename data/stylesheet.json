@@ -340,10 +340,17 @@
             dropcapStyle:	  "bodyDropCap"	
         },
         {
-            name:             "code",
-            baseStyle:        "body",
-            fontFamily:       "monospaced",
+            name:               "code",
+            baseStyle:          "body",
+            disableHyphenation: "true",
+            fontFamily:         "monospaced",
             fontSize:         "6.0pt"
+        },
+        {
+            name:             "table",
+            baseStyle:        "body",
+            spacingBefore:    "0.5em",
+            spacingAfter:     "0.5em"
         },
         {
             name:             "tableTD",
