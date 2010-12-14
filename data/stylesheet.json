@@ -82,6 +82,12 @@
                 }
                 */                
                 /*
+                {   //add empty title to the sections without title
+                    "query":    "//section[empty(./title)]/*[position()=1]",
+                    "morpher":  "(<title><p/></title>,.)"
+                }
+                */
+                /*
                 {   // change note links style
                     "query":   "//a[@type='note']",
                     "morpher": "declare variable $hid := ./@l:href; <a l:href=\"{$hid}\" type=\"note\" style=\"notesLink\">{./* | text()}</a>"
