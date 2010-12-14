@@ -38,8 +38,42 @@
         }
     ],
     pageStyle: {
-        pageWidth:    "88.2mm",
-        pageHeight:   "113.9mm",
+        // PRS-500/505/600/700/650 Portrait
+        pageWidth:    "88.184mm",
+        pageHeight:   "113.854mm",
+        
+        // PRS-500/505/600/700/650 Landscape
+        //pageWidth:    "118.384mm",
+        //pageHeight:   "83.654mm",
+        
+        // PRS-300/350 Portrait
+        //pageWidth:    "74.168mm",
+        //pageHeight:   "95.758mm",
+
+        // PRS-300/350 Landscape
+        //pageWidth:    "99.568mm",
+        //pageHeight:   "70.358mm",
+
+        // PRS-900/950 Portrait
+        //pageWidth:    "88.184mm",
+        //pageHeight:   "147.678mm",
+
+        // PRS-900/950 Landscape
+        //pageWidth:    "152.208mm",
+        //pageHeight:   "83.654mm",
+
+        // Kindle 3 Portrait
+        //pageWidth:    "84.560mm",
+        //pageHeight:   "110.985mm",
+
+        // Kindle DX Portrait
+        //pageWidth:    "133mm",
+        //pageHeight:   "195mm",
+
+        // Kindle DX Landscape
+        //pageWidth:    "196mm",
+        //pageHeight:   "131mm",
+
         marginLeft:   "1.0pt",
         marginRight:  "1.0pt",
         marginTop:    "0.0pt",
