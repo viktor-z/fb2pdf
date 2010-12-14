@@ -67,12 +67,12 @@
         //pageHeight:   "110.985mm",
 
         // Kindle DX Portrait
-        //pageWidth:    "133mm",
-        //pageHeight:   "195mm",
+        //pageWidth:    "132.757mm",
+        //pageHeight:   "194.733mm",
 
         // Kindle DX Landscape
-        //pageWidth:    "196mm",
-        //pageHeight:   "131mm",
+        //pageWidth:    "196.427mm",
+        //pageHeight:   "131.064mm",
 
         marginLeft:   "1.0pt",
         marginRight:  "1.0pt",
