@@ -4,7 +4,9 @@
         generateFrontMatter:	"true",
         transliterateMetaInfo:	"true",
         forceTransliterateAuthor: "false",
-        imageDpi: 168.212,
+        imageDpi: 168.212,  // PRS-500/505/600/700/650/900/950, Kindle
+        //imageDpi: 200,    // PRS-300/350
+        //imageDpi: 150,    // Kindle DX
         stretchCover: "true",
         enableInlineImages: "false",
         trackingSpaceCharRatio: 5.0,
