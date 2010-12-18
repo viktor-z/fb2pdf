@@ -4,7 +4,7 @@
         generateFrontMatter:	"true",
         transliterateMetaInfo:	"true",
         forceTransliterateAuthor: "false",
-        imageDpi: 166,
+        imageDpi: 168,
         stretchCover: "true",
         enableInlineImages: "false",
         trackingSpaceCharRatio: 5.0,
@@ -60,6 +60,10 @@
 
         // PRS-900/950 Landscape
         //pageWidth:    "152.208mm",
+        //pageHeight:   "83.654mm",
+
+        // PRS-900/950 Landscape 2-column
+        //pageWidth:    "75.802mm",
         //pageHeight:   "83.654mm",
 
         // Kindle 3 Portrait
