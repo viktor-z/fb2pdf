@@ -140,6 +140,18 @@
                 }
                 */
                 /*
+                {   // remove word "note" from note link
+                    "query":   "//a[@type='note']/text()",
+                    "morpher": "replace(., 'note', '')"
+                }
+                */
+                /*
+                {   // remove extra spaces from note link
+                    "query":   "//a[@type='note']/text()",
+                    "morpher": "normalize-space(.)"
+                }
+                */
+                /*
                 {   // make note links superscript
                     "query":   "//a[@type='note']/text()",
                     "morpher": "<sup>{.}</sup>"
@@ -149,6 +161,18 @@
                 {   // replace note link with note text 
                     "query":   "//a[@type='note']",
                     "morpher": "declare variable $hid := ./@l:href; <emphasis> [{//body[@name='notes']//section[@id=substring($hid,2)]/*[local-name()!='title']}]</emphasis>"
+                }
+                */
+                /*
+                {   // get rid of superscript inside note link
+                    "query":   "//a[@type='note']//sup",
+                    "morpher": "./* | text()"
+                }
+                */
+                /*
+                {   // get rid of superscript outside note link
+                    "query":   "//sup[./a[@type='note']]",
+                    "morpher": "./a"
                 }
                 */
                 /*
