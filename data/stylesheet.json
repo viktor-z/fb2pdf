@@ -84,6 +84,7 @@
         marginRight:  "1.0pt",
         marginTop:    "0.0pt",
         marginBottom: "1.0pt",
+        marginMirroring: "false",
         sectionNewPage: {
         	"0": 1.0,
         	"1": 0.5

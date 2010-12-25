@@ -11,6 +11,7 @@ public class PageStyle
     private Dimension marginRight;
     private Dimension marginTop;
     private Dimension marginBottom;
+    private boolean marginMirroring;
 
     public boolean enforcePageSize;
     public String pageSizeEnforcerColor;
@@ -29,5 +30,5 @@ public class PageStyle
     public float getMarginRight()   { return marginRight.getPoints(); }
     public float getMarginTop()     { return marginTop.getPoints(); }
     public float getMarginBottom()  { return marginBottom.getPoints(); }
-
+    public boolean getMarginMirroring() { return marginMirroring; }
 }

@@ -666,6 +666,7 @@ public class FB2toPDF
         writer.setStrictImageSequence(generalSettings.strictImageSequence);
         PdfDocument.preventWidows = pageStyle.preventWidows;
         PdfDocument.hangingPunctuation = generalSettings.hangingPunctuation;
+        doc.setMarginMirroring(pageStyle.getMarginMirroring());
     }
 
     private void closePDF() {
