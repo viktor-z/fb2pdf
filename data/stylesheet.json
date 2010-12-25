@@ -14,6 +14,7 @@
         ignoreEmptyLineBeforeImage: "true",
         ignoreEmptyLineAfterImage: "true",
         strictImageSequence:	"false",
+        enableLinkPageNum:      "false",
         hangingPunctuation: ".,;:'-"
     },
     fontFamilies: [

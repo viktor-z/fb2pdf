@@ -23,6 +23,7 @@ public class GeneralSettings {
     public float trackingSpaceCharRatio;
     public boolean strictImageSequence;
     public String hangingPunctuation = ".,;:'-";
+    public boolean enableLinkPageNum;
 
     public GeneralSettings()
     {

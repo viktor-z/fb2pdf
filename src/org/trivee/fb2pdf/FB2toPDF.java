@@ -162,10 +162,33 @@ public class FB2toPDF
     private HyphenationAuto hyphenation;
     private Stylesheet stylesheet;
     private Stack<String> anchorStack = new Stack<String>();
+    private Map<String, PdfTemplate> pageNumTemplates = new HashMap<String, PdfTemplate>();
+    private Map<String, ParagraphStyle> pageNumStyles = new HashMap<String, ParagraphStyle>();
+
 
     private FB2toPDF(String fromName, String toName) {
         this.fromName = fromName;
         this.toName = toName;
+    }
+
+    private void FillPageNumTemplate(String referenceName) throws FB2toPDFException {
+        PdfTemplate tp = pageNumTemplates.get(referenceName);
+        ParagraphStyle tpStyle = pageNumStyles.get(referenceName);
+        BaseFont tpBaseFont = tpStyle.getBaseFont();
+        float tpSize = tpStyle.getFontSize().getPoints();
+        String pageNum = String.format("[%04d]", writer.getPageNumber());
+        float tpHight = tpBaseFont.getFontDescriptor(BaseFont.CAPHEIGHT, tpSize) + tpBaseFont.getAscentPoint(pageNum, tpSize);
+        float tpWidth = tpBaseFont.getWidthPointKerned(pageNum, tpSize);
+        tp.setBoundingBox(new Rectangle(0, tpBaseFont.getDescentPoint(pageNum, tpSize), tpWidth, tpHight));
+        //tp.saveState();
+        //tp.setColorFill(BaseColor.RED);
+        //tp.rectangle(0, 0, 200, 200);
+        //tp.fillStroke();
+        //tp.restoreState();
+        tp.beginText();
+        tp.setFontAndSize(tpStyle.getBaseFont(), tpSize);
+        tp.showText(pageNum);
+        tp.endText();
     }
 
     /*
@@ -228,6 +251,21 @@ public class FB2toPDF
         rescaleImage(image);
         image.setAlignment(Image.MIDDLE);
         doc.add(image);
+    }
+
+    private void addPageNumTemplate() throws BadElementException, FB2toPDFException {
+        String text = "[0000]";
+        float tmpSize = currentStyle.getFontSize().getPoints();
+        BaseFont tmpBasefont = currentStyle.getBaseFont();
+        float templateHight = tmpBasefont.getFontDescriptor(BaseFont.CAPHEIGHT, tmpSize);
+        float templateWidth = tmpBasefont.getWidthPointKerned(text, tmpSize);
+        PdfTemplate template = writer.getDirectContent().createTemplate(templateWidth, templateHight);
+        Image templateImage = Image.getInstance(template);
+        Chunk chunk = new Chunk(templateImage, 0, 0, false);
+        chunk.setFont(currentStyle.getFont());
+        currentParagraph.add(chunk);
+        pageNumTemplates.put(currentReference, template);
+        pageNumStyles.put(currentReference, currentStyle);
     }
 
     private float rescaleImage(Image image) {
@@ -1539,6 +1577,9 @@ public class FB2toPDF
                     anchor.add(currentChunk);
                     anchor.setName(currentAnchorName);
                     currentParagraph.add(anchor);
+                    if (pageNumTemplates.containsKey("#"+currentAnchorName)) {
+                        FillPageNumTemplate("#"+currentAnchorName);
+                    }
                 } else {
                     currentParagraph.add(currentChunk);
                 }
@@ -1595,6 +1636,10 @@ public class FB2toPDF
                     }
                     processParagraphContent(child);
                     flushCurrentChunk();
+                    if (stylesheet.getGeneralSettings().enableLinkPageNum &&
+                            currentReference.startsWith("#")) {
+                        addPageNumTemplate();
+                    }
                     //if ("note".equals(child.getAttribute("type"))) {
                     //    addFootnote(currentReference);
                     //}
