@@ -131,7 +131,7 @@
                 /*
                 {   // change note links style
                     "query":   "//a[@type='note']",
-                    "morpher": "declare variable $hid := ./@l:href; <a l:href=\"{$hid}\" type=\"note\" style=\"notesLink\">{./* | text()}</a>"
+                    "morpher": "declare variable $hid := ./@l:href; <a l:href=\"{$hid}\" type=\"note\" fb2pdf-style=\"notesLink\">{./* | text()}</a>"
                 }
                 */
                 /*
@@ -191,7 +191,7 @@
                 /*
                 {   // change style of notes text
                     "query":   "//body[@name='notes']/section/p",
-                    "morpher": "<p style=\"notes\">{./* | text()}</p>"
+                    "morpher": "<p fb2pdf-style=\"notes\">{./* | text()}</p>"
                 }
                 */
         ]

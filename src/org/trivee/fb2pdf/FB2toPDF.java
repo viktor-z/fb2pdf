@@ -346,7 +346,7 @@ public class FB2toPDF
         
         ParagraphStyle result = currentStyle;
         
-        String elementStyleAttr = element.getAttribute("style");
+        String elementStyleAttr = element.getAttribute("fb2pdf-style");
         
         if (isNullOrEmpty(elementStyleAttr)) return result;
         
