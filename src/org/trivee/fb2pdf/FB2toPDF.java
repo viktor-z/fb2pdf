@@ -361,6 +361,7 @@ public class FB2toPDF
     }
 
     private void processTable(Element table) throws DocumentException, FB2toPDFException {
+        stylesheet.getGeneralSettings().enableInlineImages = true;
         List<PdfPCell> cells = new LinkedList<PdfPCell>();
         NodeList rows = table.getElementsByTagName("tr");
         int maxcol = 0;
@@ -1223,7 +1224,9 @@ public class FB2toPDF
                 processCite(element);
             } else if (element.getTagName().equals("table")) {
                 ParagraphStyle previousStyle = currentStyle;
+                boolean previousInlineMode = stylesheet.getGeneralSettings().enableInlineImages;
                 processTable(element);
+                stylesheet.getGeneralSettings().enableInlineImages = previousInlineMode;
                 currentStyle = previousStyle;
             } else if (element.getTagName().equals("title")) {
                 processTitle(element, level);
@@ -1261,7 +1264,9 @@ public class FB2toPDF
                 processCite(element);
             } else if (element.getTagName().equals("table")) {
                 ParagraphStyle previousStyle = currentStyle;
+                boolean previousInlineMode = stylesheet.getGeneralSettings().enableInlineImages;
                 processTable(element);
+                stylesheet.getGeneralSettings().enableInlineImages = previousInlineMode;
                 currentStyle = previousStyle;
             } else {
                 System.out.println("Unhandled section tag " + element.getTagName());
