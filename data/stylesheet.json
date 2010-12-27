@@ -191,8 +191,14 @@
                 */
                 /*
                 {   // change style of notes text
-                    "query":   "//body[@name='notes']/section/p",
+                    "query":   "//body[@name='notes']//section/p",
                     "morpher": "<p fb2pdf-style=\"notes\">{./* | text()}</p>"
+                }
+                */
+                /*
+                {   // wrap notes body content in two sections, making notes third-level section
+                    "query":   "//body[@name='notes']",
+                    "morpher": "<body name='notes'><section><section>{./*}</section></section></body>"
                 }
                 */
         ]
