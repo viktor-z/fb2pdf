@@ -164,6 +164,9 @@ public class FB2toPDF
     private Stack<String> anchorStack = new Stack<String>();
     private Map<String, PdfTemplate> pageNumTemplates = new HashMap<String, PdfTemplate>();
     private Map<String, ParagraphStyle> pageNumStyles = new HashMap<String, ParagraphStyle>();
+    private ParagraphStyle currentStyle;
+    private Map<Integer, PdfOutline> currentOutline = new HashMap<Integer, PdfOutline>();
+    private ArrayList<BinaryAttachment> attachments = new ArrayList<BinaryAttachment>();
 
 
     private FB2toPDF(String fromName, String toName) {
@@ -813,6 +816,7 @@ public class FB2toPDF
             doc.open();
             System.err.println("Description not found");
         }
+        currentOutline.put(0, writer.getDirectContent().getRootOutline());
 
 
         bodies = ElementCollection.childrenByTagName(root, "body");
@@ -861,7 +865,6 @@ public class FB2toPDF
             return data;
         }
     };
-    private ArrayList<BinaryAttachment> attachments = new ArrayList<BinaryAttachment>();
 
     private void extractBinaries(org.w3c.dom.Element root) {
         ElementCollection binaries = ElementCollection.childrenByTagName(root, "binary");
@@ -870,8 +873,6 @@ public class FB2toPDF
             attachments.add(new BinaryAttachment(binary));
         }
     }
-    private ParagraphStyle currentStyle;
-    private PdfOutline currentOutline;
 
     private void processDescription(org.w3c.dom.Element description)
             throws FB2toPDFException, DocumentException {
@@ -1161,15 +1162,16 @@ public class FB2toPDF
         doc.newPage();
     }
 
-    private PdfOutline addBookmark(String title) {
+    private void addBookmark(String title, int level) {
+        if (!currentOutline.containsKey(level)) return;
         System.out.println("Adding bookmark: " + transliterate(title));
         PdfDestination destination = new PdfDestination(PdfDestination.FITH);
-        return new PdfOutline(currentOutline, destination, transliterate(title));
+        PdfOutline bookmark = new PdfOutline(currentOutline.get(level), destination, transliterate(title));
+        currentOutline.put(level+1, bookmark);
     }
 
     private void processSection(org.w3c.dom.Element section, int level, int index)
             throws DocumentException, FB2toPDFException {
-        PdfOutline previousOutline = currentOutline;
 
         Float newPagePosition = stylesheet.getPageStyle().sectionNewPage.get(level);
 
@@ -1178,25 +1180,10 @@ public class FB2toPDF
             writer.setPageEmpty(false);
         }
 
-        if (level == 0) {
-            //doc.newPage();
-            if (bodyIndex == 0) {
-                String bmk = getTextContentByTagName(section, "title");
-                if (StringUtils.isNotBlank(bmk)) {
-                    currentOutline = writer.getDirectContent().getRootOutline();
-                    currentOutline = addBookmark(bmk);
-                }
-            }
-        } else if (level == 1) {
-            //if (writer.getVerticalPosition(false) < doc.getPageSize().getHeight() * 0.5f) {
-            //    doc.newPage();
-            //}
-            //writer.setPageEmpty(false);
-            if (bodyIndex == 0) {
-                String bmk = getTextContentByTagName(section, "title");
-                if (StringUtils.isNotBlank(bmk)) {
-                    addBookmark(bmk);
-                }
+        if (bodyIndex == 0) {
+            String bmk = getTextContentByTagName(section, "title");
+            if (StringUtils.isNotBlank(bmk)) {
+                addBookmark(bmk, level);
             }
         }
 
@@ -1215,9 +1202,6 @@ public class FB2toPDF
             addBacklink(id);
         }
 
-        if (previousOutline != null) {
-            currentOutline = previousOutline;
-        }
     }
 
     private void addEmptyLine()
