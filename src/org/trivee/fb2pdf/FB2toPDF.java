@@ -326,12 +326,14 @@ public class FB2toPDF
         }
     }
 
+    /*
     private void appendLF() throws FB2toPDFException, DocumentException {
         flushCurrentChunk();
         currentChunk = currentStyle.createChunk();
         currentChunk.append("\n");
         flushCurrentChunk();
     }
+     */
 
     private String getNoteBody(String refname) {
         if (StringUtils.isBlank(refname)) return "";
@@ -1604,14 +1606,12 @@ public class FB2toPDF
                     currentStyle.toggleItalic();
                 } else if (child.getTagName().equals("code")) {
                     flushCurrentChunk();
-                    appendLF();
                     ParagraphStyle prevStyle = currentStyle;
                     currentStyle = stylesheet.getParagraphStyle("code");
                     processParagraphContent(child, bFirst && bFirstTextNode);
                     bFirstTextNode = false;
                     flushCurrentChunk();
                     currentStyle = prevStyle;
-                    appendLF();
                 } else if (child.getTagName().equals("a")) {
                     flushCurrentChunk();
                     currentReference = child.getAttributeNS(NS_XLINK, "href");

@@ -201,6 +201,12 @@
                     "morpher": "<body name='notes'><section><section>{./*}</section></section></body>"
                 }
                 */
+                /*
+                {   // add new line before and after "code" 
+                    "query":   "//code",
+                    "morpher": "<code>{('\n', ./* | text(), '\n')}</code>"
+                }
+                */
         ]
     },
     textPreprocessorSettings: {
