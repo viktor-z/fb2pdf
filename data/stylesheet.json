@@ -427,6 +427,7 @@
             name:               "code",
             baseStyle:          "body",
             disableHyphenation: "true",
+            preserveWhitespaces: "true",
             fontFamily:         "monospaced",
             fontSize:         "6.0pt"
         },

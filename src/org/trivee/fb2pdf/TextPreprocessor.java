@@ -5,6 +5,7 @@
 
 package org.trivee.fb2pdf;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -13,13 +14,16 @@ import java.util.Map;
  */
 public class TextPreprocessor {
 
-    public static String process(String text, TextPreprocessorSettings settings) {
-
-        if (!settings.enabled)
-            return text;
+    public static String process(String text, TextPreprocessorSettings settings, ParagraphStyle currentStyle) throws FB2toPDFException {
 
         String result = text;
-        
+
+        if(currentStyle == null || !currentStyle.getPreserveWhitespaces())
+            result = cleanWhiteSpaces(result);
+
+        if (!settings.enabled)
+            return result;
+
         if(settings.makeReplacements)
             result = makeReplacements(result, settings.replacementsMap);
 
@@ -53,6 +57,21 @@ public class TextPreprocessor {
         }
 
         return result;
+    }
+
+    private static String cleanWhiteSpaces(String text) {
+
+        Map<String, String> replacementsMap = new HashMap<String, String>()
+        {
+            {
+                put("\r\n", "\u0020"); //end-of-line
+                put("\n", "\u0020"); //end-of-line to space
+                put("\r", "\u0020"); //end-of-line to space
+                put("\u0020\u0020+", "\u0020"); //two-or-more-spaces to space
+            }
+        };
+        
+        return makeReplacements(text, replacementsMap);
     }
 
     private static String makeEndUnbreakable(String text) {

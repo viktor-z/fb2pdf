@@ -885,7 +885,7 @@ public class FB2toPDF
     private void addLine(String text, ParagraphStyle style)
             throws FB2toPDFException, DocumentException {
         Chunk chunk = style.createChunk();
-        chunk.append(TextPreprocessor.process(text, stylesheet.getTextPreprocessorSettings()));
+        chunk.append(TextPreprocessor.process(text, stylesheet.getTextPreprocessorSettings(), currentStyle));
         addLine(chunk, style);
     }
 
@@ -1148,7 +1148,7 @@ public class FB2toPDF
             }
 
             Chunk chunk = tocItemStyle.createChunk();
-            chunk.append(TextPreprocessor.process(title, stylesheet.getTextPreprocessorSettings()));
+            chunk.append(TextPreprocessor.process(title, stylesheet.getTextPreprocessorSettings(), currentStyle));
 
             String ref = section.getAttribute("id");
             if (isNullOrEmpty(ref)) {
@@ -1694,7 +1694,7 @@ public class FB2toPDF
                     }
                 }
 
-                currentChunk.append(TextPreprocessor.process(text, stylesheet.getTextPreprocessorSettings()));
+                currentChunk.append(TextPreprocessor.process(text, stylesheet.getTextPreprocessorSettings(), currentStyle));
             }
         }
         currentStyle = previousStyle;
