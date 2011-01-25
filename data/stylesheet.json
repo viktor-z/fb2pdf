@@ -207,6 +207,12 @@
                     "morpher": "<code>{('\n', ./* | text(), '\n')}</code>"
                 }
                 */
+                /*
+                {   // replace root section of nameless (main) body with it's content
+                    "query":    "//body[not(./@name)]/section",
+                    "morpher":  "./*"
+                }
+                */
         ]
     },
     textPreprocessorSettings: {
