@@ -26,7 +26,10 @@ public class FootnoteRenderer {
         float w = pageStyle.getPageWidth() - pageStyle.getMarginLeft() - pageStyle.getMarginRight();
         float fontSize = noteStyle.getFontSize().getPoints();
         BaseFont basefont = noteStyle.getBaseFont();
-        float h = basefont.getFontDescriptor(BaseFont.CAPHEIGHT, fontSize) + noteStyle.getAbsoluteLeading() / 2;
+        float ascent = basefont.getFontDescriptor(BaseFont.ASCENT, fontSize);
+        float descent = basefont.getFontDescriptor(BaseFont.DESCENT, fontSize);
+        //float capheight = basefont.getFontDescriptor(BaseFont.CAPHEIGHT, fontSize);
+        float h = ascent - descent + noteStyle.getAbsoluteLeading() / 2;
         Rectangle pageSize = new Rectangle(w, h);
         pageSize.setBackgroundColor(BaseColor.LIGHT_GRAY);
         Document doc = new Document(pageSize, pageStyle.getMarginLeft(), pageStyle.getMarginRight(), pageStyle.getMarginTop(), pageStyle.getMarginBottom());

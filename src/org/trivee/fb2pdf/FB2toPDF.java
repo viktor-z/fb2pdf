@@ -22,6 +22,7 @@ import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Image;
+import com.itextpdf.text.FootnoteLineImage;
 
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -322,7 +323,7 @@ public class FB2toPDF
         List<Image> noteLineImages = getLinesImages(noteDoc);
         System.out.printf("Footnote has %d lines\n", noteLineImages.size());
         for (Image image: noteLineImages){
-            currentParagraph.add(image);
+            doc.add(image);
         }
     }
 
@@ -372,14 +373,14 @@ public class FB2toPDF
 
             for (int i=2; i<reader.getNumberOfPages(); i++){
                 PdfImportedPage page = writer.getImportedPage(reader, i);
-                Image image = Image.getInstance(page);
+                Image image = FootnoteLineImage.getInstance(page);
                 image.setSpacingBefore(0);
                 image.setSpacingAfter(0);
-                image.setAlignment(Image.TEXTWRAP);
+                image.setAlignment(Image.MIDDLE);
                 result.add(image);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            System.out.println("WARNING: failed to produce footnote lines");
         }
 
         return result;

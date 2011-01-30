@@ -60,6 +60,7 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.ExceptionConverter;
 import com.itextpdf.text.Font;
+import com.itextpdf.text.FootnoteLineImage;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.List;
 import com.itextpdf.text.ListItem;
@@ -690,7 +691,11 @@ public class PdfDocument extends Document {
                 case Element.IMGRAW:
                 case Element.IMGTEMPLATE: {
                     //carriageReturn(); suggestion by Marc Campforts
-                    add((Image) element);
+                    if (element instanceof FootnoteLineImage) { //+++ VIKTORZ
+                        add((FootnoteLineImage) element);       //+++ VIKTORZ
+                    } else {                                    //+++ VIKTORZ
+                        add((Image) element);
+                    }                                           //+++ VIKTORZ
                     break;
                 }
                 case Element.YMARK: {
@@ -2374,6 +2379,43 @@ public class PdfDocument extends Document {
             newLine();
         }
     }
+
+    protected void add(FootnoteLineImage image) throws PdfException, DocumentException {
+
+        // if there isn't enough room for the image on this page, save it for the next page
+        if (currentHeight != 0 && indentTop() - currentHeight - image.getScaledHeight() < indentBottom()) {
+            if (!strictImageSequence && imageWait == null) {
+                imageWait = image;
+                return;
+            }
+            newPage();
+            if (currentHeight != 0 && indentTop() - currentHeight - image.getScaledHeight() < indentBottom()) {
+                imageWait = image;
+                return;
+            }
+        }
+        pageEmpty = false;
+        // avoid endless loops
+        if (image == imageWait)
+            imageWait = null;
+
+        float lowerleft = indentTop() - currentHeight - image.getScaledHeight();
+        float mt[] = image.matrix();
+        float startPosition = indentLeft() - mt[4];
+        if ((image.getAlignment() & Image.RIGHT) == Image.RIGHT) startPosition = indentRight() - image.getScaledWidth() - mt[4];
+        if ((image.getAlignment() & Image.MIDDLE) == Image.MIDDLE) startPosition = indentLeft() + (indentRight() - indentLeft() - image.getScaledWidth()) / 2 - mt[4];
+        if (image.hasAbsoluteX()) startPosition = image.getAbsoluteX();
+
+        if ((image.getAlignment() & Image.RIGHT) == Image.RIGHT) startPosition -= image.getIndentationRight();
+        else if ((image.getAlignment() & Image.MIDDLE) == Image.MIDDLE) startPosition += image.getIndentationLeft() - image.getIndentationRight();
+        else startPosition += image.getIndentationLeft();
+        graphics.addImage(image, mt[0], mt[1], mt[2], mt[3], startPosition, lowerleft - mt[5]);
+
+        currentHeight += image.getScaledHeight();
+        flushLines();
+        text.moveText(0, - image.getScaledHeight());
+    }
+
 
 //	[M4] Adding a PdfPTable
 
