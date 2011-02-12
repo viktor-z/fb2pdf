@@ -1,5 +1,5 @@
 /*
- * $Id: PageSize.java 4113 2009-12-01 11:08:59Z blowagie $
+ * $Id: PageSize.java 4649 2011-01-09 13:30:35Z blowagie $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -61,7 +61,7 @@ public class PageSize {
     
     /** This is the note format */
     public static final Rectangle NOTE = new RectangleReadOnly(540,720);
-    
+
     /** This is the legal format */
     public static final Rectangle LEGAL = new RectangleReadOnly(612,1008);
     
@@ -85,7 +85,7 @@ public class PageSize {
     
     /** This is the a3 format */
     public static final Rectangle A3 = new RectangleReadOnly(842,1191);
-    
+
     /** This is the a4 format */
     public static final Rectangle A4 = new RectangleReadOnly(595,842);
     
@@ -211,7 +211,29 @@ public class PageSize {
     
     /** This is the Penguin large paperback format. */
     public static final Rectangle PENGUIN_LARGE_PAPERBACK = new RectangleReadOnly(365,561);
-      
+    
+    // Some extra shortcut values for pages in Landscape
+
+	/**
+	 * This is the letter format
+	 * @since iText 5.0.6
+	 */
+    public static final Rectangle LETTER_LANDSCAPE = new RectangleReadOnly(612, 792, 90);
+    
+    /**
+     * This is the legal format
+     * @since iText 5.0.6
+     */
+    public static final Rectangle LEGAL_LANDSCAPE = new RectangleReadOnly(612, 1008, 90);
+    
+    /**
+     * This is the a4 format
+     * @since iText 5.0.6
+     */
+    public static final Rectangle A4_LANDSCAPE = new RectangleReadOnly(595, 842, 90);
+    
+    
+    
     /**
      * This method returns a Rectangle based on a String.
      * Possible values are the the names of a constant in this class

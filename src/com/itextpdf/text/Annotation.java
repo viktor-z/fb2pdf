@@ -1,5 +1,5 @@
 /*
- * $Id: Annotation.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: Annotation.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -332,7 +332,7 @@ public class Annotation implements Element {
 		this(llx, lly, urx, ury);
 		annotationtype = FILE_PAGE;
 		annotationAttributes.put(FILE, file);
-		annotationAttributes.put(PAGE, new Integer(page));
+		annotationAttributes.put(PAGE, Integer.valueOf(page));
 	}
 
 	/**
@@ -352,7 +352,7 @@ public class Annotation implements Element {
 	public Annotation(float llx, float lly, float urx, float ury, int named) {
 		this(llx, lly, urx, ury);
 		annotationtype = NAMED_DEST;
-		annotationAttributes.put(NAMED, new Integer(named));
+		annotationAttributes.put(NAMED, Integer.valueOf(named));
 	}
 
 	/**

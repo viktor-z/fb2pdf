@@ -1,5 +1,5 @@
 /*
- * $Id: BarcodeDatamatrix.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: BarcodeDatamatrix.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -979,7 +979,7 @@ public class BarcodeDatamatrix {
         }
 
         static short[] doPlacement(int nrow, int ncol) {
-            Integer key = new Integer(nrow * 1000 + ncol);
+            Integer key = Integer.valueOf(nrow * 1000 + ncol);
             short[] pc = cache.get(key);
             if (pc != null)
                 return pc;

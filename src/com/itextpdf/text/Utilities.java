@@ -1,5 +1,5 @@
 /*
- * $Id: Utilities.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: Utilities.java 4672 2011-01-30 10:38:33Z blowagie $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA

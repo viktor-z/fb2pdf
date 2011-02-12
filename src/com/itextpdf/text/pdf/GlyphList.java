@@ -1,5 +1,5 @@
 /*
- * $Id: GlyphList.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: GlyphList.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -112,6 +112,6 @@ public class GlyphList {
     }
 
     public static String unicodeToName(int num) {
-        return unicode2names.get(new Integer(num));
+        return unicode2names.get(Integer.valueOf(num));
     }
 }

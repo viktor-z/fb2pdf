@@ -1,5 +1,5 @@
 /*
- * $Id: PdfNumberTree.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: PdfNumberTree.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -133,7 +133,7 @@ public class PdfNumberTree {
         if (nn != null) {
             for (int k = 0; k < nn.size(); ++k) {
                 PdfNumber s = (PdfNumber)PdfReader.getPdfObjectRelease(nn.getPdfObject(k++));
-                items.put(new Integer(s.intValue()), nn.getPdfObject(k));
+                items.put(Integer.valueOf(s.intValue()), nn.getPdfObject(k));
             }
         }
         else if ((nn = (PdfArray)PdfReader.getPdfObjectRelease(dic.get(PdfName.KIDS))) != null) {

@@ -1,5 +1,5 @@
 /*
- * $Id: PdfDocument.java 4504 2010-05-04 17:11:28Z blowagie $
+ * $Id: PdfDocument.java 4634 2010-11-24 15:08:13Z blowagie $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -1138,22 +1138,22 @@ public class PdfDocument extends Document {
         if (lines == null) {
             lines = new ArrayList<PdfLine>();
         }
-        // If the current line is not null
-        if (line != null) {
+        // If the current line is not null or empty
+        if (line != null && line.size() > 0) {
             // we check if the end of the page is reached (bugfix by Francois Gravel)
-            float h = preventWidows ? currentHeight + line.height() : currentHeight;
-            if (h + leading < indentTop() - indentBottom()) {
-                // if so nonempty lines are added and the height is augmented
-                if (line.size() > 0) {
-                    currentHeight += line.height();
-                    lines.add(line);
-                    pageEmpty = false;
-                }
+            float h = preventWidows ? currentHeight + line.height() : currentHeight; //+++ VIKTORZ
+			if (h + leading > indentTop() - indentBottom()) {
+            	// if the end of the line is reached, we start a newPage which will flush existing lines
+            	// then move to next page but before then we need to exclude the current one that does not fit
+            	// After the new page we add the current line back in
+            	PdfLine overflowLine = line;
+            	line = null;
+            	newPage();
+            	line = overflowLine;
             }
-            // if the end of the line is reached, we start a new page
-            else {
-                newPage();
-            }
+            currentHeight += line.height();
+            lines.add(line);
+            pageEmpty = false;
         }
         if (imageEnd > -1 && currentHeight > imageEnd) {
             imageEnd = -1;
@@ -2454,8 +2454,7 @@ public class PdfDocument extends Document {
             else
                 loop = 0;
             if (loop == 3) {
-                add(new Paragraph("ERROR: Infinite table loop"));
-                break;
+            	throw new DocumentException(MessageLocalization.getComposedMessage("infinite.table.loop"));
             }
             newPage();
         }

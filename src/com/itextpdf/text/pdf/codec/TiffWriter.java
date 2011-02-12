@@ -1,5 +1,5 @@
 /*
- * $Id: TiffWriter.java 4541 2010-07-13 14:03:55Z blowagie $
+ * $Id: TiffWriter.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -54,7 +54,7 @@ public class TiffWriter {
     private TreeMap<Integer,FieldBase> ifd = new TreeMap<Integer,FieldBase>();
 
     public void addField(FieldBase field) {
-        ifd.put(new Integer(field.getTag()), field);
+        ifd.put(Integer.valueOf(field.getTag()), field);
     }
 
     public int getIfdSize() {

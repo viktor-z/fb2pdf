@@ -1,5 +1,5 @@
 /*
- * $Id: BaseField.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: BaseField.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -149,7 +149,7 @@ public abstract class BaseField {
 
     static {
         fieldKeys.putAll(PdfCopyFieldsImp.fieldKeys);
-        fieldKeys.put(PdfName.T, new Integer(1));
+        fieldKeys.put(PdfName.T, Integer.valueOf(1));
     }
     /** Creates a new <CODE>TextField</CODE>.
      * @param writer the document <CODE>PdfWriter</CODE>

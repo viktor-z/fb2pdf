@@ -1,5 +1,5 @@
 /*
- * $Id: PdfWriter.java 4574 2010-08-12 15:15:30Z blowagie $
+ * $Id: PdfWriter.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -446,14 +446,14 @@ public class PdfWriter extends DocWriter implements
                 if (first + len == entry.getRefnum())
                     ++len;
                 else {
-                    sections.add(new Integer(first));
-                    sections.add(new Integer(len));
+                    sections.add(Integer.valueOf(first));
+                    sections.add(Integer.valueOf(len));
                     first = entry.getRefnum();
                     len = 1;
                 }
             }
-            sections.add(new Integer(first));
-            sections.add(new Integer(len));
+            sections.add(Integer.valueOf(first));
+            sections.add(Integer.valueOf(len));
             if (writer.isFullCompression()) {
                 int mid = 4;
                 int mask = 0xff000000;

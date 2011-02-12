@@ -1,5 +1,5 @@
 /*
- * $Id: FontFactory.java 4543 2010-07-14 17:25:52Z mstorer $
+ * $Id: FontFactory.java 4676 2011-01-30 11:25:42Z blowagie $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -148,19 +148,6 @@ public final class FontFactory {
 
     public static Font getFont(String fontname, String encoding, boolean embedded, float size, int style, BaseColor color, boolean cached) {
         return fontImp.getFont(fontname, encoding, embedded, size, style, color, cached);
-    }
-
-/**
- * Constructs a <CODE>Font</CODE>-object.
- *
- * @param   attributes  the attributes of a <CODE>Font</CODE> object.
- * @return the Font constructed based on the attributes
- */
-
-    public static Font getFont(Properties attributes) {
-        fontImp.defaultEmbedding = defaultEmbedding;
-        fontImp.defaultEncoding = defaultEncoding;
-        return fontImp.getFont(attributes);
     }
 
 /**

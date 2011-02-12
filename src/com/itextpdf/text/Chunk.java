@@ -1,5 +1,5 @@
 /*
- * $Id: Chunk.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: Chunk.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -638,7 +638,7 @@ public class Chunk implements Element {
 	 */
 	public Chunk setTextRenderMode(int mode, float strokeWidth,
 			BaseColor strokeColor) {
-		return setAttribute(TEXTRENDERMODE, new Object[] { new Integer(mode),
+		return setAttribute(TEXTRENDERMODE, new Object[] { Integer.valueOf(mode),
 				new Float(strokeWidth), strokeColor });
 	}
 
@@ -700,7 +700,7 @@ public class Chunk implements Element {
 
 	public Chunk setRemoteGoto(String filename, int page) {
 		return setAttribute(REMOTEGOTO, new Object[] { filename,
-				new Integer(page) });
+				Integer.valueOf(page) });
 	}
 
 	/** Key for local goto. */

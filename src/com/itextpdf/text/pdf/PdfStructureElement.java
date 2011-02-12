@@ -1,5 +1,5 @@
 /*
- * $Id: PdfStructureElement.java 4141 2009-12-05 19:01:18Z psoares33 $
+ * $Id: PdfStructureElement.java 4618 2010-11-03 09:27:04Z blowagie $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -73,6 +73,7 @@ public class PdfStructureElement extends PdfDictionary {
         init(parent, structureType);
         this.parent = parent;
         put(PdfName.P, parent.reference);
+        put(PdfName.TYPE, PdfName.STRUCTELEM);
     }
     
     /**
@@ -84,6 +85,7 @@ public class PdfStructureElement extends PdfDictionary {
         top = parent;
         init(parent, structureType);
         put(PdfName.P, parent.getReference());
+        put(PdfName.TYPE, PdfName.STRUCTELEM);
     }
     
     private void init(PdfDictionary parent, PdfName structureType) {

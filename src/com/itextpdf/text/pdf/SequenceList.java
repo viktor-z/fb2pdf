@@ -1,5 +1,5 @@
 /*
- * $Id: SequenceList.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: SequenceList.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -290,7 +290,7 @@ public class SequenceList {
                             parse.low -= (parse.low & 1) == 1 ? 0 : 1;
                     }
                     for (int k = parse.low; k >= parse.high; k += inc)
-                        list.add(new Integer(k));
+                        list.add(Integer.valueOf(k));
                 }
                 else {
                     if (parse.odd || parse.even) {
@@ -301,7 +301,7 @@ public class SequenceList {
                             parse.low += (parse.low & 1) == 1 ? 1 : 0;
                     }
                     for (int k = parse.low; k <= parse.high; k += inc) {
-                        list.add(new Integer(k));
+                        list.add(Integer.valueOf(k));
                     }
                 }
             }

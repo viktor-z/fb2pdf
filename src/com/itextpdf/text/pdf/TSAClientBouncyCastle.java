@@ -1,5 +1,5 @@
 /*
- * $Id: TSAClientBouncyCastle.java 4113 2009-12-01 11:08:59Z blowagie $
+ * $Id: TSAClientBouncyCastle.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -200,7 +200,7 @@ public class TSAClientBouncyCastle implements TSAClient {
         if ((tsaUsername != null) && !tsaUsername.equals("") ) {
             String userPassword = tsaUsername + ":" + tsaPassword;
             tsaConnection.setRequestProperty("Authorization", "Basic " +
-                new String(Base64.encodeBytes(userPassword.getBytes())));
+                Base64.encodeBytes(userPassword.getBytes()));
         }
         OutputStream out = tsaConnection.getOutputStream();
         out.write(requestBytes);

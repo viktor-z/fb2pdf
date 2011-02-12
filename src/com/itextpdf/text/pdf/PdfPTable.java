@@ -1,5 +1,5 @@
 /*
- * $Id: PdfPTable.java 4439 2010-04-03 17:59:10Z psoares33 $
+ * $Id: PdfPTable.java 4634 2010-11-24 15:08:13Z blowagie $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -59,8 +59,6 @@ import com.itextpdf.text.pdf.events.PdfPTableEventForwarder;
 /**
  * This is a table that can be put at an absolute position but can also
  * be added to the document as the class <CODE>Table</CODE>.
- * In the last case when crossing pages the table always break at full rows; if a
- * row is bigger than the page it is dropped silently to avoid infinite loops.
  * <P>
  * A PdfPTableEvent can be associated to the table to do custom drawing
  * when the table is rendered.

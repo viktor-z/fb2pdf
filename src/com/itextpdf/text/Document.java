@@ -1,5 +1,5 @@
 /*
- * $Id: Document.java 4607 2010-11-02 09:56:47Z blowagie $
+ * $Id: Document.java 4699 2011-02-04 09:17:10Z blowagie $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -104,7 +104,7 @@ public class Document implements DocListener {
      * This constant may only be changed by Paulo Soares and/or Bruno Lowagie.
      * @since	2.1.6
      */
-	private static final String RELEASE = "5.0.5";
+	private static final String RELEASE = "5.0.6";
 	/** This constant may only be changed by Paulo Soares and/or Bruno Lowagie. */
 	private static final String ITEXT_VERSION = ITEXT + " " + RELEASE + " (c) 1T3XT BVBA";
 

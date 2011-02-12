@@ -1,5 +1,5 @@
 /*
- * $Id: PdfGraphics2D.java 4552 2010-07-22 09:40:13Z blowagie $
+ * $Id: PdfGraphics2D.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -1005,7 +1005,7 @@ public class PdfGraphics2D extends Graphics2D {
         g2.kid = true;
         if (this.kids == null)
             this.kids = new ArrayList<Kid>();
-        this.kids.add(new Kid(new Integer(cb.getInternalBuffer().size()), g2));
+        this.kids.add(new Kid(cb.getInternalBuffer().size(), g2));
         return g2;
     }
 

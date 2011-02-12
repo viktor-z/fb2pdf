@@ -1,5 +1,5 @@
 /*
- * $Id: RectangleReadOnly.java 4147 2009-12-06 21:26:09Z psoares33 $
+ * $Id: RectangleReadOnly.java 4656 2011-01-24 12:05:21Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -76,7 +76,22 @@ public class RectangleReadOnly extends Rectangle {
 	}
 
 	/**
-	 * Constructs a <CODE>RectangleReadOnly</CODE> -object starting from the origin
+	 * Constructs a <CODE>RectangleReadOnly</CODE> -object.
+	 * 
+	 * @param llx	lower left x
+	 * @param lly	lower left y
+	 * @param urx	upper right x
+	 * @param ury	upper right y
+	 * @param rotation	the rotation of the Rectangle (0, 90, 180, 270)
+	 * @since iText 5.0.6
+	 */
+	public RectangleReadOnly(float llx, float lly, float urx, float ury, int rotation) {
+        super(llx, lly, urx, ury);
+        super.setRotation(rotation);
+	}
+
+	/**
+	 * Constructs a <CODE>RectangleReadOnly</CODE>-object starting from the origin
 	 * (0, 0).
 	 * 
 	 * @param urx	upper right x
@@ -84,6 +99,19 @@ public class RectangleReadOnly extends Rectangle {
 	 */
 	public RectangleReadOnly(float urx, float ury) {
 		super(0, 0, urx, ury);
+	}
+
+	/**
+	 * Constructs a <CODE>RectangleReadOnly</CODE>-object starting from the origin
+	 * (0, 0) and with a specific rotation (valid values are 0, 90, 180, 270).
+	 * 
+	 * @param urx	upper right x
+	 * @param ury	upper right y
+	 * @since iText 5.0.6
+	 */
+	public RectangleReadOnly(float urx, float ury, int rotation) {
+		super(0, 0, urx, ury);
+		super.setRotation(rotation);
 	}
 
 	/**
@@ -103,7 +131,16 @@ public class RectangleReadOnly extends Rectangle {
         throw new UnsupportedOperationException(MessageLocalization.getComposedMessage("rectanglereadonly.this.rectangle.is.read.only"));
     }
     
-	// OVERWRITE METHODS SETTING THE DIMENSIONS:
+	/**
+	 * Sets the rotation of the rectangle. Valid values are 0, 90, 180, and 270.
+	 * @param rotation the new rotation value
+	 * @since iText 5.0.6
+	 */
+	public void setRotation(int rotation) {
+        throwReadOnlyError();
+    }
+
+    // OVERWRITE METHODS SETTING THE DIMENSIONS:
 
 	/**
 	 * Sets the lower left x-coordinate.

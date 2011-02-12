@@ -1,5 +1,5 @@
 /*
- * $Id: PdfPTableEventForwarder.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: PdfPTableEventForwarder.java 4633 2010-11-24 14:45:50Z blowagie $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPTableEvent;
+import com.itextpdf.text.pdf.PdfPTableEventSplit;
 
 /**
  * If you want to add more than one page event to a PdfPTable,
@@ -56,7 +57,7 @@ import com.itextpdf.text.pdf.PdfPTableEvent;
  * the PdfWriter.
  */
 
-public class PdfPTableEventForwarder implements PdfPTableEvent {
+public class PdfPTableEventForwarder implements PdfPTableEventSplit {
 
 	/** ArrayList containing all the PageEvents that have to be executed. */
 	protected ArrayList<PdfPTableEvent> events = new ArrayList<PdfPTableEvent>();
@@ -77,4 +78,15 @@ public class PdfPTableEventForwarder implements PdfPTableEvent {
 			event.tableLayout(table, widths, heights, headerRows, rowStart, canvases);
 		}
 	}
+
+    /**
+     * @see com.itextpdf.text.pdf.PdfPTableEventSplit#splitTable(com.itextpdf.text.pdf.PdfPTable)
+	 * @since iText 5.0.6
+     */
+    public void splitTable(PdfPTable table) {
+		for (PdfPTableEvent event: events) {
+			if (event instanceof PdfPTableEventSplit)
+                ((PdfPTableEventSplit)event).splitTable(table);
+		}
+    }
 }

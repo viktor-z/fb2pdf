@@ -1,5 +1,5 @@
 /*
- * $Id: PdfImage.java 4322 2010-02-16 17:01:06Z mstorer $
+ * $Id: PdfImage.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -105,11 +105,11 @@ public class PdfImage extends PdfStream {
                 int colorspace = image.getColorspace();
                 int transparency[] = image.getTransparency();
                 if (transparency != null && !image.isMask() && maskRef == null) {
-                    String s = "[";
+                    StringBuilder s = new StringBuilder("[");
                     for (int k = 0; k < transparency.length; ++k)
-                        s += transparency[k] + " ";
-                    s += "]";
-                    put(PdfName.MASK, new PdfLiteral(s));
+                        s.append(transparency[k]).append(" ");
+                    s.append("]");
+                    put(PdfName.MASK, new PdfLiteral(s.toString()));
                 }
                 bytes = image.getRawData();
                 put(PdfName.LENGTH, new PdfNumber(bytes.length));

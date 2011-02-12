@@ -1,5 +1,5 @@
 /*
- * $Id: PdfContentByte.java 4372 2010-03-20 16:07:38Z psoares33 $
+ * $Id: PdfContentByte.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -2989,7 +2989,7 @@ public class PdfContentByte {
         if (layerDepth == null)
             layerDepth = new ArrayList<Integer>();
         if (layer instanceof PdfLayerMembership) {
-            layerDepth.add(new Integer(1));
+            layerDepth.add(Integer.valueOf(1));
             beginLayer2(layer);
             return;
         }
@@ -3002,7 +3002,7 @@ public class PdfContentByte {
             }
             la = la.getParent();
         }
-        layerDepth.add(new Integer(n));
+        layerDepth.add(Integer.valueOf(n));
     }
 
     private void beginLayer2(PdfOCG layer) {

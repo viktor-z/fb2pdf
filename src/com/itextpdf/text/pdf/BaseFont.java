@@ -1,5 +1,5 @@
 /*
- * $Id: BaseFont.java 4451 2010-04-06 13:23:06Z blowagie $
+ * $Id: BaseFont.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -1110,9 +1110,9 @@ public abstract class BaseFont {
      * @return the subset prefix
      */
     public static String createSubsetPrefix() {
-        String s = "";
+        StringBuilder s = new StringBuilder("");
         for (int k = 0; k < 6; ++k)
-            s += (char)(Math.random() * 26 + 'A');
+            s.append((char)(Math.random() * 26 + 'A'));
         return s + "+";
     }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: CMapAwareDocumentFont.java 4598 2010-10-02 12:41:44Z psoares33 $
+ * $Id: CMapAwareDocumentFont.java 4651 2011-01-20 20:49:19Z psoares33 $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -127,7 +127,7 @@ public class CMapAwareDocumentFont extends DocumentFont {
             // this is messy, messy - an encoding can have multiple unicode values mapping to the same cid - we are going to arbitrarily choose the first one
             // what we really need to do is to parse the encoding, and handle the differences info ourselves.  This is a huge duplication of code of what is already
             // being done in DocumentFont, so I really hate to go down that path without seriously thinking about a change in the organization of the Font class hierarchy
-            if (cidbyte2uni[n] == 0)
+            if (n < 256 && cidbyte2uni[n] == 0)
                 cidbyte2uni[n] = (char)e[k];
         }
         IntHashtable diffmap = getDiffmap();
@@ -136,7 +136,8 @@ public class CMapAwareDocumentFont extends DocumentFont {
             e = diffmap.toOrderedKeys();
             for (int k = 0; k < e.length; ++k) {
                 int n = diffmap.get(e[k]);
-                cidbyte2uni[n] = (char)e[k];
+                if (n < 256)
+                    cidbyte2uni[n] = (char)e[k];
             }
         }
     }

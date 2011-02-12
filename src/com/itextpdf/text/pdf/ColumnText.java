@@ -1,5 +1,5 @@
 /*
- * $Id: ColumnText.java 4585 2010-08-24 15:47:36Z blowagie $
+ * $Id: ColumnText.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -1240,7 +1240,7 @@ public class ColumnText {
                         else ++count;
                     }
                     else if (obj instanceof com.itextpdf.text.List) {
-                        stack.push(new Object[]{list, new Integer(k), new Float(listIndentation)});
+                        stack.push(new Object[]{list, Integer.valueOf(k), new Float(listIndentation)});
                         list = (com.itextpdf.text.List)obj;
                         items = list.getItems();
                         listIndentation += list.getIndentationLeft();
@@ -1475,6 +1475,13 @@ public class ColumnText {
                         last.setMaxHeights(yTemp - minY + rowHeight);
                         yTemp = minY;
                     }
+                    if (newPageFollows) {
+                        // newPageFollows indicate that this table is being split
+                        PdfPTableEvent tableEvent = table.getTableEvent();
+                        if (tableEvent instanceof PdfPTableEventSplit) {
+                            ((PdfPTableEventSplit)tableEvent).splitTable(table);
+                        }
+                    }
 
                     // now we render the rows of the new table
                     if (canvases != null)
@@ -1491,7 +1498,13 @@ public class ColumnText {
                 if (!(skipHeader || table.isComplete()))
                 	yLine += footerHeight;
                 if (k >= table.size()) {
-                    yLine -= table.spacingAfter();
+                	// Use up space no more than left
+                	if(yLine - table.spacingAfter() < minY) {
+                		yLine = minY;
+                	}
+                	else {
+                		yLine -= table.spacingAfter();
+                	}
                     compositeElements.removeFirst();
                     splittedRow = false;
                     listIdx = 0;

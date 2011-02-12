@@ -1,5 +1,5 @@
 /*
- * $Id: PdfChunk.java 4268 2010-01-21 10:05:22Z blowagie $
+ * $Id: PdfChunk.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -202,7 +202,7 @@ public class PdfChunk {
         else {
             // bold simulation
             if ((style & Font.BOLD) != 0)
-                attributes.put(Chunk.TEXTRENDERMODE, new Object[]{new Integer(PdfContentByte.TEXT_RENDER_MODE_FILL_STROKE), new Float(size / 30f), null});
+                attributes.put(Chunk.TEXTRENDERMODE, new Object[]{Integer.valueOf(PdfContentByte.TEXT_RENDER_MODE_FILL_STROKE), new Float(size / 30f), null});
             // italic simulation
             if ((style & Font.ITALIC) != 0)
                 attributes.put(Chunk.SKEW, new float[]{0, ITALIC_ANGLE});
@@ -423,18 +423,23 @@ public class PdfChunk {
         return pc;
     }
 
-/**
- * Truncates this <CODE>PdfChunk</CODE> if it's too long for the given width.
- * <P>
- * Returns <VAR>null</VAR> if the <CODE>PdfChunk</CODE> wasn't truncated.
- *
- * @param		width		a given width
- * @return		the <CODE>PdfChunk</CODE> that doesn't fit into the width.
- */
-
+    /**
+     * Truncates this <CODE>PdfChunk</CODE> if it's too long for the given width.
+     * <P>
+     * Returns <VAR>null</VAR> if the <CODE>PdfChunk</CODE> wasn't truncated.
+     *
+     * @param		width		a given width
+     * @return		the <CODE>PdfChunk</CODE> that doesn't fit into the width.
+     */
     PdfChunk truncate(float width) {
         if (image != null) {
             if (image.getScaledWidth() > width) {
+            	// Image does not fit the line, resize if requested
+            	if (image.isScaleToFitLineWhenOverflow()) {
+            		float scalePercent = width / image.getWidth() * 100;
+            		image.scalePercent(scalePercent);
+            		return null;
+            	}
                 PdfChunk pc = new PdfChunk("", this);
                 value = "";
                 attributes.remove(Chunk.IMAGE);
@@ -461,8 +466,6 @@ public class PdfChunk {
         // or until the totalWidth is reached
         int length = value.length();
         boolean surrogate = false;
-        @SuppressWarnings("unused")
-        char character;
         while (currentPosition < length) {
             // the width of every character is added to the currentWidth
             surrogate = Utilities.isSurrogatePair(value, currentPosition);

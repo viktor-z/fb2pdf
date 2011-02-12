@@ -1,5 +1,5 @@
 /*
- * $Id: PdfName.java 4497 2010-04-28 15:05:50Z blowagie $
+ * $Id: PdfName.java 4618 2010-11-03 09:27:04Z blowagie $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -1475,6 +1475,11 @@ public class PdfName extends PdfObject implements Comparable<PdfName> {
     public static final PdfName STRF = new PdfName("StrF");
     /** A name */
     public static final PdfName STRIKEOUT = new PdfName("StrikeOut");
+    /**
+     * A name.
+     * @since iText 5.0.6
+     */
+    public static final PdfName STRUCTELEM = new PdfName("StructElem");
     /** A name */
     public static final PdfName STRUCTPARENT = new PdfName("StructParent");
     /** A name */

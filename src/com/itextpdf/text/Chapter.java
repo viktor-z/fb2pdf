@@ -1,5 +1,5 @@
 /*
- * $Id: Chapter.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: Chapter.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -79,7 +79,7 @@ public class Chapter extends Section {
     public Chapter(int number) {
         super(null, 1);
         numbers = new ArrayList<Integer>();
-        numbers.add(new Integer(number));
+        numbers.add(Integer.valueOf(number));
         triggerNewPage = true;
     }
 
@@ -93,7 +93,7 @@ public class Chapter extends Section {
     public Chapter(Paragraph title, int number) {
         super(title, 1);
         numbers = new ArrayList<Integer>();
-        numbers.add(new Integer(number));
+        numbers.add(Integer.valueOf(number));
         triggerNewPage = true;
     }
 

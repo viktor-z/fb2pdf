@@ -1,5 +1,5 @@
 /*
- * $Id: Base64.java 4113 2009-12-01 11:08:59Z blowagie $
+ * $Id: Base64.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -415,7 +415,6 @@ public class Base64 {
      * Encodes or decodes two files from the command line;
      * <strong>feel free to delete this method (in fact you probably should)
      * if you're embedding this code into a larger program.</strong>
-     */
     public final static void main( String[] args ) {
         if( args.length < 3 ){
             usage("Not enough arguments.");
@@ -435,6 +434,7 @@ public class Base64 {
             }   // end else
         }   // end else
     }   // end main
+     */
     
     /**
      * Prints command line usage.
@@ -1163,7 +1163,9 @@ public class Base64 {
             System.err.println( "Error decoding from file " + filename );
         }   // end catch: IOException
         finally {
-            try{ bis.close(); } catch( Exception e) {}
+             if (null != bis){
+            	 try{ bis.close(); } catch( Exception e) {}
+             }
         }   // end finally
         
         return decodedData;

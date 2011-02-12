@@ -1,5 +1,5 @@
 /*
- * $Id: TiffImage.java 4590 2010-09-04 19:55:13Z psoares33 $
+ * $Id: TiffImage.java 4682 2011-02-01 11:40:17Z psoares33 $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -52,6 +52,7 @@ import com.itextpdf.text.error_messages.MessageLocalization;
 
 import com.itextpdf.text.ExceptionConverter;
 import com.itextpdf.text.Image;
+import com.itextpdf.text.ImgRaw;
 import com.itextpdf.text.Jpeg;
 import com.itextpdf.text.pdf.PdfArray;
 import com.itextpdf.text.pdf.PdfDictionary;
@@ -392,7 +393,7 @@ public class TiffImage {
             }
 
             CCITTG4Encoder g4 = null;
-            if (bitsPerSample == 1 && samplePerPixel == 1) {
+            if (bitsPerSample == 1 && samplePerPixel == 1 && photometric != TIFFConstants.PHOTOMETRIC_PALETTE) {
                 g4 = new CCITTG4Encoder(w);
             }
             else {
@@ -458,7 +459,7 @@ public class TiffImage {
                             lzwDecoder.decode(im, outBuf, height);
                             break;
                     }
-                    if (bitsPerSample == 1 && samplePerPixel == 1) {
+                    if (bitsPerSample == 1 && samplePerPixel == 1 && photometric != TIFFConstants.PHOTOMETRIC_PALETTE) {
                         g4.fax4Encode(outBuf, height);
                     }
                     else {
@@ -469,13 +470,13 @@ public class TiffImage {
                     }
                     rowsLeft -= rowsStrip;
                 }
-                if (bitsPerSample == 1 && samplePerPixel == 1) {
+                if (bitsPerSample == 1 && samplePerPixel == 1 && photometric != TIFFConstants.PHOTOMETRIC_PALETTE) {
                     img = Image.getInstance(w, h, false, Image.CCITTG4, 
                         photometric == TIFFConstants.PHOTOMETRIC_MINISBLACK ? Image.CCITT_BLACKIS1 : 0, g4.close());
                 }
                 else {
                     zip.close();
-                    img = Image.getInstance(w, h, samplePerPixel - extraSamples, bitsPerSample, stream.toByteArray());
+                    img = new ImgRaw(w, h, samplePerPixel - extraSamples, bitsPerSample, stream.toByteArray());
                     img.setDeflated(true);
                 }
             }

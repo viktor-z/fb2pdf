@@ -1,5 +1,5 @@
 /*
- * $Id: Paragraph.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: Paragraph.java 4676 2011-01-30 11:25:42Z blowagie $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -255,31 +255,6 @@ public class Paragraph extends Phrase {
      */
     public void setAlignment(int alignment) {
         this.alignment = alignment;
-    }
-
-    /**
-     * Sets the alignment of this paragraph.
-     *
-     * @param	alignment		the new alignment as a <CODE>String</CODE>
-     */
-    public void setAlignment(String alignment) {
-        if (ElementTags.ALIGN_CENTER.equalsIgnoreCase(alignment)) {
-            this.alignment = Element.ALIGN_CENTER;
-            return;
-        }
-        if (ElementTags.ALIGN_RIGHT.equalsIgnoreCase(alignment)) {
-            this.alignment = Element.ALIGN_RIGHT;
-            return;
-        }
-        if (ElementTags.ALIGN_JUSTIFIED.equalsIgnoreCase(alignment)) {
-            this.alignment = Element.ALIGN_JUSTIFIED;
-            return;
-        }
-        if (ElementTags.ALIGN_JUSTIFIED_ALL.equalsIgnoreCase(alignment)) {
-            this.alignment = Element.ALIGN_JUSTIFIED_ALL;
-            return;
-        }
-        this.alignment = Element.ALIGN_LEFT;
     }
 
     /**

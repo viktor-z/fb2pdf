@@ -1,5 +1,5 @@
 /*
- * $Id: RomanAlphabetFactory.java 4113 2009-12-01 11:08:59Z blowagie $
+ * $Id: RomanAlphabetFactory.java 4644 2010-12-15 13:35:05Z blowagie $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -110,15 +110,6 @@ public class RomanAlphabetFactory {
 		}
 		else {
 			return getUpperCaseString(index);
-		}
-	}
-	
-	/**
-	 * Test this class using this main method.
-	 */
-	public static void main(String[] args) {
-		for (int i = 1; i < 32000; i++) {
-			System.out.println(getString(i));
 		}
 	}
 }

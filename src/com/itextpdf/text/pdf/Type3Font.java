@@ -1,5 +1,5 @@
 /*
- * $Id: Type3Font.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: Type3Font.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -124,7 +124,7 @@ public class Type3Font extends BaseFont {
         if (c == 0 || c > 255)
             throw new IllegalArgumentException(MessageLocalization.getComposedMessage("the.char.1.doesn.t.belong.in.this.type3.font", c));
         usedSlot[c] = true;
-        Integer ck = new Integer(c);
+        Integer ck = Integer.valueOf(c);
         Type3Glyph glyph = char2glyph.get(ck);
         if (glyph != null)
             return glyph;
@@ -246,7 +246,7 @@ public class Type3Font extends BaseFont {
                 s = "a" + c2;
             PdfName n = new PdfName(s);
             diffs.add(n);
-            Type3Glyph glyph = char2glyph.get(new Integer(c2));
+            Type3Glyph glyph = char2glyph.get(Integer.valueOf(c2));
             PdfStream stream = new PdfStream(glyph.toPdf(null));
             stream.flateCompress(compressionLevel);
             PdfIndirectReference refp = writer.addToBody(stream).getIndirectReference();

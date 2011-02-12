@@ -1,5 +1,5 @@
 /*
- * $Id: GifImage.java 4604 2010-10-27 16:06:50Z mstorer $
+ * $Id: GifImage.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -213,10 +213,10 @@ public class GifImage {
      * Reads GIF file header information.
      */
     protected void readHeader() throws IOException {
-        String id = "";
+        StringBuilder id = new StringBuilder("");
         for (int i = 0; i < 6; i++)
-            id += (char)in.read();
-        if (!id.startsWith("GIF8")) {
+            id.append((char)in.read());
+        if (!id.toString().startsWith("GIF8")) {
             throw new IOException(MessageLocalization.getComposedMessage("gif.signature.nor.found"));
         }
 

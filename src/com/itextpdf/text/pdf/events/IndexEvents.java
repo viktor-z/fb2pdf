@@ -1,5 +1,5 @@
 /*
- * $Id: IndexEvents.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: IndexEvents.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -79,7 +79,7 @@ public class IndexEvents extends PdfPageEventHelper {
     @Override
     public void onGenericTag(PdfWriter writer, Document document,
             Rectangle rect, String text) {
-        indextag.put(text, new Integer(writer.getPageNumber()));
+        indextag.put(text, Integer.valueOf(writer.getPageNumber()));
     }
 
     // --------------------------------------------------------------------
@@ -343,7 +343,7 @@ public class IndexEvents extends PdfPageEventHelper {
          * @param tag
          */
         public void addPageNumberAndTag(final int number, final String tag) {
-            pagenumbers.add(new Integer(number));
+            pagenumbers.add(Integer.valueOf(number));
             tags.add(tag);
         }
 

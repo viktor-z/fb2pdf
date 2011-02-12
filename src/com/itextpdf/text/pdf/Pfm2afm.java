@@ -1,5 +1,5 @@
 /*
- * $Id: Pfm2afm.java 4289 2010-01-31 12:16:52Z blowagie $
+ * $Id: Pfm2afm.java 4644 2010-12-15 13:35:05Z blowagie $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -172,6 +172,7 @@ public final class Pfm2afm {
         p.out.flush();
     }
     
+    /*
     public static void main(String[] args) {
         try {
             RandomAccessFileOrArray in = new RandomAccessFileOrArray(args[0]);
@@ -184,6 +185,7 @@ public final class Pfm2afm {
             e.printStackTrace();
         }
     }
+    */
     
     private String readString(int n) throws IOException {
         byte b[] = new byte[n];

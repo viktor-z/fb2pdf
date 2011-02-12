@@ -1,6 +1,4 @@
 /*
- * $Id: ALink.java 4113 2009-12-01 11:08:59Z blowagie $
- *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
@@ -41,13 +39,19 @@
  * For more information, please contact iText Software Corp. at this
  * address: sales@itextpdf.com
  */
-package com.itextpdf.text.html.simpleparser;
+package com.itextpdf.text.pdf;
 
-import com.itextpdf.text.Paragraph;
 /**
- *
- * @author  psoares
+ * Signals that a table will continue in the next page.
+ * 
+ * @since 5.0.6
  */
-public interface ALink {
-    boolean process(Paragraph current, ChainedProperties cprops);
+public interface PdfPTableEventSplit extends PdfPTableEvent {
+    /**
+     * This method is called to indicate that table is being split. It's called
+     * before the <CODE>tableLayout</CODE> method and before the table is drawn.
+     *
+     * @param table the <CODE>PdfPTable</CODE> in use
+     */
+    public void splitTable(PdfPTable table);
 }

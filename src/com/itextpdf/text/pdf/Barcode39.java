@@ -1,5 +1,5 @@
 /*
- * $Id: Barcode39.java 4144 2009-12-06 19:08:44Z psoares33 $
+ * $Id: Barcode39.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -181,7 +181,7 @@ public class Barcode39 extends Barcode{
      * @return the escaped text
      */    
     public static String getCode39Ex(String text) {
-        String out = "";
+        StringBuilder out = new StringBuilder("");
         for (int k = 0; k < text.length(); ++k) {
             char c = text.charAt(k);
             if (c > 127)
@@ -189,10 +189,10 @@ public class Barcode39 extends Barcode{
             char c1 = EXTENDED.charAt(c * 2);
             char c2 = EXTENDED.charAt(c * 2 + 1);
             if (c1 != ' ')
-                out += c1;
-            out += c2;
+                out.append(c1);
+            out.append(c2);
         }
-        return out;
+        return out.toString();
     }
     
     /** Calculates the checksum.

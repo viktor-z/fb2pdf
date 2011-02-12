@@ -1,5 +1,5 @@
 /*
- * $Id: TrueTypeFontUnicode.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: TrueTypeFontUnicode.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -442,7 +442,7 @@ class TrueTypeFontUnicode extends TrueTypeFont implements Comparator<int[]>{
     @Override
     public int[] getMetricsTT(int c) {
         if (cmapExt != null)
-            return cmapExt.get(new Integer(c));
+            return cmapExt.get(Integer.valueOf(c));
         HashMap<Integer, int[]> map = null;
         if (fontSpecific)
             map = cmap10;
@@ -452,12 +452,12 @@ class TrueTypeFontUnicode extends TrueTypeFont implements Comparator<int[]>{
             return null;
         if (fontSpecific) {
             if ((c & 0xffffff00) == 0 || (c & 0xffffff00) == 0xf000)
-                return map.get(new Integer(c & 0xff));
+                return map.get(Integer.valueOf(c & 0xff));
             else
                 return null;
         }
         else
-            return map.get(new Integer(c));
+            return map.get(Integer.valueOf(c));
     }
 
     /**

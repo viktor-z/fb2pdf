@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleBookmark.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: SimpleBookmark.java 4645 2011-01-06 15:16:40Z redlab_b $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -556,7 +556,7 @@ public final class SimpleBookmark implements SimpleXMLDocHandler {
             createOutlineAction(outline, map, writer, namedAsNames);
             writer.addToBody(outline, refs[ptr]);
         }
-        return new Object[]{refs[0], refs[refs.length - 1], new Integer(count)};
+        return new Object[]{refs[0], refs[refs.length - 1], Integer.valueOf(count)};
     }
 
     /**

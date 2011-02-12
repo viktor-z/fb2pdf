@@ -1,5 +1,5 @@
 /*
- * $Id: ListItem.java 4113 2009-12-01 11:08:59Z blowagie $
+ * $Id: ListItem.java 4671 2011-01-29 16:26:15Z blowagie $
  *
  * This file is part of the iText project.
  * Copyright (c) 1998-2009 1T3XT BVBA
@@ -232,6 +232,17 @@ public class ListItem extends Paragraph {
     	else {
     		setIndentationLeft(indentation);
     	}
+    }
+
+    /**
+     * Changes the font of the list symbol to the font of the first chunk
+     * in the list item.
+     * @since 5.0.6
+     */
+    public void adjustListSymbolFont() {
+		java.util.List<Chunk> cks = getChunks();
+		if (!cks.isEmpty() && symbol != null)
+			symbol.setFont(cks.get(0).getFont());
     }
     
     // methods to retrieve information
