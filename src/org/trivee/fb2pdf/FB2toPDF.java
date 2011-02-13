@@ -193,21 +193,6 @@ public class FB2toPDF {
         tp.endText();
     }
 
-    /*
-    private void addAnchor(Element element) throws FB2toPDFException, DocumentException {
-    String id = element.getAttribute("id");
-    if (id.length() > 0) {
-    addAnchor(id);
-    }
-    }
-
-    protected void addAnchor(String id) throws DocumentException, FB2toPDFException {
-    Anchor anchor = currentStyle.createInvisibleAnchor();
-    anchor.setName(id);
-    doc.add(anchor);
-    System.out.println("Adding A NAME=" + id);
-    }
-     */
     private void addInvisibleAnchor(Element child) throws FB2toPDFException, DocumentException {
         String id = child.getAttribute("id");
         if (id.length() > 0) {
@@ -216,12 +201,6 @@ public class FB2toPDF {
     }
 
     protected void addInvisibleAnchor(String name) {
-        /*
-        Anchor anchor = currentStyle.createInvisibleAnchor();
-        anchor.setName(name);
-        currentParagraph.add(anchor);
-        System.out.println("Adding A NAME=" + name);
-         */
         anchorStack.push(name);
     }
 
@@ -1560,11 +1539,11 @@ public class FB2toPDF {
                     currentAnchorName = refname + "_backlink";
                 } else {
                     anchor.setReference(currentReference);
-                    System.out.println("Adding A HREF=" + currentReference);
+                    System.out.println("Adding A Link " + currentReference);
                 }
                 if (currentAnchorName != null) {
                     anchor.setName(currentAnchorName);
-                    System.out.println("Adding A NAME=" + currentAnchorName);
+                    System.out.println("Adding A Destination " + currentAnchorName);
                 }
                 anchor.add(currentChunk);
                 currentParagraph.add(anchor);
@@ -1574,6 +1553,7 @@ public class FB2toPDF {
                     anchor.add(currentChunk);
                     anchor.setName(currentAnchorName);
                     currentParagraph.add(anchor);
+                    System.out.println("Adding A Destination " + currentAnchorName);
                     if (pageNumTemplates.containsKey("#" + currentAnchorName)) {
                         FillPageNumTemplate("#" + currentAnchorName);
                     }
