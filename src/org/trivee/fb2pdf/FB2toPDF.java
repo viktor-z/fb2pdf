@@ -52,17 +52,16 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 
-public class FB2toPDF
-{
+public class FB2toPDF {
+
     public static String FB2PDF_HOME = ".";
 
-    static
-    {
+    static {
         String fb2pdf_home = System.getenv("FB2PDF_HOME");
-        if (fb2pdf_home != null)
+        if (fb2pdf_home != null) {
             FB2PDF_HOME = fb2pdf_home;
+        }
     }
-
     private static final String NS_XLINK = "http://www.w3.org/1999/xlink";
     private static final String[][] TRANSTABLE = {
         // верхний регистр
@@ -148,7 +147,6 @@ public class FB2toPDF
         {"\u0407", "YI"},
         {"\u0491", "g"},
         {"\u0490", "G"},};
-
     private String fromName;
     private String toName;
     private org.w3c.dom.Document fb2;
@@ -169,7 +167,6 @@ public class FB2toPDF
     private ParagraphStyle currentStyle;
     private Map<Integer, PdfOutline> currentOutline = new HashMap<Integer, PdfOutline>();
     private ArrayList<BinaryAttachment> attachments = new ArrayList<BinaryAttachment>();
-
 
     private FB2toPDF(String fromName, String toName) {
         this.fromName = fromName;
@@ -198,20 +195,19 @@ public class FB2toPDF
 
     /*
     private void addAnchor(Element element) throws FB2toPDFException, DocumentException {
-        String id = element.getAttribute("id");
-        if (id.length() > 0) {
-            addAnchor(id);
-        }
+    String id = element.getAttribute("id");
+    if (id.length() > 0) {
+    addAnchor(id);
+    }
     }
 
     protected void addAnchor(String id) throws DocumentException, FB2toPDFException {
-        Anchor anchor = currentStyle.createInvisibleAnchor();
-        anchor.setName(id);
-        doc.add(anchor);
-        System.out.println("Adding A NAME=" + id);
+    Anchor anchor = currentStyle.createInvisibleAnchor();
+    anchor.setName(id);
+    doc.add(anchor);
+    System.out.println("Adding A NAME=" + id);
     }
      */
-    
     private void addInvisibleAnchor(Element child) throws FB2toPDFException, DocumentException {
         String id = child.getAttribute("id");
         if (id.length() > 0) {
@@ -323,30 +319,33 @@ public class FB2toPDF
         byte[] noteDoc = FootnoteRenderer.renderNoteDoc(stylesheet, body);
         List<Image> noteLineImages = getLinesImages(noteDoc);
         System.out.printf("Footnote has %d lines\n", noteLineImages.size());
-        for (Image image: noteLineImages){
+        for (Image image : noteLineImages) {
             doc.add(image);
         }
     }
 
     /*
     private void appendLF() throws FB2toPDFException, DocumentException {
-        flushCurrentChunk();
-        currentChunk = currentStyle.createChunk();
-        currentChunk.append("\n");
-        flushCurrentChunk();
+    flushCurrentChunk();
+    currentChunk = currentStyle.createChunk();
+    currentChunk.append("\n");
+    flushCurrentChunk();
     }
      */
-
     private String getNoteBody(String refname) {
-        if (StringUtils.isBlank(refname)) return "";
+        if (StringUtils.isBlank(refname)) {
+            return "";
+        }
         Element noteBody = getNotesBody();
-        if (noteBody == null) return "";
+        if (noteBody == null) {
+            return "";
+        }
 
         NodeList sections = noteBody.getElementsByTagName("section");
-        for (int i=0; i<sections.getLength(); i++){
-            Element section = (Element)sections.item(i);
+        for (int i = 0; i < sections.getLength(); i++) {
+            Element section = (Element) sections.item(i);
             String id = section.getAttribute("id");
-            if (refname.equals(id)){
+            if (refname.equals(id)) {
                 String text = section.getTextContent();
                 text = text.replaceAll("\n", " ").replaceAll("  ", " ").trim();
                 return text;
@@ -372,7 +371,7 @@ public class FB2toPDF
         try {
             PdfReader reader = new PdfReader(noteDoc);
 
-            for (int i=2; i<reader.getNumberOfPages(); i++){
+            for (int i = 2; i < reader.getNumberOfPages(); i++) {
                 PdfImportedPage page = writer.getImportedPage(reader, i);
                 Image image = FootnoteLineImage.getInstance(page);
                 image.setSpacingBefore(0);
@@ -388,13 +387,15 @@ public class FB2toPDF
     }
 
     private ParagraphStyle getStyleForElement(Element element) {
-        
+
         ParagraphStyle result = currentStyle;
-        
+
         String elementStyleAttr = element.getAttribute("fb2pdf-style");
-        
-        if (isNullOrEmpty(elementStyleAttr)) return result;
-        
+
+        if (isNullOrEmpty(elementStyleAttr)) {
+            return result;
+        }
+
         try {
             result = stylesheet.getParagraphStyle(elementStyleAttr);
         } catch (FB2toPDFException ex) {
@@ -417,7 +418,9 @@ public class FB2toPDF
             for (int j = 0; j < cols.getLength(); j++) {
 
                 String nodeName = cols.item(j).getNodeName();
-                if (!nodeName.equals("th") && !nodeName.equals("td")) continue;
+                if (!nodeName.equals("th") && !nodeName.equals("td")) {
+                    continue;
+                }
 
                 if (nodeName.equalsIgnoreCase("td")) {
                     currentStyle = stylesheet.getParagraphStyle("tableTD");
@@ -425,9 +428,11 @@ public class FB2toPDF
                 if (nodeName.equalsIgnoreCase("th")) {
                     currentStyle = stylesheet.getParagraphStyle("tableTH");
                 }
-                Element cellElement = (Element)cols.item(j);
+                Element cellElement = (Element) cols.item(j);
                 currentParagraph = currentStyle.createParagraph();
-                if (i==0 && j==0) addInvisibleAnchor(table);
+                if (i == 0 && j == 0) {
+                    addInvisibleAnchor(table);
+                }
                 processParagraphContent(cellElement);
                 flushCurrentChunk();
 
@@ -457,14 +462,16 @@ public class FB2toPDF
 
     private int setTableCellAttributes(Element cellElement, PdfPCell cell) throws NumberFormatException {
 
-        Map<String, Integer> hAlignMap = new HashMap<String, Integer> () {
+        Map<String, Integer> hAlignMap = new HashMap<String, Integer>() {
+
             {
                 put("center", PdfPCell.ALIGN_CENTER);
                 put("left", PdfPCell.ALIGN_LEFT);
                 put("right", PdfPCell.ALIGN_RIGHT);
             }
         };
-        Map<String, Integer> vAlignMap = new HashMap<String, Integer> () {
+        Map<String, Integer> vAlignMap = new HashMap<String, Integer>() {
+
             {
                 put("middle", PdfPCell.ALIGN_MIDDLE);
                 put("top", PdfPCell.ALIGN_TOP);
@@ -682,7 +689,7 @@ public class FB2toPDF
 
         try {
             is = Transformation.transform(is, stylesheet.getTransformationSettings());
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             System.err.println(ex);
             System.exit(-1);
         }
@@ -1063,8 +1070,8 @@ public class FB2toPDF
 
         if (documentInfo != null) {
             addLine(
-                "UUID: " + getTextContentByTagName(documentInfo, "id"),
-                frontMatter);
+                    "UUID: " + getTextContentByTagName(documentInfo, "id"),
+                    frontMatter);
         }
 
         addLine("PDF: org.trivee.fb2pdf.FB2toPDF 1.0, "
@@ -1167,11 +1174,13 @@ public class FB2toPDF
     }
 
     private void addBookmark(String title, int level) {
-        if (!currentOutline.containsKey(level)) return;
+        if (!currentOutline.containsKey(level)) {
+            return;
+        }
         System.out.println("Adding bookmark: " + transliterate(title));
         PdfDestination destination = new PdfDestination(PdfDestination.FITH);
         PdfOutline bookmark = new PdfOutline(currentOutline.get(level), destination, transliterate(title));
-        currentOutline.put(level+1, bookmark);
+        currentOutline.put(level + 1, bookmark);
     }
 
     private void processSection(org.w3c.dom.Element section, int level, int index)
@@ -1565,8 +1574,8 @@ public class FB2toPDF
                     anchor.add(currentChunk);
                     anchor.setName(currentAnchorName);
                     currentParagraph.add(anchor);
-                    if (pageNumTemplates.containsKey("#"+currentAnchorName)) {
-                        FillPageNumTemplate("#"+currentAnchorName);
+                    if (pageNumTemplates.containsKey("#" + currentAnchorName)) {
+                        FillPageNumTemplate("#" + currentAnchorName);
                     }
                 } else {
                     currentParagraph.add(currentChunk);
@@ -1622,8 +1631,8 @@ public class FB2toPDF
                     }
                     processParagraphContent(child);
                     flushCurrentChunk();
-                    if (stylesheet.getGeneralSettings().enableLinkPageNum &&
-                            currentReference.startsWith("#")) {
+                    if (stylesheet.getGeneralSettings().enableLinkPageNum
+                            && currentReference.startsWith("#")) {
                         addPageNumTemplate();
                     }
                     //if ("note".equals(child.getAttribute("type"))) {
