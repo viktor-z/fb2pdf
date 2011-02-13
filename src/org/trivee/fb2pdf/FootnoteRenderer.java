@@ -5,9 +5,11 @@
 package org.trivee.fb2pdf;
 
 import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfDocument;
@@ -21,7 +23,7 @@ import java.io.ByteArrayOutputStream;
  */
 public class FootnoteRenderer {
 
-    public static byte[] renderNoteDoc(Stylesheet stylesheet, String body) throws FB2toPDFException, DocumentException {
+    public static byte[] renderNoteDoc(Stylesheet stylesheet, String body, HyphenationAuto hyphenation) throws FB2toPDFException, DocumentException {
         final PageStyle pageStyle = stylesheet.getPageStyle();
         final ParagraphStyle noteStyle = stylesheet.getParagraphStyle("footnote");
         float w = pageStyle.getPageWidth() - pageStyle.getMarginLeft() - pageStyle.getMarginRight();
@@ -41,7 +43,10 @@ public class FootnoteRenderer {
         writer.setPageEvent(new PageEvents());
         doc.open();
         Paragraph p = noteStyle.createParagraph();
-        p.add(body);
+        Chunk chunk = noteStyle.createChunk();
+        chunk.setHyphenation(hyphenation);
+        chunk.append(body);
+        p.add(chunk);
         doc.add(p);
         doc.close();
         return output.toByteArray();

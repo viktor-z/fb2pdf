@@ -2405,16 +2405,11 @@ public class PdfDocument extends Document {
             }
             //pageEmpty = false;
 
-            float lowerleft = indentTop() - currentHeight - image.getScaledHeight();
+            float lowerleft = indentTop() - currentHeight - image.getScaledHeight() - leading / 2;
             float mt[] = image.matrix();
-            float startPosition = indentLeft() - mt[4];
-            startPosition = indentLeft() + (indentRight() - indentLeft() - image.getScaledWidth()) / 2 - mt[4];
-            startPosition += image.getIndentationLeft() - image.getIndentationRight();
+            float startPosition = marginLeft; 
             graphics.addImage(image, mt[0], mt[1], mt[2], mt[3], startPosition, lowerleft - mt[5]);
-
             currentHeight += image.getScaledHeight();
-            //flushLines();
-            //text.moveText(0, - image.getScaledHeight());
         }
     }
 

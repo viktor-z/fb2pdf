@@ -316,7 +316,7 @@ public class FB2toPDF {
         refname = refname.substring(1);
         System.out.println("Adding footnote " + refname);
         String body = getNoteBody(refname);
-        byte[] noteDoc = FootnoteRenderer.renderNoteDoc(stylesheet, body);
+        byte[] noteDoc = FootnoteRenderer.renderNoteDoc(stylesheet, body, hyphenation);
         List<Image> noteLineImages = getLinesImages(noteDoc);
         System.out.printf("Footnote has %d lines\n", noteLineImages.size());
         for (Image image : noteLineImages) {

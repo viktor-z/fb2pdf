@@ -97,6 +97,7 @@
 
         enforcePageSize: "false",
         pageSizeEnforcerColor: "0x7F7F7F",
+        footnotes:      "false",
         preventWidows:	"true"
     },
     hyphenationSettings: {
@@ -464,11 +465,11 @@
         {
             name:             "footnote",
             baseStyle:        "default",
-            fontFamily:       "serif",
-            fontSize:         "8pt",
-            alignment:        "left",
+            fontFamily:       "sansSerif",
+            fontSize:         "6pt",
+            alignment:        "justified",
             firstLineIndent:  "0em",
-            leading:          "1.0em",
+            leading:          "6pt",
             firstFirstLineIndent:  "0em",
             dropcapStyle:	  "",	
             firstSpacingBefore:   "0em",
