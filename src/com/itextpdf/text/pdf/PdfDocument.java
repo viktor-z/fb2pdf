@@ -76,6 +76,8 @@ import com.itextpdf.text.pdf.collection.PdfCollection;
 import com.itextpdf.text.pdf.draw.DrawInterface;
 import com.itextpdf.text.pdf.internal.PdfAnnotationsImp;
 import com.itextpdf.text.pdf.internal.PdfViewerPreferencesImp;
+import java.util.Deque;
+import java.util.LinkedList;
 
 /**
  * <CODE>PdfDocument</CODE> is the class that is used by <CODE>PdfWriter</CODE>
@@ -1129,13 +1131,27 @@ public class PdfDocument extends Document {
      * If the current line is not empty or null, it is added to the arraylist
      * of lines and a new empty line is added.
      */
-    protected void carriageReturn() {
+    protected void carriageReturn() throws DocumentException {
         // the arraylist with lines may not be null
         if (lines == null) {
             lines = new ArrayList<PdfLine>();
         }
         // If the current line is not null or empty
         if (line != null && line.size() > 0) {
+
+            if (footnoteImages.size() > 0) {                                                    //+++ VIKTORZ
+                int footnotesNum = Math.min(footnoteImages.size(), 5);                          //+++ VIKTORZ
+                FootnoteLineImage footNoteLine = footnoteImages.getFirst();                     //+++ VIKTORZ
+                float footnoteLineH = footNoteLine.getHeight();                                 //+++ VIKTORZ
+                float spaceLeftOnPage = indentTop() - indentBottom() - currentHeight;           //+++ VIKTORZ
+                float allFootnotesH = footnoteLineH * footnotesNum;                             //+++ VIKTORZ
+                if (spaceLeftOnPage >= footnoteLineH                                            //+++ VIKTORZ
+                        && spaceLeftOnPage < allFootnotesH + line.height() + leading / 2 ) {    //+++ VIKTORZ
+                    flushFootnotes();                                                           //+++ VIKTORZ
+                }                                                                               //+++ VIKTORZ
+            }                                                                                   //+++ VIKTORZ
+
+
             // we check if the end of the page is reached (bugfix by Francois Gravel)
             //if (currentHeight + line.height() + leading > indentTop() - indentBottom()) {   //--- VIKTORZ
             if (currentHeight + line.height() + leading / 2 > indentTop() - indentBottom()) { //+++ VIKTORZ
@@ -1687,7 +1703,7 @@ public class PdfDocument extends Document {
      * Adds extra space.
      * This method should probably be rewritten.
      */
-    protected void addSpacing(float extraspace, float oldleading, Font f) {
+    protected void addSpacing(float extraspace, float oldleading, Font f) throws DocumentException { //+++ VIKTORZ
     	if (extraspace == 0) return;
     	if (pageEmpty) return;
     	if (currentHeight + line.height() + leading > indentTop() - indentBottom()) return;
@@ -2290,7 +2306,7 @@ public class PdfDocument extends Document {
 	/**
 	 * Method added by Pelikan Stephan
 	 */
-	public void clearTextWrap() {
+	public void clearTextWrap() throws DocumentException {
 		float tmpHeight = imageEnd - currentHeight;
 		if (line != null) {
 			tmpHeight += line.height();
@@ -2376,8 +2392,35 @@ public class PdfDocument extends Document {
         }
     }
 
-    protected void add(FootnoteLineImage image) throws PdfException, DocumentException {
+    private Deque<FootnoteLineImage> footnoteImages = new LinkedList<FootnoteLineImage>();//+++ VIKTORZ
 
+    protected void flushFootnotes() throws DocumentException { //+++ VIKTORZ
+        while (!footnoteImages.isEmpty()) {
+            FootnoteLineImage image = footnoteImages.poll();
+            // if there isn't enough room for the image on this page, save it for the next page
+            if (currentHeight != 0 && indentTop() - currentHeight - image.getScaledHeight() < indentBottom()) {
+                footnoteImages.push(image);
+                newPage();
+                return;
+            }
+            //pageEmpty = false;
+
+            float lowerleft = indentTop() - currentHeight - image.getScaledHeight();
+            float mt[] = image.matrix();
+            float startPosition = indentLeft() - mt[4];
+            startPosition = indentLeft() + (indentRight() - indentLeft() - image.getScaledWidth()) / 2 - mt[4];
+            startPosition += image.getIndentationLeft() - image.getIndentationRight();
+            graphics.addImage(image, mt[0], mt[1], mt[2], mt[3], startPosition, lowerleft - mt[5]);
+
+            currentHeight += image.getScaledHeight();
+            //flushLines();
+            //text.moveText(0, - image.getScaledHeight());
+        }
+    }
+
+    protected void add(FootnoteLineImage image) throws PdfException, DocumentException {
+        footnoteImages.add(image);
+        /*
         // if there isn't enough room for the image on this page, save it for the next page
         if (currentHeight != 0 && indentTop() - currentHeight - image.getScaledHeight() < indentBottom()) {
             if (!strictImageSequence && imageWait == null) {
@@ -2410,6 +2453,7 @@ public class PdfDocument extends Document {
         currentHeight += image.getScaledHeight();
         flushLines();
         text.moveText(0, - image.getScaledHeight());
+         */
     }
 
 
