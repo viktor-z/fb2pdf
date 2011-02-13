@@ -10,6 +10,7 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfDocument;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
 import java.io.ByteArrayOutputStream;
@@ -33,6 +34,7 @@ public class FootnoteRenderer {
         Rectangle pageSize = new Rectangle(w, h);
         pageSize.setBackgroundColor(BaseColor.LIGHT_GRAY);
         Document doc = new Document(pageSize, pageStyle.getMarginLeft(), pageStyle.getMarginRight(), pageStyle.getMarginTop(), pageStyle.getMarginBottom());
+        PdfDocument.preventWidows = false;
         PdfWriter writer = null;
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         writer = PdfWriter.getInstance(doc, output);

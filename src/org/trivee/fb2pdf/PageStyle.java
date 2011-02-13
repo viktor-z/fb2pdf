@@ -16,6 +16,7 @@ public class PageStyle
     public boolean enforcePageSize;
     public String pageSizeEnforcerColor;
     public boolean preventWidows = true;
+    public boolean footnotes = false;
 
     public String backgroundColor = "0xFFFFFF";
 

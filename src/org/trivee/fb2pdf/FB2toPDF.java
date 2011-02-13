@@ -173,6 +173,12 @@ public class FB2toPDF {
         this.toName = toName;
     }
 
+    private void addFootnote(Element child) throws DocumentException, FB2toPDFException {
+        if (stylesheet.getPageStyle().footnotes && "note".equals(child.getAttribute("type"))) {
+            addFootnote(currentReference);
+        }
+    }
+
     private void fillPageNumTemplate(String referenceName) throws FB2toPDFException {
         String pageNumFormat = stylesheet.getGeneralSettings().linkPageNumFormat;
         for (LinkPageNumTemplate lpnt : linkPageNumTemplates.get(referenceName)) {
@@ -365,7 +371,7 @@ public class FB2toPDF {
         try {
             PdfReader reader = new PdfReader(noteDoc);
 
-            for (int i = 2; i < reader.getNumberOfPages(); i++) {
+            for (int i = 2; i <= reader.getNumberOfPages(); i++) {
                 PdfImportedPage page = writer.getImportedPage(reader, i);
                 Image image = FootnoteLineImage.getInstance(page);
                 image.setSpacingBefore(0);
@@ -817,7 +823,12 @@ public class FB2toPDF {
 
 
         extractBinaries(root);
-        // findEnclosures(fb, outdir, outname)
+
+        bodies = ElementCollection.childrenByTagName(root, "body");
+        if (bodies.getLength() == 0) {
+            throw new FB2toPDFException("Element not found: FictionBook/body");
+        }
+
 
         org.w3c.dom.Element description = getOptionalChildByTagName(root, "description");
         if (description != null) {
@@ -831,11 +842,6 @@ public class FB2toPDF {
         }
         currentOutline.put(0, writer.getDirectContent().getRootOutline());
 
-
-        bodies = ElementCollection.childrenByTagName(root, "body");
-        if (bodies.getLength() == 0) {
-            throw new FB2toPDFException("Element not found: FictionBook/body");
-        }
 
         org.w3c.dom.Element body = bodies.item(0);
         if (stylesheet.getGeneralSettings().generateTOC) {
@@ -1633,9 +1639,7 @@ public class FB2toPDF {
                     processParagraphContent(child);
                     flushCurrentChunk();
                     addPageNumTemplate();
-                    //if ("note".equals(child.getAttribute("type"))) {
-                    //    addFootnote(currentReference);
-                    //}
+                    addFootnote(child);
                     currentReference = null;
                 } else if (child.getTagName().equals("style")) {
                     String styleName = child.getAttribute("name");
