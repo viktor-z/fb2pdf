@@ -497,7 +497,7 @@ public class PdfDocument extends Document {
                     // we adjust the parameters of the document
                     alignment = paragraph.getAlignment();
                     leading = paragraph.getTotalLeading();
-                    carriageReturn(false);
+                    carriageReturn();
 
                     // we don't want to make orphans/widows
                     //if (currentHeight + line.height() + leading > indentTop() - indentBottom()) { //VIKTORZ --
@@ -506,7 +506,7 @@ public class PdfDocument extends Document {
                     }
                     indentation.indentLeft += paragraph.getIndentationLeft();
                     indentation.indentRight += paragraph.getIndentationRight();
-                    carriageReturn(false);
+                    carriageReturn();
 
                     PdfPageEvent pageEvent = writer.getPageEvent();
                     if (pageEvent != null && !isSectionTitle)
@@ -531,7 +531,7 @@ public class PdfDocument extends Document {
                     else {
                     	line.setExtraIndent(paragraph.getFirstLineIndent());
                     	element.process(this);
-                        carriageReturn(false);
+                        carriageReturn();
                         addSpacing(paragraph.getSpacingAfter(), paragraph.getTotalLeading(), paragraph.getFont());
                     }
 
@@ -541,7 +541,7 @@ public class PdfDocument extends Document {
                     alignment = Element.ALIGN_LEFT;
                     indentation.indentLeft -= paragraph.getIndentationLeft();
                     indentation.indentRight -= paragraph.getIndentationRight();
-                    carriageReturn(false);
+                    carriageReturn();
                     leadingCount--;
                     break;
                 }
@@ -1130,10 +1130,6 @@ public class PdfDocument extends Document {
      * of lines and a new empty line is added.
      */
     protected void carriageReturn() {
-        carriageReturn(true);
-    }
-
-    protected void carriageReturn(boolean preventWidows) {
         // the arraylist with lines may not be null
         if (lines == null) {
             lines = new ArrayList<PdfLine>();
@@ -1141,8 +1137,8 @@ public class PdfDocument extends Document {
         // If the current line is not null or empty
         if (line != null && line.size() > 0) {
             // we check if the end of the page is reached (bugfix by Francois Gravel)
-            float h = preventWidows ? currentHeight + line.height() : currentHeight; //+++ VIKTORZ
-			if (h + leading > indentTop() - indentBottom()) {
+            //if (currentHeight + line.height() + leading > indentTop() - indentBottom()) {   //--- VIKTORZ
+            if (currentHeight + line.height() + leading / 2 > indentTop() - indentBottom()) { //+++ VIKTORZ
             	// if the end of the line is reached, we start a newPage which will flush existing lines
             	// then move to next page but before then we need to exclude the current one that does not fit
             	// After the new page we add the current line back in
