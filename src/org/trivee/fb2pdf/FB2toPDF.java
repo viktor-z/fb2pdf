@@ -1553,7 +1553,6 @@ public class FB2toPDF {
             String currentAnchorName = anchorStack.isEmpty() ? null : anchorStack.pop();
             if (!isNullOrEmpty(currentReference)) {
                 Anchor anchor = currentStyle.createAnchor();
-                anchor.add(currentChunk);
                 if (currentReference.charAt(0) == '#') {
                     //Unlike Anchor, Action won't fail even when local destination does not exist
                     String refname = currentReference.substring(1); //getting rid of "#" at the begin of the reference
@@ -1567,6 +1566,7 @@ public class FB2toPDF {
                     anchor.setName(currentAnchorName);
                     System.out.println("Adding A NAME=" + currentAnchorName);
                 }
+                anchor.add(currentChunk);
                 currentParagraph.add(anchor);
             } else {
                 if (currentAnchorName != null) {
