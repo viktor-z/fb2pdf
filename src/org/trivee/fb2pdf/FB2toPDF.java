@@ -173,13 +173,14 @@ public class FB2toPDF {
         this.toName = toName;
     }
 
-    private void FillPageNumTemplate(String referenceName) throws FB2toPDFException {
+    private void fillPageNumTemplate(String referenceName) throws FB2toPDFException {
+        String pageNumFormat = stylesheet.getGeneralSettings().linkPageNumFormat;
         for (LinkPageNumTemplate lpnt : linkPageNumTemplates.get(referenceName)) {
             PdfTemplate tp = lpnt.template;
             ParagraphStyle tpStyle = lpnt.style;
             BaseFont tpBaseFont = tpStyle.getBaseFont();
             float tpSize = tpStyle.getFontSize().getPoints();
-            String pageNum = String.format("[%04d]", linkPageNumbers.get(referenceName));
+            String pageNum = String.format(pageNumFormat, linkPageNumbers.get(referenceName));
             float tpHight = tpBaseFont.getFontDescriptor(BaseFont.CAPHEIGHT, tpSize) + tpBaseFont.getAscentPoint(pageNum, tpSize);
             float tpWidth = tpBaseFont.getWidthPointKerned(pageNum, tpSize);
             tp.setBoundingBox(new Rectangle(0, tpBaseFont.getDescentPoint(pageNum, tpSize), tpWidth, tpHight));
@@ -244,12 +245,12 @@ public class FB2toPDF {
     }
 
     private void addPageNumTemplate() throws BadElementException, FB2toPDFException {
-        if (!stylesheet.getGeneralSettings().enableLinkPageNum
-                || !currentReference.startsWith("#")) {
+        GeneralSettings settings = stylesheet.getGeneralSettings();
+        if (!settings.enableLinkPageNum || !currentReference.startsWith("#")) {
             return;
         }
 
-        String text = "[0000]";
+        String text = String.format(settings.linkPageNumFormat, settings.linkPageNumMax);
         float tmpSize = currentStyle.getFontSize().getPoints();
         BaseFont tmpBasefont = currentStyle.getBaseFont();
         float templateHight = tmpBasefont.getFontDescriptor(BaseFont.CAPHEIGHT, tmpSize);
@@ -720,7 +721,7 @@ public class FB2toPDF {
 
         for (String destination : linkPageNumbers.keySet()) {
             if (linkPageNumTemplates.containsKey(destination)) {
-                FillPageNumTemplate(destination);
+                fillPageNumTemplate(destination);
             }
         }
 

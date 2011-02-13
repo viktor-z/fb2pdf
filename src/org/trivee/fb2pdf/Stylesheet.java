@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import com.itextpdf.text.DocumentException;
 
 import com.google.gson.*;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -84,13 +85,14 @@ public class Stylesheet
     public static Stylesheet readStylesheet(String filename)
         throws DocumentException, IOException, FB2toPDFException
     {
-        return readStylesheet(new FileReader(filename));
+        FileInputStream fis = new FileInputStream(filename);
+        return readStylesheet(new InputStreamReader(fis, "UTF-8"));
     }
 
     public static Stylesheet readStylesheet(InputStream stream)
         throws DocumentException, IOException, FB2toPDFException
     {
-        return readStylesheet(new InputStreamReader(stream));
+        return readStylesheet(new InputStreamReader(stream, "UTF-8"));
     }
 
     public static Stylesheet readStylesheet(Reader reader)

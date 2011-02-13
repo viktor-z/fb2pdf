@@ -24,6 +24,8 @@ public class GeneralSettings {
     public boolean strictImageSequence;
     public String hangingPunctuation = ".,;:'-";
     public boolean enableLinkPageNum;
+    public String linkPageNumFormat = "[%04d]";
+    public int linkPageNumMax = 9999;
 
     public GeneralSettings()
     {

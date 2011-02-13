@@ -15,6 +15,8 @@
         ignoreEmptyLineAfterImage: "true",
         strictImageSequence:	"false",
         enableLinkPageNum:      "false",
+        linkPageNumFormat:  "[%04d]",
+        linkPageNumMax:     9999,
         hangingPunctuation: ".,;:'-"
     },
     fontFamilies: [
