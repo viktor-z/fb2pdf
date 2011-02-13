@@ -162,8 +162,8 @@ public class FB2toPDF {
     private HyphenationAuto hyphenation;
     private Stylesheet stylesheet;
     private Stack<String> anchorStack = new Stack<String>();
-    private Map<String, PdfTemplate> pageNumTemplates = new HashMap<String, PdfTemplate>();
-    private Map<String, ParagraphStyle> pageNumStyles = new HashMap<String, ParagraphStyle>();
+    private Map<String, Integer> linkPageNumbers = new HashMap<String, Integer>();
+    private LinkPageNumTemplateMap linkPageNumTemplates = new LinkPageNumTemplateMap();
     private ParagraphStyle currentStyle;
     private Map<Integer, PdfOutline> currentOutline = new HashMap<Integer, PdfOutline>();
     private ArrayList<BinaryAttachment> attachments = new ArrayList<BinaryAttachment>();
@@ -174,23 +174,25 @@ public class FB2toPDF {
     }
 
     private void FillPageNumTemplate(String referenceName) throws FB2toPDFException {
-        PdfTemplate tp = pageNumTemplates.get(referenceName);
-        ParagraphStyle tpStyle = pageNumStyles.get(referenceName);
-        BaseFont tpBaseFont = tpStyle.getBaseFont();
-        float tpSize = tpStyle.getFontSize().getPoints();
-        String pageNum = String.format("[%04d]", writer.getPageNumber());
-        float tpHight = tpBaseFont.getFontDescriptor(BaseFont.CAPHEIGHT, tpSize) + tpBaseFont.getAscentPoint(pageNum, tpSize);
-        float tpWidth = tpBaseFont.getWidthPointKerned(pageNum, tpSize);
-        tp.setBoundingBox(new Rectangle(0, tpBaseFont.getDescentPoint(pageNum, tpSize), tpWidth, tpHight));
-        //tp.saveState();
-        //tp.setColorFill(BaseColor.RED);
-        //tp.rectangle(0, 0, 200, 200);
-        //tp.fillStroke();
-        //tp.restoreState();
-        tp.beginText();
-        tp.setFontAndSize(tpStyle.getBaseFont(), tpSize);
-        tp.showText(pageNum);
-        tp.endText();
+        for (LinkPageNumTemplate lpnt : linkPageNumTemplates.get(referenceName)) {
+            PdfTemplate tp = lpnt.template;
+            ParagraphStyle tpStyle = lpnt.style;
+            BaseFont tpBaseFont = tpStyle.getBaseFont();
+            float tpSize = tpStyle.getFontSize().getPoints();
+            String pageNum = String.format("[%04d]", linkPageNumbers.get(referenceName));
+            float tpHight = tpBaseFont.getFontDescriptor(BaseFont.CAPHEIGHT, tpSize) + tpBaseFont.getAscentPoint(pageNum, tpSize);
+            float tpWidth = tpBaseFont.getWidthPointKerned(pageNum, tpSize);
+            tp.setBoundingBox(new Rectangle(0, tpBaseFont.getDescentPoint(pageNum, tpSize), tpWidth, tpHight));
+            //tp.saveState();
+            //tp.setColorFill(BaseColor.RED);
+            //tp.rectangle(0, 0, 200, 200);
+            //tp.fillStroke();
+            //tp.restoreState();
+            tp.beginText();
+            tp.setFontAndSize(tpStyle.getBaseFont(), tpSize);
+            tp.showText(pageNum);
+            tp.endText();
+        }
     }
 
     private void addInvisibleAnchor(Element child) throws FB2toPDFException, DocumentException {
@@ -233,7 +235,20 @@ public class FB2toPDF {
         doc.add(image);
     }
 
+    private void saveLinkPageNumber(String currentAnchorName) {
+        if (!stylesheet.getGeneralSettings().enableLinkPageNum) {
+            return;
+        }
+
+        linkPageNumbers.put("#" + currentAnchorName, writer.getPageNumber());
+    }
+
     private void addPageNumTemplate() throws BadElementException, FB2toPDFException {
+        if (!stylesheet.getGeneralSettings().enableLinkPageNum
+                || !currentReference.startsWith("#")) {
+            return;
+        }
+
         String text = "[0000]";
         float tmpSize = currentStyle.getFontSize().getPoints();
         BaseFont tmpBasefont = currentStyle.getBaseFont();
@@ -244,8 +259,7 @@ public class FB2toPDF {
         Chunk chunk = new Chunk(templateImage, 0, 0, false);
         chunk.setFont(currentStyle.getFont());
         currentParagraph.add(chunk);
-        pageNumTemplates.put(currentReference, template);
-        pageNumStyles.put(currentReference, currentStyle);
+        linkPageNumTemplates.put(currentReference, new LinkPageNumTemplate(template, currentStyle));
     }
 
     private float rescaleImage(Image image) {
@@ -702,7 +716,14 @@ public class FB2toPDF {
         doc.setMarginMirroring(pageStyle.getMarginMirroring());
     }
 
-    private void closePDF() {
+    private void closePDF() throws FB2toPDFException {
+
+        for (String destination : linkPageNumbers.keySet()) {
+            if (linkPageNumTemplates.containsKey(destination)) {
+                FillPageNumTemplate(destination);
+            }
+        }
+
         doc.close();
     }
 
@@ -1544,6 +1565,7 @@ public class FB2toPDF {
                 if (currentAnchorName != null) {
                     anchor.setName(currentAnchorName);
                     System.out.println("Adding A Destination " + currentAnchorName);
+                    saveLinkPageNumber(currentAnchorName);
                 }
                 anchor.add(currentChunk);
                 currentParagraph.add(anchor);
@@ -1554,9 +1576,7 @@ public class FB2toPDF {
                     anchor.setName(currentAnchorName);
                     currentParagraph.add(anchor);
                     System.out.println("Adding A Destination " + currentAnchorName);
-                    if (pageNumTemplates.containsKey("#" + currentAnchorName)) {
-                        FillPageNumTemplate("#" + currentAnchorName);
-                    }
+                    saveLinkPageNumber(currentAnchorName);
                 } else {
                     currentParagraph.add(currentChunk);
                 }
@@ -1611,10 +1631,7 @@ public class FB2toPDF {
                     }
                     processParagraphContent(child);
                     flushCurrentChunk();
-                    if (stylesheet.getGeneralSettings().enableLinkPageNum
-                            && currentReference.startsWith("#")) {
-                        addPageNumTemplate();
-                    }
+                    addPageNumTemplate();
                     //if ("note".equals(child.getAttribute("type"))) {
                     //    addFootnote(currentReference);
                     //}
