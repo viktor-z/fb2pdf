@@ -848,14 +848,12 @@ public class FB2toPDF
 
         private String href;
         private String contentType;
-        private byte[] data;
+        private Element binary;
 
         public BinaryAttachment(org.w3c.dom.Element binary) {
             this.href = "#" + binary.getAttribute("id");
             this.contentType = binary.getAttribute("content-type");
-            this.data = Base64.decodeBase64(binary.getTextContent().getBytes());
-
-            System.out.println("Loaded binary " + this.href + " (" + this.contentType + ")");
+            this.binary = binary;
         }
 
         public String getHREF() {
@@ -867,7 +865,8 @@ public class FB2toPDF
         }
 
         public byte[] getData() {
-            return data;
+            System.out.println("Loaded binary " + this.href + " (" + this.contentType + ")");
+            return Base64.decodeBase64(this.binary.getTextContent().getBytes());
         }
     };
 
