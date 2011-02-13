@@ -90,6 +90,9 @@
         	"0": 1.0,
         	"1": 0.5
         },
+
+        backgroundColor: "0xFFFFFF",
+
         enforcePageSize: "false",
         pageSizeEnforcerColor: "0x7F7F7F",
         preventWidows:	"true"
@@ -273,6 +276,7 @@
         {
             name:             "default",
             fontFamily:       "sansSerif",
+            color:            "0x000000",  
             fontSize:         "11.0pt"
         },
         {
@@ -372,6 +376,7 @@
         },
         {
             name:             "poem",
+            baseStyle:        "default",
             fontFamily:       "serif",
             fontSize:         "11.0pt",
             fontStyle:        "italic",
@@ -395,6 +400,7 @@
         },
         {
             name:             "epigraph",
+            baseStyle:        "default",
             fontFamily:       "serif",
             fontSize:         "11.0pt",
             fontStyle:        "italic",
@@ -421,6 +427,7 @@
         },
         {
             name:             "body",
+            baseStyle:        "default",
             fontFamily:       "serif",
             fontSize:         "10.5pt",
             alignment:        "justified",
@@ -454,6 +461,7 @@
         },
         {
             name:             "footnote",
+            baseStyle:        "default",
             fontFamily:       "serif",
             fontSize:         "8pt",
             alignment:        "left",
@@ -468,8 +476,8 @@
         },
        	{
        		name:			"bodyDropCap",
+            baseStyle:      "default",
             enabled: 	    "true",
-            color:          "0x000000",
        		fontFamily:		"serif",
        		fontSize:		"26.0pt",
        		fontStyle:		"regular",
@@ -478,6 +486,7 @@
        	},
         {
             name:             "bodySubtitle",
+            baseStyle:        "default",
             fontFamily:       "sansSerif",
             fontSize:         "13.0pt",
             fontStyle:        "bold",

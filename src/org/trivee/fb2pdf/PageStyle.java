@@ -17,6 +17,8 @@ public class PageStyle
     public String pageSizeEnforcerColor;
     public boolean preventWidows = true;
 
+    public String backgroundColor = "0xFFFFFF";
+
     public HashMap<Integer, Float> sectionNewPage = new HashMap<Integer, Float>();
 
     public PageStyle()

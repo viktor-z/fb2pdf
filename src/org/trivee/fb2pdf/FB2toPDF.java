@@ -17,6 +17,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.Anchor;
+import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
@@ -695,6 +696,7 @@ public class FB2toPDF
         final GeneralSettings generalSettings = stylesheet.getGeneralSettings();
 
         Rectangle pageSize = new Rectangle(pageStyle.getPageWidth(), pageStyle.getPageHeight());
+        pageSize.setBackgroundColor(new BaseColor(Color.decode(pageStyle.backgroundColor)));
 
         doc = new com.itextpdf.text.Document(pageSize,
                 pageStyle.getMarginLeft(), pageStyle.getMarginRight(),

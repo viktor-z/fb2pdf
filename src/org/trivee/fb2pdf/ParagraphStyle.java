@@ -134,7 +134,7 @@ public class ParagraphStyle {
     private Boolean disableHyphenation;
     private Boolean preserveWhitespaces;
     private String dropcapStyle;
-    private String color = "0x000000";
+    private String color;
     private String text;
 
     public ParagraphStyle() {
@@ -265,8 +265,21 @@ public class ParagraphStyle {
         return "";
     }
 
-    public BaseColor getColor() {
-        return new BaseColor(Color.decode(color));
+    private BaseColor getColor(String c) {
+        return new BaseColor(Color.decode(c));
+    }
+
+    public BaseColor getColor() throws FB2toPDFException {
+        if (color != null) {
+            return getColor(color);
+        }
+
+        ParagraphStyle base = getBaseStyle();
+        if (base != null) {
+            return base.getColor();
+        }
+
+        return getColor("0x000000");
     }
 
     public void toggleBold() {
