@@ -719,6 +719,7 @@ public class FB2toPDF {
         writer.setSpaceCharRatio(generalSettings.trackingSpaceCharRatio);
         writer.setStrictImageSequence(generalSettings.strictImageSequence);
         PdfDocument.preventWidows = pageStyle.preventWidows;
+        PdfDocument.maxFootnoteLines = pageStyle.footnotesMaxLines;
         PdfDocument.hangingPunctuation = generalSettings.hangingPunctuation;
         doc.setMarginMirroring(pageStyle.getMarginMirroring());
     }

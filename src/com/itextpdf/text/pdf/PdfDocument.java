@@ -693,11 +693,11 @@ public class PdfDocument extends Document {
                 case Element.IMGRAW:
                 case Element.IMGTEMPLATE: {
                     //carriageReturn(); suggestion by Marc Campforts
-                    if (element instanceof FootnoteLineImage) { //+++ VIKTORZ
-                        add((FootnoteLineImage) element);       //+++ VIKTORZ
-                    } else {                                    //+++ VIKTORZ
+                    if (element instanceof FootnoteLineImage) { //VIKTORZ ++
+                        add((FootnoteLineImage) element);       //VIKTORZ ++
+                    } else {                                    //VIKTORZ ++
                         add((Image) element);
-                    }                                           //+++ VIKTORZ
+                    }                                           //VIKTORZ ++
                     break;
                 }
                 case Element.YMARK: {
@@ -1139,22 +1139,22 @@ public class PdfDocument extends Document {
         // If the current line is not null or empty
         if (line != null && line.size() > 0) {
 
-            if (footnoteImages.size() > 0) {                                                    //+++ VIKTORZ
-                int footnotesNum = Math.min(footnoteImages.size(), 5);                          //+++ VIKTORZ
-                FootnoteLineImage footNoteLine = footnoteImages.getFirst();                     //+++ VIKTORZ
-                float footnoteLineH = footNoteLine.getHeight();                                 //+++ VIKTORZ
-                float spaceLeftOnPage = indentTop() - indentBottom() - currentHeight;           //+++ VIKTORZ
-                float allFootnotesH = footnoteLineH * footnotesNum;                             //+++ VIKTORZ
-                if (spaceLeftOnPage >= footnoteLineH                                            //+++ VIKTORZ
-                        && spaceLeftOnPage < allFootnotesH + line.height() + leading / 2 ) {    //+++ VIKTORZ
-                    flushFootnotes();                                                           //+++ VIKTORZ
-                }                                                                               //+++ VIKTORZ
-            }                                                                                   //+++ VIKTORZ
+            if (footnoteImages.size() > 0) {                                                    //VIKTORZ ++
+                int footnotesNum = Math.min(footnoteImages.size(), maxFootnoteLines);           //VIKTORZ ++
+                FootnoteLineImage footNoteLine = footnoteImages.getFirst();                     //VIKTORZ ++
+                float footnoteLineH = footNoteLine.getHeight();                                 //VIKTORZ ++
+                float spaceLeftOnPage = indentTop() - indentBottom() - currentHeight;           //VIKTORZ ++
+                float allFootnotesH = footnoteLineH * footnotesNum;                             //VIKTORZ ++
+                if (spaceLeftOnPage >= footnoteLineH                                            //VIKTORZ ++
+                        && spaceLeftOnPage < allFootnotesH + line.height() + leading / 2 ) {    //VIKTORZ ++
+                    flushFootnotes();                                                           //VIKTORZ ++
+                }                                                                               //VIKTORZ ++
+            }                                                                                   //VIKTORZ ++
 
 
             // we check if the end of the page is reached (bugfix by Francois Gravel)
-            //if (currentHeight + line.height() + leading > indentTop() - indentBottom()) {   //--- VIKTORZ
-            if (currentHeight + line.height() + leading / 2 > indentTop() - indentBottom()) { //+++ VIKTORZ
+            //if (currentHeight + line.height() + leading > indentTop() - indentBottom()) {   //VIKTORZ --
+            if (currentHeight + line.height() + leading / 2 > indentTop() - indentBottom()) { //VIKTORZ ++
             	// if the end of the line is reached, we start a newPage which will flush existing lines
             	// then move to next page but before then we need to exclude the current one that does not fit
             	// After the new page we add the current line back in
@@ -1264,6 +1264,7 @@ public class PdfDocument extends Document {
     //static final String hangingPunctuation = ".,;:'"; //VIKTORZ --
     public static String hangingPunctuation = ".,;:'-"; //VIKTORZ ++
     public static boolean preventWidows = true;         //VIKTORZ ++
+    public static int maxFootnoteLines = 5;             //VIKTORZ ++
 
     /**
      * Writes a text line to the document. It takes care of all the attributes.
@@ -1703,7 +1704,7 @@ public class PdfDocument extends Document {
      * Adds extra space.
      * This method should probably be rewritten.
      */
-    protected void addSpacing(float extraspace, float oldleading, Font f) throws DocumentException { //+++ VIKTORZ
+    protected void addSpacing(float extraspace, float oldleading, Font f) throws DocumentException { //VIKTORZ ++
     	if (extraspace == 0) return;
     	if (pageEmpty) return;
     	if (currentHeight + line.height() + leading > indentTop() - indentBottom()) return;
@@ -2392,10 +2393,10 @@ public class PdfDocument extends Document {
         }
     }
 
-    private Deque<FootnoteLineImage> footnoteImages = new LinkedList<FootnoteLineImage>();//+++ VIKTORZ
+    private Deque<FootnoteLineImage> footnoteImages = new LinkedList<FootnoteLineImage>();//VIKTORZ ++
 
-    protected void flushFootnotes() throws DocumentException { //+++ VIKTORZ
-        int footnotesNum = Math.min(footnoteImages.size(), 5);
+    protected void flushFootnotes() throws DocumentException { //VIKTORZ ++
+        int footnotesNum = Math.min(footnoteImages.size(), maxFootnoteLines);
         FootnoteLineImage footNoteLine = footnoteImages.getFirst();
         float footnoteLineH = footNoteLine.getHeight();
         float allFootnotesH = footnoteLineH * footnotesNum;                             
@@ -2407,7 +2408,8 @@ public class PdfDocument extends Document {
                 newPage();
                 return;
             }
-            //pageEmpty = false;
+
+            pageEmpty = false;
 
             float lowerleft = indentBottom() + footnoteLineH * (footnotesNum - i - 1);
             float mt[] = image.matrix();

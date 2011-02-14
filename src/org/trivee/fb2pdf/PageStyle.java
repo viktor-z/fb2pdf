@@ -17,6 +17,7 @@ public class PageStyle
     public String pageSizeEnforcerColor;
     public boolean preventWidows = true;
     public boolean footnotes = false;
+    public int footnotesMaxLines = 5;
 
     public String backgroundColor = "0xFFFFFF";
 
