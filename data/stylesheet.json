@@ -98,6 +98,7 @@
         enforcePageSize: "false",
         pageSizeEnforcerColor: "0x7F7F7F",
         footnotes:      "false",
+        footnotesMaxLines:      7,
         preventWidows:	"true"
     },
     hyphenationSettings: {
