@@ -35,7 +35,7 @@ public class FootnoteRenderer {
         float h = ascent - descent + noteStyle.getAbsoluteLeading() / 2;
         Rectangle pageSize = new Rectangle(w, h);
         pageSize.setBackgroundColor(BaseColor.LIGHT_GRAY);
-        Document doc = new Document(pageSize, pageStyle.getMarginLeft(), pageStyle.getMarginRight(), pageStyle.getMarginTop(), pageStyle.getMarginBottom());
+        Document doc = new Document(pageSize, pageStyle.getMarginLeft(), pageStyle.getMarginRight(), 0, 0);
         PdfDocument.preventWidows = false;
         PdfWriter writer = null;
         ByteArrayOutputStream output = new ByteArrayOutputStream();

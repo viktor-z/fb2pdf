@@ -371,7 +371,7 @@ public class FB2toPDF {
         try {
             PdfReader reader = new PdfReader(noteDoc);
 
-            for (int i = 2; i <= reader.getNumberOfPages(); i++) {
+            for (int i = 1; i <= reader.getNumberOfPages(); i++) {
                 PdfImportedPage page = writer.getImportedPage(reader, i);
                 Image image = FootnoteLineImage.getInstance(page);
                 image.setSpacingBefore(0);
