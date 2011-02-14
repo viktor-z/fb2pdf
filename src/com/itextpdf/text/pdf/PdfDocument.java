@@ -76,8 +76,11 @@ import com.itextpdf.text.pdf.collection.PdfCollection;
 import com.itextpdf.text.pdf.draw.DrawInterface;
 import com.itextpdf.text.pdf.internal.PdfAnnotationsImp;
 import com.itextpdf.text.pdf.internal.PdfViewerPreferencesImp;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 
 /**
  * <CODE>PdfDocument</CODE> is the class that is used by <CODE>PdfWriter</CODE>
@@ -1139,18 +1142,7 @@ public class PdfDocument extends Document {
         // If the current line is not null or empty
         if (line != null && line.size() > 0) {
 
-            if (footnoteImages.size() > 0) {                                                    //VIKTORZ ++
-                int footnotesNum = Math.min(footnoteImages.size(), maxFootnoteLines);           //VIKTORZ ++
-                FootnoteLineImage footNoteLine = footnoteImages.getFirst();                     //VIKTORZ ++
-                float footnoteLineH = footNoteLine.getHeight();                                 //VIKTORZ ++
-                float spaceLeftOnPage = indentTop() - indentBottom() - currentHeight;           //VIKTORZ ++
-                float allFootnotesH = footnoteLineH * footnotesNum;                             //VIKTORZ ++
-                if (spaceLeftOnPage >= footnoteLineH                                            //VIKTORZ ++
-                        && spaceLeftOnPage < allFootnotesH + line.height() + leading / 2 ) {    //VIKTORZ ++
-                    flushFootnotes();                                                           //VIKTORZ ++
-                }                                                                               //VIKTORZ ++
-            }                                                                                   //VIKTORZ ++
-
+            flushFootnotes(line); //VIKTORZ ++
 
             // we check if the end of the page is reached (bugfix by Francois Gravel)
             //if (currentHeight + line.height() + leading > indentTop() - indentBottom()) {   //VIKTORZ --
@@ -1174,6 +1166,63 @@ public class PdfDocument extends Document {
         }
         // a new current line is constructed
         line = new PdfLine(indentLeft(), indentRight(), alignment, leading);
+    }
+    
+    private void markFootnotes(String refname) {
+        for (FootnoteLineImage image : footnoteImages) {
+            if (image.refname.equals(refname)) {
+                image.ready = true;
+            }
+        }
+    }
+
+    private void markFootnotes(PdfLine line) throws DocumentException { //VIKTORZ ++
+        for (int i=0; i<line.size(); i++) {
+            PdfChunk chunk = line.getChunk(i);
+            String genericTag = (String) chunk.getAttribute(Chunk.GENERICTAG);
+            if (genericTag != null && genericTag.startsWith("FOOTNOTE:")) {
+                markFootnotes(genericTag.split(":")[1]);
+            }
+        }
+    }
+    
+    private Predicate predicateFootnoteLineImageReady = new Predicate() {
+
+            public boolean evaluate(Object o) {
+                return ((FootnoteLineImage)o).ready;
+            }
+        };
+
+    private void flushFootnotes(PdfLine line) throws DocumentException { //VIKTORZ ++
+
+        markFootnotes(line);
+
+        //boolean haveReadyFootnotes = false;
+        //for (FootnoteLineImage image : footnoteImages) {
+        //    if (image.ready) {
+        //        haveReadyFootnotes = true;
+        //        break;
+        //    }
+        //}
+
+        boolean haveReadyFootnotes = CollectionUtils.exists(footnoteImages, predicateFootnoteLineImageReady);
+
+        if (!haveReadyFootnotes) {
+            return;
+        }
+
+        int readyNum = countReadyFootnoteLineImages();
+
+        if (footnoteImages.size() > 0) {
+            int footnotesNum = Math.min(readyNum, maxFootnoteLines);
+            FootnoteLineImage footNoteLine = footnoteImages.getFirst(); 
+            float footnoteLineH = footNoteLine.getHeight(); 
+            float spaceLeftOnPage = indentTop() - indentBottom() - currentHeight; 
+            float allFootnotesH = footnoteLineH * footnotesNum; 
+            if (spaceLeftOnPage >= footnoteLineH && spaceLeftOnPage < allFootnotesH + line.height() + leading * 0.75f) {
+                flushFootnotes(); 
+            } 
+        } 
     }
 
     /**
@@ -2395,33 +2444,56 @@ public class PdfDocument extends Document {
 
     private Deque<FootnoteLineImage> footnoteImages = new LinkedList<FootnoteLineImage>();//VIKTORZ ++
 
+    private int countReadyFootnoteLineImages() {
+        return CollectionUtils.countMatches(footnoteImages, predicateFootnoteLineImageReady);
+    }
+
     protected void flushFootnotes() throws DocumentException { //VIKTORZ ++
-        int footnotesNum = Math.min(footnoteImages.size(), maxFootnoteLines);
+        int readyNum = countReadyFootnoteLineImages();
+        int maxReadyNum = Math.min(readyNum, maxFootnoteLines);
         FootnoteLineImage footNoteLine = footnoteImages.getFirst();
         float footnoteLineH = footNoteLine.getHeight();
+        
+        int footnotesNum = 0;
+        for (int i=1; i<=maxReadyNum; i++) {
+            if (currentHeight != 0 && indentTop() - currentHeight - footnoteLineH * (i+1) < indentBottom()) {
+                break;
+            }
+            footnotesNum++;
+        }
+
         float allFootnotesH = footnoteLineH * footnotesNum;
-        float upperleft = indentBottom() + footnoteLineH * footnotesNum;
+        float upperleft = indentBottom() + footnoteLineH * footnotesNum + leading * 0.25f;
         graphics.moveTo(marginLeft, upperleft);
         graphics.setLineWidth(0.5f);
         graphics.lineTo((getPageSize().getWidth() - marginRight) / 3, upperleft);
         graphics.stroke();
-        for (int i=0; i<footnotesNum; i++) {
-            FootnoteLineImage image = footnoteImages.poll();
+        graphics.setLineWidth(1);
+        currentHeight += leading * 0.25f;
+
+        Object[] readyImages = CollectionUtils.select(footnoteImages, predicateFootnoteLineImageReady).toArray();
+        for (int i=0; i<maxReadyNum; i++) {
+            FootnoteLineImage image = (FootnoteLineImage)readyImages[i];
             // if there isn't enough room for the image on this page, save it for the next page
             if (currentHeight != 0 && indentTop() - currentHeight - image.getScaledHeight() < indentBottom()) {
-                footnoteImages.push(image);
-                newPage();
+            	PdfLine overflowLine = line;
+            	line = null;
+            	newPage();
+            	line = overflowLine;
                 return;
             }
+
+            footnoteImages.remove(image);
 
             pageEmpty = false;
 
             float lowerleft = indentBottom() + footnoteLineH * (footnotesNum - i - 1);
             float mt[] = image.matrix();
-            float startPosition = marginLeft; 
+            float startPosition = marginLeft;
             graphics.addImage(image, mt[0], mt[1], mt[2], mt[3], startPosition, lowerleft - mt[5]);
             currentHeight += image.getScaledHeight();
         }
+
     }
 
     protected void add(FootnoteLineImage image) throws PdfException, DocumentException {

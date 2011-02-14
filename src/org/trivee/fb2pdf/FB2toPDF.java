@@ -317,7 +317,7 @@ public class FB2toPDF {
         System.out.println("Adding footnote " + refname);
         String body = getNoteBody(refname);
         byte[] noteDoc = FootnoteRenderer.renderNoteDoc(stylesheet, body, hyphenation);
-        List<Image> noteLineImages = getLinesImages(noteDoc);
+        List<Image> noteLineImages = getLinesImages(noteDoc, refname);
         System.out.printf("Footnote has %d lines\n", noteLineImages.size());
         for (Image image : noteLineImages) {
             doc.add(image);
@@ -366,14 +366,14 @@ public class FB2toPDF {
         return null;
     }
 
-    private List<Image> getLinesImages(byte[] noteDoc) {
+    private List<Image> getLinesImages(byte[] noteDoc, String refname) {
         List<Image> result = new ArrayList<Image>();
         try {
             PdfReader reader = new PdfReader(noteDoc);
 
             for (int i = 1; i <= reader.getNumberOfPages(); i++) {
                 PdfImportedPage page = writer.getImportedPage(reader, i);
-                Image image = FootnoteLineImage.getInstance(page);
+                Image image = FootnoteLineImage.getInstance(page, refname);
                 image.setSpacingBefore(0);
                 image.setSpacingAfter(0);
                 image.setAlignment(Image.MIDDLE);
@@ -497,7 +497,7 @@ public class FB2toPDF {
         return colspan;
     }
 
-    private class PageEventHandler extends PdfPageEventHelper {
+    private class PageSizeEnforceHelper extends PdfPageEventHelper {
 
         public boolean enforcePageSize = false;
         public Color pageSizeEnforcerColor;
@@ -711,10 +711,10 @@ public class FB2toPDF {
 
         writer = PdfWriter.getInstance(doc, new FileOutputStream(toName));
         if (pageStyle.enforcePageSize) {
-            PageEventHandler pageEventHandler = new PageEventHandler();
-            pageEventHandler.enforcePageSize = pageStyle.enforcePageSize;
-            pageEventHandler.pageSizeEnforcerColor = Color.decode(pageStyle.pageSizeEnforcerColor);
-            writer.setPageEvent(pageEventHandler);
+            PageSizeEnforceHelper pageSizeEnforceHelper = new PageSizeEnforceHelper();
+            pageSizeEnforceHelper.enforcePageSize = pageStyle.enforcePageSize;
+            pageSizeEnforceHelper.pageSizeEnforcerColor = Color.decode(pageStyle.pageSizeEnforcerColor);
+            writer.setPageEvent(pageSizeEnforceHelper);
         }
         writer.setSpaceCharRatio(generalSettings.trackingSpaceCharRatio);
         writer.setStrictImageSequence(generalSettings.strictImageSequence);
@@ -1564,6 +1564,7 @@ public class FB2toPDF {
                 if (currentReference.charAt(0) == '#') {
                     //Unlike Anchor, Action won't fail even when local destination does not exist
                     String refname = currentReference.substring(1); //getting rid of "#" at the begin of the reference
+                    currentChunk.setGenericTag("FOOTNOTE:" + refname);
                     addGoToActionToChunk(refname, currentChunk);
                     currentAnchorName = refname + "_backlink";
                 } else {
