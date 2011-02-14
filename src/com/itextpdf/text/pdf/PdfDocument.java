@@ -2395,7 +2395,11 @@ public class PdfDocument extends Document {
     private Deque<FootnoteLineImage> footnoteImages = new LinkedList<FootnoteLineImage>();//+++ VIKTORZ
 
     protected void flushFootnotes() throws DocumentException { //+++ VIKTORZ
-        while (!footnoteImages.isEmpty()) {
+        int footnotesNum = Math.min(footnoteImages.size(), 5);
+        FootnoteLineImage footNoteLine = footnoteImages.getFirst();
+        float footnoteLineH = footNoteLine.getHeight();
+        float allFootnotesH = footnoteLineH * footnotesNum;                             
+        for (int i=0; i<footnotesNum; i++) {
             FootnoteLineImage image = footnoteImages.poll();
             // if there isn't enough room for the image on this page, save it for the next page
             if (currentHeight != 0 && indentTop() - currentHeight - image.getScaledHeight() < indentBottom()) {
@@ -2405,7 +2409,7 @@ public class PdfDocument extends Document {
             }
             //pageEmpty = false;
 
-            float lowerleft = indentTop() - currentHeight - image.getScaledHeight() - leading / 2;
+            float lowerleft = indentBottom() + footnoteLineH * (footnotesNum - i - 1);
             float mt[] = image.matrix();
             float startPosition = marginLeft; 
             graphics.addImage(image, mt[0], mt[1], mt[2], mt[3], startPosition, lowerleft - mt[5]);
@@ -2415,40 +2419,6 @@ public class PdfDocument extends Document {
 
     protected void add(FootnoteLineImage image) throws PdfException, DocumentException {
         footnoteImages.add(image);
-        /*
-        // if there isn't enough room for the image on this page, save it for the next page
-        if (currentHeight != 0 && indentTop() - currentHeight - image.getScaledHeight() < indentBottom()) {
-            if (!strictImageSequence && imageWait == null) {
-                imageWait = image;
-                return;
-            }
-            newPage();
-            if (currentHeight != 0 && indentTop() - currentHeight - image.getScaledHeight() < indentBottom()) {
-                imageWait = image;
-                return;
-            }
-        }
-        pageEmpty = false;
-        // avoid endless loops
-        if (image == imageWait)
-            imageWait = null;
-
-        float lowerleft = indentTop() - currentHeight - image.getScaledHeight();
-        float mt[] = image.matrix();
-        float startPosition = indentLeft() - mt[4];
-        if ((image.getAlignment() & Image.RIGHT) == Image.RIGHT) startPosition = indentRight() - image.getScaledWidth() - mt[4];
-        if ((image.getAlignment() & Image.MIDDLE) == Image.MIDDLE) startPosition = indentLeft() + (indentRight() - indentLeft() - image.getScaledWidth()) / 2 - mt[4];
-        if (image.hasAbsoluteX()) startPosition = image.getAbsoluteX();
-
-        if ((image.getAlignment() & Image.RIGHT) == Image.RIGHT) startPosition -= image.getIndentationRight();
-        else if ((image.getAlignment() & Image.MIDDLE) == Image.MIDDLE) startPosition += image.getIndentationLeft() - image.getIndentationRight();
-        else startPosition += image.getIndentationLeft();
-        graphics.addImage(image, mt[0], mt[1], mt[2], mt[3], startPosition, lowerleft - mt[5]);
-
-        currentHeight += image.getScaledHeight();
-        flushLines();
-        text.moveText(0, - image.getScaledHeight());
-         */
     }
 
 
