@@ -2399,7 +2399,12 @@ public class PdfDocument extends Document {
         int footnotesNum = Math.min(footnoteImages.size(), maxFootnoteLines);
         FootnoteLineImage footNoteLine = footnoteImages.getFirst();
         float footnoteLineH = footNoteLine.getHeight();
-        float allFootnotesH = footnoteLineH * footnotesNum;                             
+        float allFootnotesH = footnoteLineH * footnotesNum;
+        float upperleft = indentBottom() + footnoteLineH * footnotesNum;
+        graphics.moveTo(marginLeft, upperleft);
+        graphics.setLineWidth(0.5f);
+        graphics.lineTo((getPageSize().getWidth() - marginRight) / 3, upperleft);
+        graphics.stroke();
         for (int i=0; i<footnotesNum; i++) {
             FootnoteLineImage image = footnoteImages.poll();
             // if there isn't enough room for the image on this page, save it for the next page
