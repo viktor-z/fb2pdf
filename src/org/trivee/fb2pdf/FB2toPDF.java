@@ -702,8 +702,9 @@ public class FB2toPDF {
         final PageStyle pageStyle = stylesheet.getPageStyle();
         final GeneralSettings generalSettings = stylesheet.getGeneralSettings();
 
-        Rectangle pageSize = new Rectangle(pageStyle.getPageWidth(), pageStyle.getPageHeight());
+        Rectangle pageSize = new Rectangle(pageStyle.getPageWidth(), pageStyle.getPageHeight(), pageStyle.getPageRotation());
         pageSize.setBackgroundColor(new BaseColor(Color.decode(pageStyle.backgroundColor)));
+        System.out.println("Page size is " + pageSize);
 
         doc = new com.itextpdf.text.Document(pageSize,
                 pageStyle.getMarginLeft(), pageStyle.getMarginRight(),

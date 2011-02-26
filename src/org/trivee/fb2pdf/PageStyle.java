@@ -6,6 +6,7 @@ public class PageStyle
 {
     private Dimension pageWidth;
     private Dimension pageHeight;
+    private int pageRotation;
 
     private Dimension marginLeft;
     private Dimension marginRight;
@@ -29,6 +30,7 @@ public class PageStyle
 
     public float getPageWidth()     { return pageWidth.getPoints(); }
     public float getPageHeight()    { return pageHeight.getPoints(); }
+    public int getPageRotation()    { return pageRotation; }
 
     public float getMarginLeft()    { return marginLeft.getPoints(); }
     public float getMarginRight()   { return marginRight.getPoints(); }

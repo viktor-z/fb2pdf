@@ -43,6 +43,10 @@
         }
     ],
     pageStyle: {
+        //values: 0, 90, 180, 270
+        //usually has no visual effect, only PDF internals are different
+        pageRotation:   "0", 
+
         // PRS-500/505/600/700/650 Portrait
         pageWidth:    "88.184mm",
         pageHeight:   "113.854mm",
