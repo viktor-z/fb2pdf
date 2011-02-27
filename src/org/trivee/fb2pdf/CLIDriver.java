@@ -23,6 +23,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.trivee.utils.Rotate;
 import org.trivee.utils.TwoUp;
 
 /**
@@ -69,6 +70,12 @@ public class CLIDriver {
         options.addOption("l", "log", true, "Log creation");
         options.addOption("e", "encoding", true, "Log's encoding (default is cp1251)");
         options.addOption("t", "twoup", false, "Create two-up pdf");
+        options.addOption(OptionBuilder
+                .withLongOpt("rotate")
+                .hasArg()
+                .withArgName("ROTATION")
+                .withDescription("90, 180 or 270")
+                .create("rt"));
 
         cl = new PosixParser().parse(options, args);
 
@@ -198,6 +205,9 @@ public class CLIDriver {
                         succeeded++;
                         if (cl.hasOption("t")){
                             TwoUp.execute(pdfname, pdfname+".booklet.pdf");
+                        }
+                        if (cl.hasOption("rt")){
+                            Rotate.execute(pdfname, pdfname+".rotated.pdf", cl.getOptionValue("rt"));
                         }
                 }
                 catch (Exception ex)
