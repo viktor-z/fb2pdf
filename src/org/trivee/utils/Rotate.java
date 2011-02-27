@@ -75,7 +75,9 @@ public class Rotate {
      */
     public static void main(String[] args) {
         if (args.length != 3) {
-            System.err.println("Usage: java org.trivee.utils.Rotate src dest 90|180|270");
+            System.err.println("Usage: Rotate <input file> <output file> <rotation>");
+            System.err.println("  Valid values for rotation are 90, 180, 270");
+            return;
         }
         execute(args[0], args[1], args[2]);
     }

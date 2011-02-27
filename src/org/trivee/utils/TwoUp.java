@@ -94,7 +94,8 @@ public class TwoUp {
      */
     public static void main(String[] args) {
         if (args.length != 2) {
-            System.err.println("Usage: java org.trivee.utils.TwoUp src dest");
+            System.err.println("Usage: TwoUp <input file> <output file>");
+            return;
         }
         execute(args[0], args[1]);
     }
