@@ -76,11 +76,8 @@ import com.itextpdf.text.pdf.collection.PdfCollection;
 import com.itextpdf.text.pdf.draw.DrawInterface;
 import com.itextpdf.text.pdf.internal.PdfAnnotationsImp;
 import com.itextpdf.text.pdf.internal.PdfViewerPreferencesImp;
-import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 
 /**
  * <CODE>PdfDocument</CODE> is the class that is used by <CODE>PdfWriter</CODE>
@@ -1186,12 +1183,15 @@ public class PdfDocument extends Document {
         }
     }
     
-    private Predicate predicateFootnoteLineImageReady = new Predicate() {
-
-            public boolean evaluate(Object o) {
-                return ((FootnoteLineImage)o).ready;
+    private boolean haveReadyFootnoteLineImage() {
+        for (FootnoteLineImage image : footnoteImages) {
+            if (image.ready) {
+                return true;
             }
-        };
+        }
+
+        return false;
+    }
 
     private void flushFootnotes(PdfLine line) throws DocumentException { //VIKTORZ ++
 
@@ -1205,7 +1205,7 @@ public class PdfDocument extends Document {
         //    }
         //}
 
-        boolean haveReadyFootnotes = CollectionUtils.exists(footnoteImages, predicateFootnoteLineImageReady);
+        boolean haveReadyFootnotes = haveReadyFootnoteLineImage();
 
         if (!haveReadyFootnotes) {
             return;
@@ -2445,8 +2445,27 @@ public class PdfDocument extends Document {
     private Deque<FootnoteLineImage> footnoteImages = new LinkedList<FootnoteLineImage>();//VIKTORZ ++
 
     private int countReadyFootnoteLineImages() {
-        return CollectionUtils.countMatches(footnoteImages, predicateFootnoteLineImageReady);
+        int result = 0;
+        for (FootnoteLineImage image : footnoteImages) {
+            if (image.ready) {
+                result++;
+            }
+        }
+
+        return result;
     }
+
+    private ArrayList<FootnoteLineImage> selectReadyFootnoteLineImages() {
+        ArrayList<FootnoteLineImage> result = new ArrayList<FootnoteLineImage>();
+        for (FootnoteLineImage image : footnoteImages) {
+            if (image.ready) {
+                result.add(image);
+            }
+        }
+
+        return result;
+    }
+
 
     protected void flushFootnotes() throws DocumentException { //VIKTORZ ++
         int readyNum = countReadyFootnoteLineImages();
@@ -2471,9 +2490,9 @@ public class PdfDocument extends Document {
         graphics.setLineWidth(1);
         currentHeight += leading * 0.25f;
 
-        Object[] readyImages = CollectionUtils.select(footnoteImages, predicateFootnoteLineImageReady).toArray();
+        ArrayList<FootnoteLineImage> readyImages = selectReadyFootnoteLineImages();
         for (int i=0; i<maxReadyNum; i++) {
-            FootnoteLineImage image = (FootnoteLineImage)readyImages[i];
+            FootnoteLineImage image = readyImages.get(i);
             // if there isn't enough room for the image on this page, save it for the next page
             if (currentHeight != 0 && indentTop() - currentHeight - image.getScaledHeight() < indentBottom()) {
             	PdfLine overflowLine = line;
