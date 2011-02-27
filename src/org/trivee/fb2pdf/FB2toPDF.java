@@ -690,8 +690,7 @@ public class FB2toPDF {
         try {
             is = Transformation.transform(is, stylesheet.getTransformationSettings());
         } catch (Exception ex) {
-            System.err.println(ex);
-            System.exit(-1);
+            throw new RuntimeException("Error processing transformation. " + ex.getMessage());
         }
 
         fb2 = builder.parse(is);

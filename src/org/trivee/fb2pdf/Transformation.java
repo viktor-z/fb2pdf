@@ -39,6 +39,7 @@ public class Transformation {
 
         for (Entry entry : settings.transformationsMap)
         {
+            if (entry == null) continue;
             transform(queryProlog + entry.query, morpherProlog + entry.morpher, xdoc);
         }
 
