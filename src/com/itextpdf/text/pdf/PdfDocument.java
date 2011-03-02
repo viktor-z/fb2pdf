@@ -2479,6 +2479,10 @@ public class PdfDocument extends Document {
             footnotesNum++;
         }
 
+        if (footnotesNum == 0) {
+            return;
+        }
+
         float allFootnotesH = footnoteLineH * footnotesNum;
         float upperleft = indentBottom() + footnoteLineH * footnotesNum + leading * 0.25f;
         graphics.moveTo(marginLeft, upperleft);
