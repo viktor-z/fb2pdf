@@ -19,6 +19,7 @@ public class PageStyle
     public boolean preventWidows = true;
     public boolean footnotes = false;
     public int footnotesMaxLines = 5;
+    public int footnoteMaxLines = Integer.MAX_VALUE;
 
     public String backgroundColor = "0xFFFFFF";
 

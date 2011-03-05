@@ -318,7 +318,6 @@ public class FB2toPDF {
         String body = getNoteBody(refname);
         byte[] noteDoc = FootnoteRenderer.renderNoteDoc(stylesheet, body, hyphenation);
         List<Image> noteLineImages = getLinesImages(noteDoc, refname);
-        System.out.printf("Footnote has %d lines\n", noteLineImages.size());
         for (Image image : noteLineImages) {
             doc.add(image);
         }
@@ -367,11 +366,17 @@ public class FB2toPDF {
     }
 
     private List<Image> getLinesImages(byte[] noteDoc, String refname) {
+
         List<Image> result = new ArrayList<Image>();
         try {
             PdfReader reader = new PdfReader(noteDoc);
 
-            for (int i = 1; i <= reader.getNumberOfPages(); i++) {
+            int numPages = reader.getNumberOfPages();
+            int maxLines = stylesheet.getPageStyle().footnoteMaxLines;
+            int numLines = Math.min(maxLines, numPages);
+            System.out.printf("Footnote has %d lines, maximum in settings is %d, will render %d\n", numPages, maxLines, numLines);
+
+            for (int i = 1; i <= numLines; i++) {
                 PdfImportedPage page = writer.getImportedPage(reader, i);
                 Image image = FootnoteLineImage.getInstance(page, refname);
                 image.setSpacingBefore(0);
