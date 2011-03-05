@@ -371,13 +371,24 @@ public class FB2toPDF {
         try {
             PdfReader reader = new PdfReader(noteDoc);
 
-            int numPages = reader.getNumberOfPages();
+            int numPages = reader.getNumberOfPages() - 1;
             int maxLines = stylesheet.getPageStyle().footnoteMaxLines;
             int numLines = Math.min(maxLines, numPages);
+            if (numLines + 1 == numPages) {
+                numLines = numPages;
+            }
             System.out.printf("Footnote has %d lines, maximum in settings is %d, will render %d\n", numPages, maxLines, numLines);
 
             for (int i = 1; i <= numLines; i++) {
                 PdfImportedPage page = writer.getImportedPage(reader, i);
+                Image image = FootnoteLineImage.getInstance(page, refname);
+                image.setSpacingBefore(0);
+                image.setSpacingAfter(0);
+                image.setAlignment(Image.MIDDLE);
+                result.add(image);
+            }
+            if (numLines < numPages) {
+                PdfImportedPage page = writer.getImportedPage(reader, numPages+1);
                 Image image = FootnoteLineImage.getInstance(page, refname);
                 image.setSpacingBefore(0);
                 image.setSpacingAfter(0);

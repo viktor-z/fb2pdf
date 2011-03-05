@@ -8,6 +8,7 @@ import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Font;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
@@ -16,6 +17,9 @@ import com.itextpdf.text.pdf.PdfDocument;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -48,6 +52,15 @@ public class FootnoteRenderer {
         chunk.append(body);
         p.add(chunk);
         doc.add(p);
+
+        doc.newPage();
+        p = noteStyle.createParagraph();
+        p.setAlignment(Paragraph.ALIGN_CENTER);
+        chunk = noteStyle.createChunk();
+        chunk.append("[...]");
+        p.add(chunk);
+        doc.add(p);
+
         doc.close();
         return output.toByteArray();
     }
