@@ -2496,7 +2496,7 @@ public class PdfDocument extends Document {
         for (int i=0; i<footnotesNum; i++) {
             FootnoteLineImage image = readyImages.get(i);
             // if there isn't enough room for the image on this page, save it for the next page
-            if (currentHeight != 0 && indentTop() - currentHeight - image.getScaledHeight() < indentBottom()) {
+            if (currentHeight != 0 && currentHeight - image.getScaledHeight() < indentBottom()) {
             	PdfLine overflowLine = line;
             	line = null;
             	newPage();
