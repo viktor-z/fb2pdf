@@ -4,6 +4,7 @@
  */
 package org.trivee.fb2pdf;
 
+import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -47,11 +48,12 @@ public class FootnoteRenderer {
         p.add(chunk);
         doc.add(p);
 
+        doc.setPageSize(new Rectangle(basefont.getWidthPointKerned("  <…> ", fontSize),h));
         doc.newPage();
         p = noteStyle.createParagraph();
-        p.setAlignment(Paragraph.ALIGN_CENTER);
+        p.setAlignment(Paragraph.ALIGN_RIGHT);
         chunk = noteStyle.createChunk();
-        chunk.append("[...]");
+        chunk.append("<…> ");
         p.add(chunk);
         doc.add(p);
 

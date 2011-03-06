@@ -391,29 +391,28 @@ public class FB2toPDF {
             int numPages = reader.getNumberOfPages() - 1;
             int maxLines = stylesheet.getPageStyle().footnoteMaxLines;
             int numLines = Math.min(maxLines, numPages);
-            if (numLines < numPages) {
-                numLines--;
-            }
             System.out.printf("Footnote has %d lines, maximum in settings is %d, will render %d\n", numPages, maxLines, numLines);
 
             for (int i = 1; i <= numLines; i++) {
                 PdfImportedPage page = writer.getImportedPage(reader, i);
-                Image image = FootnoteLineImage.getInstance(page, refname);
-                image.setSpacingBefore(0);
-                image.setSpacingAfter(0);
-                image.setAlignment(Image.MIDDLE);
-                result.add(image);
-            }
-            if (numLines < numPages) {
-                PdfImportedPage page = writer.getImportedPage(reader, numPages+1);
-                Image image = FootnoteLineImage.getInstance(page, refname);
+                Image image = null;
+                if (numLines < numPages && i == numLines) {
+                    PdfTemplate tmp = PdfTemplate.createTemplate(writer, page.getWidth(), page.getHeight());
+                    PdfImportedPage cutImg = writer.getImportedPage(reader, numPages+1);
+                    page.setWidth(tmp.getWidth() - cutImg.getWidth());
+                    tmp.addTemplate(page, 0, 0);
+                    tmp.addTemplate(cutImg, page.getWidth(), 0);
+                    image = FootnoteLineImage.getInstance(tmp, refname);
+                } else {
+                    image = FootnoteLineImage.getInstance(page, refname);
+                }
                 image.setSpacingBefore(0);
                 image.setSpacingAfter(0);
                 image.setAlignment(Image.MIDDLE);
                 result.add(image);
             }
         } catch (Exception ex) {
-            System.out.println("WARNING: failed to produce footnote lines");
+            System.out.println("WARNING: failed to produce footnote lines: " + ex);
         }
 
         return result;
