@@ -175,7 +175,7 @@ public class FB2toPDF {
 
     private void addFootnote(Element child) throws DocumentException, FB2toPDFException {
         if (stylesheet.getPageStyle().footnotes && "note".equals(child.getAttribute("type"))) {
-            addFootnote(currentReference);
+            addFootnote(child.getTextContent(), currentReference);
         }
     }
 
@@ -312,10 +312,10 @@ public class FB2toPDF {
         chunk.setAction(action);
     }
 
-    private void addFootnote(String refname) throws DocumentException, FB2toPDFException {
+    private void addFootnote(String marker, String refname) throws DocumentException, FB2toPDFException {
         refname = refname.substring(1);
         System.out.println("Adding footnote " + refname);
-        String body = getNoteBody(refname);
+        String body = marker + "  " + getNoteBody(refname);
         byte[] noteDoc = FootnoteRenderer.renderNoteDoc(stylesheet, body, hyphenation);
         List<Image> noteLineImages = getLinesImages(noteDoc, refname);
         for (Image image : noteLineImages) {
@@ -345,9 +345,26 @@ public class FB2toPDF {
             Element section = (Element) sections.item(i);
             String id = section.getAttribute("id");
             if (refname.equals(id)) {
-                String text = section.getTextContent();
-                text = text.replaceAll("\n", " ").replaceAll("  ", " ").trim();
-                return text;
+                StringBuilder text = new StringBuilder();
+                NodeList children = section.getChildNodes();
+                for (int j = 0; j < children.getLength(); j++) {
+                    Node node = children.item(j);
+                    if (node.getLocalName() != null && node.getLocalName().equals("p")) {
+                        Element paragraph = (Element) children.item(j);
+                        String paragraphText = paragraph.getTextContent();
+                        paragraphText = paragraphText.replaceAll("\n", " ").replaceAll("  ", " ").trim();
+                        if (paragraphText.isEmpty()) {
+                            continue;
+                        }
+                        if (text.length() > 0) {
+                            text.append("    ");
+                        }
+                        text.append(paragraphText);
+                        text.append("\n");
+                    }
+                }
+
+                return text.toString();
             }
         }
         System.out.printf("WARNING: note %s not found\n", refname);
