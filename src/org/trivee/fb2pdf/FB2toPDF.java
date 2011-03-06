@@ -391,8 +391,8 @@ public class FB2toPDF {
             int numPages = reader.getNumberOfPages() - 1;
             int maxLines = stylesheet.getPageStyle().footnoteMaxLines;
             int numLines = Math.min(maxLines, numPages);
-            if (numLines + 1 == numPages) {
-                numLines = numPages;
+            if (numLines < numPages) {
+                numLines--;
             }
             System.out.printf("Footnote has %d lines, maximum in settings is %d, will render %d\n", numPages, maxLines, numLines);
 
