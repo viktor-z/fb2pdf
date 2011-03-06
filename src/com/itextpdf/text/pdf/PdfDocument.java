@@ -2465,14 +2465,17 @@ public class PdfDocument extends Document {
         footnoteImages.add(image);
     }
 
-    protected void flushFootnotes() throws DocumentException { //VIKTORZ ++
+    public void flushFootnotes(boolean fillPage) throws DocumentException { //VIKTORZ ++
         int readyNum = countReadyFootnoteLineImages();
-        int maxReadyNum = Math.min(readyNum, maxFootnoteLines);
+        if (readyNum < 1) return;
+
+        readyNum = fillPage ? readyNum : Math.min(readyNum, maxFootnoteLines);
+
         FootnoteLineImage footNoteLine = footnoteImages.getFirst();
         float footnoteLineH = footNoteLine.getHeight();
 
         int footnotesNum = 0;
-        for (int i=1; i<=maxReadyNum; i++) {
+        for (int i=1; i<=readyNum; i++) {
             if (currentHeight != 0 && indentTop() - currentHeight - footnoteLineH * (i+1) < indentBottom()) {
                 break;
             }
@@ -2497,10 +2500,12 @@ public class PdfDocument extends Document {
             FootnoteLineImage image = readyImages.get(i);
             // if there isn't enough room for the image on this page, save it for the next page
             if (currentHeight != 0 && currentHeight - image.getScaledHeight() < indentBottom()) {
-            	PdfLine overflowLine = line;
-            	line = null;
-            	newPage();
-            	line = overflowLine;
+                if (!fillPage) {
+                    PdfLine overflowLine = line;
+                    line = null;
+                    newPage();
+                    line = overflowLine;
+                }
                 return;
             }
 
@@ -2564,7 +2569,7 @@ public class PdfDocument extends Document {
             float spaceLeftOnPage = indentTop() - indentBottom() - currentHeight;
             float allFootnotesH = footnoteLineH * footnotesNum;
             if (spaceLeftOnPage >= footnoteLineH && spaceLeftOnPage < allFootnotesH + line.height() + leading * 0.75f) {
-                flushFootnotes();
+                flushFootnotes(false);
             }
         }
     }

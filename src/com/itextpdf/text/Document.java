@@ -364,6 +364,13 @@ public class Document implements DocListener {
             return false;
         }
         for (DocListener listener : listeners) {
+            if (listener instanceof PdfDocument) {                      //VIKTORZ ++
+                try {                                                   //VIKTORZ ++
+                    ((PdfDocument) listener).flushFootnotes(true);      //VIKTORZ ++
+                } catch (DocumentException ex) {                        //VIKTORZ ++
+                    throw new RuntimeException(ex);                     //VIKTORZ ++
+                }
+            }
             listener.newPage();
         }
         return true;
