@@ -114,9 +114,41 @@
     transformationSettings: {
         enabled:					"false",
         outputDebugFile:            "false",
-        queryProlog:                "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\";",
+        queryProlog:                "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\"; declare namespace l = \"http://www.w3.org/1999/xlink\";",
         morpherProlog:              "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\"; declare namespace l = \"http://www.w3.org/1999/xlink\";",
         transformationsMap: [
+                /*
+                {   // convert poem note to paragraphs, part 1
+                    "query":   "//body[@name='notes']//section/poem",
+                    "morpher": ".//stanza/*"
+                },
+                {   // convert poem note to paragraphs, part 2
+                    "query":   "//body[@name='notes']//section/v",
+                    "morpher": "<p>{./* | text()}</p>"
+                },
+                */
+                /*
+                {   // delete links with empty href
+                    "query":   "//a[@l:href='']",
+                    "morpher": "()"
+                },
+                */
+                /*
+                {   // merge notes bodies, part 1
+                    "query":   "//body[@name='notes']",
+                    "morpher": "<body name='notes'>{//body[@name='notes' or @name='footnotes']/*}</body>"
+                },
+                {   // merge notes bodies, part 2
+                    "query":   "//body[@name='footnotes']",
+                    "morpher": "()"
+                },
+                */
+                /*
+                {   // fix image-wrapped-in-paragraph
+                    "query":   "//p[exists(image) and count(*) = 1]",
+                    "morpher": "./*"
+                },
+                */
                 /*
                 {   // convert table cells to paragraphs 
                     "query":   "//td", 
@@ -471,17 +503,12 @@
         {
             name:             "footnote",
             baseStyle:        "default",
-            fontFamily:       "sansSerif",
-            fontSize:         "6pt",
+            fontFamily:       "serif",
+            fontSize:         "10.5pt",
             alignment:        "justified",
             firstLineIndent:  "0em",
-            leading:          "6pt",
-            firstFirstLineIndent:  "0em",
-            dropcapStyle:	  "",	
-            firstSpacingBefore:   "0em",
-            lastSpacingAfter:     "0em",
-            spacingBefore:   "0em",
-            spacingAfter:    "0em"
+            leading:          "1.2em",
+            firstFirstLineIndent:  "0em"
         },
        	{
        		name:			"bodyDropCap",
