@@ -503,12 +503,17 @@
         {
             name:             "footnote",
             baseStyle:        "default",
-            fontFamily:       "serif",
-            fontSize:         "10.5pt",
+            fontFamily:       "sansSerif",
+            fontSize:         "6pt",
             alignment:        "justified",
             firstLineIndent:  "0em",
-            leading:          "1.2em",
-            firstFirstLineIndent:  "0em"
+            leading:          "6pt",
+            firstFirstLineIndent:  "0em",
+            dropcapStyle:	  "",	
+            firstSpacingBefore:   "0em",
+            lastSpacingAfter:     "0em",
+            spacingBefore:   "0em",
+            spacingAfter:    "0em"
         },
        	{
        		name:			"bodyDropCap",
