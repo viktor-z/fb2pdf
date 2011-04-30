@@ -1271,7 +1271,8 @@ public class FB2toPDF {
 
         processSectionContent(section, level);
 
-        if (bodyIndex > 0 && StringUtils.isNotBlank(id)) {
+        if (bodyIndex > 0 && StringUtils.isNotBlank(id) &&
+                stylesheet.getGeneralSettings().generateNoteBackLinks) {
             addBacklink(id);
         }
 
