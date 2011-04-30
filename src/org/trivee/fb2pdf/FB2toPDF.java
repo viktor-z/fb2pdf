@@ -339,51 +339,56 @@ public class FB2toPDF {
         if (StringUtils.isBlank(refname)) {
             return "";
         }
-        Element noteBody = getNotesBody();
-        if (noteBody == null) {
+        List<Element> noteBodies = getNotesBodies();
+        if (noteBodies.isEmpty()) {
             return "";
         }
 
-        NodeList sections = noteBody.getElementsByTagName("section");
-        for (int i = 0; i < sections.getLength(); i++) {
-            Element section = (Element) sections.item(i);
-            String id = section.getAttribute("id");
-            if (refname.equals(id)) {
-                StringBuilder text = new StringBuilder();
-                NodeList children = section.getChildNodes();
-                for (int j = 0; j < children.getLength(); j++) {
-                    Node node = children.item(j);
-                    if (node.getLocalName() != null && node.getLocalName().equals("p")) {
-                        Element paragraph = (Element) children.item(j);
-                        String paragraphText = paragraph.getTextContent();
-                        paragraphText = paragraphText.replaceAll("\n", " ").replaceAll("  ", " ").trim();
-                        if (paragraphText.isEmpty()) {
-                            continue;
+        for (Element noteBody : noteBodies) {
+            NodeList sections = noteBody.getElementsByTagName("section");
+            for (int i = 0; i < sections.getLength(); i++) {
+                Element section = (Element) sections.item(i);
+                String id = section.getAttribute("id");
+                if (refname.equals(id)) {
+                    StringBuilder text = new StringBuilder();
+                    NodeList children = section.getChildNodes();
+                    for (int j = 0; j < children.getLength(); j++) {
+                        Node node = children.item(j);
+                        if (node.getLocalName() != null && node.getLocalName().equals("p")) {
+                            Element paragraph = (Element) children.item(j);
+                            String paragraphText = paragraph.getTextContent();
+                            paragraphText = paragraphText.replaceAll("\n", " ").replaceAll("  ", " ").trim();
+                            if (paragraphText.isEmpty()) {
+                                continue;
+                            }
+                            if (text.length() > 0) {
+                                text.append("    ");
+                            }
+                            text.append(paragraphText);
+                            text.append("\n");
                         }
-                        if (text.length() > 0) {
-                            text.append("    ");
-                        }
-                        text.append(paragraphText);
-                        text.append("\n");
                     }
-                }
 
-                return text.toString();
+                    return text.toString();
+                }
             }
         }
         System.out.printf("WARNING: note %s not found\n", refname);
         return "";
     }
 
-    private Element getNotesBody() {
+    private List<Element> getNotesBodies() {
+        List<Element> result = new ArrayList<Element>();
         for (int i = 0; i < bodies.getLength(); i++) {
             Element body = bodies.item(i);
-            if ("notes".equals(body.getAttribute("name"))) {
-                return body;
+            if (!isNullOrEmpty(body.getAttribute("name"))) {
+                result.add(body);
             }
         }
-        System.out.println("WARNING: notes not found in the document");
-        return null;
+        if (result.isEmpty()) {
+            System.out.println("WARNING: notes not found in the document");
+        }
+        return result;
     }
 
     private List<Image> getLinesImages(byte[] noteDoc, String refname) {
