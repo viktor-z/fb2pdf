@@ -49,6 +49,7 @@ public class FootnoteRenderer {
         doc.add(p);
 
         doc.setPageSize(new Rectangle(basefont.getWidthPointKerned("  <…> ", fontSize),h));
+        doc.setMargins(0,0,0,0);
         doc.newPage();
         p = noteStyle.createParagraph();
         p.setAlignment(Paragraph.ALIGN_RIGHT);
