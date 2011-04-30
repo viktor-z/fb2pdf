@@ -313,9 +313,13 @@ public class FB2toPDF {
     }
 
     private void addFootnote(String marker, String refname) throws DocumentException, FB2toPDFException {
+        if (isNullOrEmpty(refname)) {
+            System.out.println("Skipping footnote with empty reference");
+            return;
+        }
         refname = refname.substring(1);
         System.out.println("Adding footnote " + refname);
-        String body = marker + "  " + getNoteBody(refname);
+        String body = marker + "\u2000" + getNoteBody(refname);
         byte[] noteDoc = FootnoteRenderer.renderNoteDoc(stylesheet, body, hyphenation);
         List<Image> noteLineImages = getLinesImages(noteDoc, refname);
         for (Image image : noteLineImages) {
