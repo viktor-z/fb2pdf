@@ -179,6 +179,34 @@ public class FB2toPDF {
         }
     }
 
+    private void extractTextFromElement(Element element, StringBuilder text, boolean skipTitle) throws DOMException {
+        NodeList children = element.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node node = children.item(i);
+            String localName = node.getLocalName();
+            if(isNullOrEmpty(localName)) {
+                continue;
+            }
+            if(localName.equals("poem") || localName.equals("stanza")){
+                extractTextFromElement((Element) node, text, false);
+            } else if (localName.equals("p") || localName.equals("v") || localName.equals("text-author") ||
+                    localName.equals("date") || localName.equals("epigraph") ||
+                    (!skipTitle && localName.equals("title"))) {
+                Element paragraph = (Element) node;
+                String paragraphText = paragraph.getTextContent();
+                paragraphText = paragraphText.replaceAll("\n", " ").replaceAll("  ", " ").trim();
+                if (paragraphText.isEmpty()) {
+                    continue;
+                }
+                if (text.length() > 0) {
+                    text.append("    ");
+                }
+                text.append(paragraphText);
+                text.append("\n");
+            }
+        }
+    }
+
     private void fillPageNumTemplate(String referenceName) throws FB2toPDFException {
         String pageNumFormat = stylesheet.getGeneralSettings().linkPageNumFormat;
         for (LinkPageNumTemplate lpnt : linkPageNumTemplates.get(referenceName)) {
@@ -351,24 +379,7 @@ public class FB2toPDF {
                 String id = section.getAttribute("id");
                 if (refname.equals(id)) {
                     StringBuilder text = new StringBuilder();
-                    NodeList children = section.getChildNodes();
-                    for (int j = 0; j < children.getLength(); j++) {
-                        Node node = children.item(j);
-                        if (node.getLocalName() != null && node.getLocalName().equals("p")) {
-                            Element paragraph = (Element) children.item(j);
-                            String paragraphText = paragraph.getTextContent();
-                            paragraphText = paragraphText.replaceAll("\n", " ").replaceAll("  ", " ").trim();
-                            if (paragraphText.isEmpty()) {
-                                continue;
-                            }
-                            if (text.length() > 0) {
-                                text.append("    ");
-                            }
-                            text.append(paragraphText);
-                            text.append("\n");
-                        }
-                    }
-
+                    extractTextFromElement(section, text, true);
                     return text.toString();
                 }
             }
