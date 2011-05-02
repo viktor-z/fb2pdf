@@ -347,7 +347,7 @@ public class FB2toPDF {
         }
         refname = refname.substring(1);
         System.out.println("Adding footnote " + refname);
-        String body = marker + "\u2000" + getNoteBody(refname);
+        String body = marker + " " + getNoteBody(refname);
         byte[] noteDoc = FootnoteRenderer.renderNoteDoc(stylesheet, body, hyphenation);
         List<Image> noteLineImages = getLinesImages(noteDoc, refname);
         for (Image image : noteLineImages) {
