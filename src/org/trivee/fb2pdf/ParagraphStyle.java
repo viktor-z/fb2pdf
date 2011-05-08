@@ -136,6 +136,8 @@ public class ParagraphStyle {
     private String dropcapStyle;
     private String color;
     private String text;
+    private Float inlineImageOffsetY;
+    private Float inlineImageZoom;
 
     public ParagraphStyle() {
     }
@@ -280,6 +282,32 @@ public class ParagraphStyle {
         }
 
         return getColor("0x000000");
+    }
+
+    public float getInlineImageOffsetY() throws FB2toPDFException {
+        if (inlineImageOffsetY != null) {
+            return inlineImageOffsetY.floatValue();
+        }
+
+        ParagraphStyle base = getBaseStyle();
+        if (base != null) {
+            return base.getInlineImageOffsetY();
+        }
+
+        return 0.0f;
+    }
+
+    public float getInlineImageZoom() throws FB2toPDFException {
+        if (inlineImageZoom != null) {
+            return inlineImageZoom.floatValue();
+        }
+
+        ParagraphStyle base = getBaseStyle();
+        if (base != null) {
+            return base.getInlineImageZoom();
+        }
+
+        return 1.0f;
     }
 
     public void toggleBold() {

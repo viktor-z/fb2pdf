@@ -298,12 +298,16 @@ public class FB2toPDF {
     }
 
     private float rescaleImage(Image image) {
+        return rescaleImage(image, 1.0f);
+    }
+
+    private float rescaleImage(Image image, float zoomFactor) {
         Rectangle pageSize = doc.getPageSize();
         float dpi = stylesheet.getGeneralSettings().imageDpi;
         float scaleWidth = (pageSize.getWidth() - doc.leftMargin() - doc.rightMargin()) * 0.95f;
         float scaleHeight = (pageSize.getHeight() - doc.topMargin() - doc.bottomMargin()) * 0.95f;
-        float imgWidth = image.getWidth() / dpi * 72;
-        float imgHeight = image.getHeight() / dpi * 72;
+        float imgWidth = image.getWidth() / dpi * 72 * zoomFactor;
+        float imgHeight = image.getHeight() / dpi * 72 * zoomFactor;
         if ((imgWidth <= scaleWidth) && (imgHeight <= scaleHeight)) {
             scaleWidth = imgWidth;
             scaleHeight = imgHeight;
@@ -313,9 +317,9 @@ public class FB2toPDF {
     }
 
     protected void addInlineImage(Image image) throws DocumentException, FB2toPDFException {
-        float scaleHeight = rescaleImage(image);
-        float leading = currentParagraph.getLeading();
-        float offsetY = (scaleHeight - leading) / 2;
+        float zoom = currentStyle.getInlineImageZoom();
+        rescaleImage(image, zoom);
+        float offsetY = currentStyle.getInlineImageOffsetY();
         Chunk chunk = new Chunk(image, 0, offsetY, true);
         chunk.setFont(currentStyle.getFont());
         currentParagraph.add(chunk);

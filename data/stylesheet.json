@@ -319,6 +319,8 @@
             name:             "default",
             fontFamily:       "sansSerif",
             color:            "0x000000",  
+            inlineImageZoom:    "1.0",
+            inlineImageOffsetY: "0.0",
             fontSize:         "11.0pt"
         },
         {
