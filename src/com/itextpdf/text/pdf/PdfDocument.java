@@ -43,6 +43,7 @@
  */
 package com.itextpdf.text.pdf;
 
+import com.itextpdf.text.BadElementException;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -503,7 +504,7 @@ public class PdfDocument extends Document {
 
                     // we don't want to make orphans/widows
                     //if (currentHeight + line.height() + leading > indentTop() - indentBottom()) { //VIKTORZ --
-                    if (preventWidows && (currentHeight + line.height() + leading > indentTop() - indentBottom())) {   //VIKTORZ ++
+                    if (preventWidows && (currentHeight + line.height() - line.getDescender() > indentTop() - indentBottom())) {   //VIKTORZ ++
                         newPage();
                     }
                     indentation.indentLeft += paragraph.getIndentationLeft();
@@ -1141,7 +1142,7 @@ public class PdfDocument extends Document {
 
             // we check if the end of the page is reached (bugfix by Francois Gravel)
             //if (currentHeight + line.height() + leading > indentTop() - indentBottom()) {   //VIKTORZ --
-            if (currentHeight + line.height() + leading / 2 > indentTop() - indentBottom()) { //VIKTORZ ++
+            if (currentHeight  + line.height() - line.getDescender() > indentTop() - indentBottom()) { //VIKTORZ ++
             	// if the end of the line is reached, we start a newPage which will flush existing lines
             	// then move to next page but before then we need to exclude the current one that does not fit
             	// After the new page we add the current line back in
@@ -1695,7 +1696,8 @@ public class PdfDocument extends Document {
     protected void addSpacing(float extraspace, float oldleading, Font f) throws DocumentException { //VIKTORZ ++
     	if (extraspace == 0) return;
     	if (pageEmpty) return;
-    	if (currentHeight + line.height() + leading > indentTop() - indentBottom()) return;
+    	//if (currentHeight + line.height() + leading > indentTop() - indentBottom()) return; //VIKTORZ --
+    	if (currentHeight + line.height- line.getDescender() > indentTop() - indentBottom()) return; //VIKTORZ ++
         leading = extraspace;
         carriageReturn();
         if (f.isUnderlined() || f.isStrikethru()) {
@@ -2465,18 +2467,51 @@ public class PdfDocument extends Document {
         footnoteImages.add(image);
     }
 
+    private float getFootnoteLineH() {
+        FootnoteLineImage footNoteLine = footnoteImages.getFirst();
+        return footNoteLine.getHeight();
+    }
+
+    private float getFootnoteSeparatorH() {
+        return getFootnoteLineH() * 0.25f;
+    }
+
+    private void addFootnotesSeparator(int footnotesNum) throws BadElementException, DocumentException {
+        float footnoteLineH = getFootnoteLineH();
+        float sepHeight = getFootnoteSeparatorH();
+        float sepWidth = (getPageSize().getWidth() - marginRight) / 3;
+        float allFootnotesH = footnoteLineH * footnotesNum + sepHeight;
+        PdfTemplate tp = graphics.createTemplate(sepWidth, sepHeight);
+        tp.setLineWidth(0.5f);
+        //tp.moveTo(0,0);
+        //tp.lineTo(sepWidth, 0);
+        //tp.moveTo(0,sepHeight);
+        //tp.lineTo(sepWidth, sepHeight);
+        tp.moveTo(0,sepHeight/2);
+        tp.lineTo(sepWidth, sepHeight/2);
+        tp.stroke();
+
+        Image image = Image.getInstance(tp);
+        float lowerleft = indentBottom() + footnoteLineH * footnotesNum;
+        float mt[] = image.matrix();
+        float startPosition = marginLeft;
+        graphics.addImage(image, sepWidth, 0, 0, sepHeight, startPosition, lowerleft);
+        
+        currentHeight += sepHeight;
+    }
+
     public void flushFootnotes(boolean fillPage) throws DocumentException { //VIKTORZ ++
         int readyNum = countReadyFootnoteLineImages();
         if (readyNum < 1) return;
 
         readyNum = fillPage ? readyNum : Math.min(readyNum, maxFootnoteLines);
 
-        FootnoteLineImage footNoteLine = footnoteImages.getFirst();
-        float footnoteLineH = footNoteLine.getHeight();
-
+        float footnoteLineH = getFootnoteLineH();
+        float separatorH = getFootnoteSeparatorH();
         int footnotesNum = 0;
         for (int i=1; i<=readyNum; i++) {
-            if (currentHeight != 0 && indentTop() - currentHeight - footnoteLineH * (i+1) < indentBottom()) {
+            float spaceLeftOnPage = indentTop() - indentBottom() - currentHeight + line.getDescender();
+            if (spaceLeftOnPage < footnoteLineH * i  + separatorH) {
                 break;
             }
             footnotesNum++;
@@ -2486,14 +2521,7 @@ public class PdfDocument extends Document {
             return;
         }
 
-        float allFootnotesH = footnoteLineH * footnotesNum;
-        float upperleft = indentBottom() + footnoteLineH * footnotesNum + leading * 0.25f;
-        graphics.moveTo(marginLeft, upperleft);
-        graphics.setLineWidth(0.5f);
-        graphics.lineTo((getPageSize().getWidth() - marginRight) / 3, upperleft);
-        graphics.stroke();
-        graphics.setLineWidth(1);
-        currentHeight += leading * 0.25f;
+        addFootnotesSeparator(footnotesNum);
 
         ArrayList<FootnoteLineImage> readyImages = selectReadyFootnoteLineImages();
         for (int i=0; i<footnotesNum; i++) {
@@ -2522,6 +2550,30 @@ public class PdfDocument extends Document {
 
     }
 
+    private void flushFootnotes(PdfLine line) throws DocumentException { //VIKTORZ ++
+
+        markFootnotes(line);
+
+        boolean haveReadyFootnotes = haveReadyFootnoteLineImage();
+
+        if (!haveReadyFootnotes) {
+            return;
+        }
+
+        int readyNum = countReadyFootnoteLineImages();
+
+        if (footnoteImages.size() > 0) {
+            int footnotesNum = Math.min(readyNum, maxFootnoteLines);
+            float footnoteLineH = getFootnoteLineH();
+            float separatorH = getFootnoteSeparatorH();
+            float spaceLeftOnPage = indentTop() - indentBottom() - currentHeight;
+            float allFootnotesH = footnoteLineH * footnotesNum + separatorH;
+            if (spaceLeftOnPage >= footnoteLineH  + separatorH && spaceLeftOnPage < allFootnotesH + line.height - line.getDescender()) {
+                flushFootnotes(false);
+            }
+        }
+    }
+
     private void markFootnotes(String refname) {
         for (FootnoteLineImage image : footnoteImages) {
             if (image.refname.equals(refname)) {
@@ -2548,30 +2600,6 @@ public class PdfDocument extends Document {
         }
 
         return false;
-    }
-
-    private void flushFootnotes(PdfLine line) throws DocumentException { //VIKTORZ ++
-
-        markFootnotes(line);
-
-        boolean haveReadyFootnotes = haveReadyFootnoteLineImage();
-
-        if (!haveReadyFootnotes) {
-            return;
-        }
-
-        int readyNum = countReadyFootnoteLineImages();
-
-        if (footnoteImages.size() > 0) {
-            int footnotesNum = Math.min(readyNum, maxFootnoteLines);
-            FootnoteLineImage footNoteLine = footnoteImages.getFirst();
-            float footnoteLineH = footNoteLine.getHeight();
-            float spaceLeftOnPage = indentTop() - indentBottom() - currentHeight;
-            float allFootnotesH = footnoteLineH * footnotesNum;
-            if (spaceLeftOnPage >= footnoteLineH && spaceLeftOnPage < allFootnotesH + line.height() + leading * 0.75f) {
-                flushFootnotes(false);
-            }
-        }
     }
 
     private int countReadyFootnoteLineImages() {
