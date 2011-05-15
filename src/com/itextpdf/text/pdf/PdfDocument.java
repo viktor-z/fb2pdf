@@ -43,7 +43,6 @@
  */
 package com.itextpdf.text.pdf;
 
-import com.itextpdf.text.BadElementException;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -77,6 +76,8 @@ import com.itextpdf.text.pdf.collection.PdfCollection;
 import com.itextpdf.text.pdf.draw.DrawInterface;
 import com.itextpdf.text.pdf.internal.PdfAnnotationsImp;
 import com.itextpdf.text.pdf.internal.PdfViewerPreferencesImp;
+import java.util.Deque;
+import java.util.LinkedList;
 
 /**
  * <CODE>PdfDocument</CODE> is the class that is used by <CODE>PdfWriter</CODE>
@@ -961,6 +962,7 @@ public class PdfDocument extends Document {
         return true;
     }
 
+    @Override
     public void setBottomMargin(float margin) { // VIKTORZ ++
         this.marginBottom = margin;             // VIKTORZ ++
     }                                           // VIKTORZ ++
@@ -2261,7 +2263,7 @@ public class PdfDocument extends Document {
 	/**
 	 * Method added by Pelikan Stephan
 	 */
-	public void clearTextWrap() {
+	public void clearTextWrap() throws DocumentException {
 		float tmpHeight = imageEnd - currentHeight;
 		if (line != null) {
 			tmpHeight += line.height();
@@ -2436,7 +2438,7 @@ public class PdfDocument extends Document {
         return getFootnoteLineH() * 0.25f;
     }
 
-    private void addFootnotesSeparator(int footnotesNum) throws BadElementException, DocumentException {
+    private void addFootnotesSeparator(int footnotesNum) throws DocumentException {
         float footnoteLineH = getFootnoteLineH();
         float sepHeight = getFootnoteSeparatorH();
         float sepWidth = (getPageSize().getWidth() - marginRight) / 3;
@@ -2542,7 +2544,7 @@ public class PdfDocument extends Document {
         }
     }
 
-    private void markFootnotes(PdfLine line) throws DocumentException { //VIKTORZ ++
+    private void markFootnotes(PdfLine line) { //VIKTORZ ++
         for (int i=0; i<line.size(); i++) {
             PdfChunk chunk = line.getChunk(i);
             String genericTag = (String) chunk.getAttribute(Chunk.GENERICTAG);
