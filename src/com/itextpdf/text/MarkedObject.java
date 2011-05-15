@@ -1,8 +1,8 @@
 /*
- * $Id: MarkedObject.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: MarkedObject.java 4847 2011-05-05 19:46:13Z redlab_b $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -43,7 +43,7 @@
  */
 package com.itextpdf.text;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -71,8 +71,9 @@ public class MarkedObject implements Element {
 
 	/**
 	 * Creates a MarkedObject.
+	 * @param element the element
 	 */
-	public MarkedObject(Element element) {
+	public MarkedObject(final Element element) {
 		this.element = element;
 	}
 
@@ -81,7 +82,7 @@ public class MarkedObject implements Element {
      *
      * @return  an <CODE>ArrayList</CODE>
      */
-	public ArrayList<Chunk> getChunks() {
+	public List<Chunk> getChunks() {
 		return element.getChunks();
 	}
 
@@ -92,7 +93,7 @@ public class MarkedObject implements Element {
      * @param       listener        an <CODE>ElementListener</CODE>
      * @return <CODE>true</CODE> if the element was processed successfully
      */
-	public boolean process(ElementListener listener) {
+	public boolean process(final ElementListener listener) {
         try {
             return listener.add(element);
         }
@@ -136,8 +137,10 @@ public class MarkedObject implements Element {
 
 	/**
 	 * Adds one markup attribute.
+	 * @param key markup key
+	 * @param value markup value
 	 */
-	public void setMarkupAttribute(String key, String value) {
+	public void setMarkupAttribute(final String key, final String value) {
 		markupAttributes.setProperty(key, value);
 	}
 

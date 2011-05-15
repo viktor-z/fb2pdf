@@ -1,8 +1,8 @@
 /*
- * $Id: ChapterAutoNumber.java 4113 2009-12-01 11:08:59Z blowagie $
+ * $Id: ChapterAutoNumber.java 4847 2011-05-05 19:46:13Z redlab_b $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -59,7 +59,7 @@ public class ChapterAutoNumber extends Chapter {
      * @since	2.1.4
      */
     protected boolean numberSet = false;
-    
+
     /**
      * Create a new object.
      *
@@ -71,7 +71,7 @@ public class ChapterAutoNumber extends Chapter {
 
     /**
      * Create a new object.
-     * 
+     *
      * @param title	    the Chapter title (as a <CODE>String</CODE>)
      */
     public ChapterAutoNumber(final String title) {
@@ -84,7 +84,8 @@ public class ChapterAutoNumber extends Chapter {
      * @param title  the Section title (as a <CODE>String</CODE>)
      * @return Returns the new section.
      */
-    public Section addSection(final String title) {
+    @Override
+	public Section addSection(final String title) {
     	if (isAddedCompletely()) {
     		throw new IllegalStateException(MessageLocalization.getComposedMessage("this.largeelement.has.already.been.added.to.the.document"));
     	}
@@ -97,16 +98,18 @@ public class ChapterAutoNumber extends Chapter {
      * @param title  the Section title (as a <CODE>Paragraph</CODE>)
      * @return Returns the new section.
      */
-    public Section addSection(final Paragraph title) {
+    @Override
+	public Section addSection(final Paragraph title) {
     	if (isAddedCompletely()) {
     		throw new IllegalStateException(MessageLocalization.getComposedMessage("this.largeelement.has.already.been.added.to.the.document"));
     	}
         return addSection(title, 2);
     }
-    
+
     /**
      * Changes the Chapter number.
      * @param	number	the new chapter number
+     * @return possibly increased number if the chapternumber was already set.
      * @since 2.1.4
      */
     public int setAutomaticNumber(int number) {

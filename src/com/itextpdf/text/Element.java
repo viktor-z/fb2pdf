@@ -1,8 +1,8 @@
 /*
- * $Id: Element.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: Element.java 4784 2011-03-15 08:33:00Z blowagie $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -43,7 +43,7 @@
  */
 package com.itextpdf.text;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Interface for a text element.
@@ -324,7 +324,7 @@ public interface Element {
 	 * @return an <CODE>ArrayList</CODE>
 	 */
 
-	public ArrayList<Chunk> getChunks();
+	public List<Chunk> getChunks();
 
 	/**
 	 * Gets the content of the text element.
