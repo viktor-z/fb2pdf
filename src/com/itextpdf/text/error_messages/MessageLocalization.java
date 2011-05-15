@@ -1,8 +1,8 @@
 /*
  * $Id: Chapter.java 3373 2008-05-12 16:21:24Z xlv $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -62,7 +62,7 @@ import com.itextpdf.text.pdf.BaseFont;
 public final class MessageLocalization {
     private static HashMap<String, String> defaultLanguage = new HashMap<String, String>();
     private static HashMap<String, String> currentLanguage;
-    private static final String BASE_PATH = "l10n/error/";
+    private static final String BASE_PATH = "com/itextpdf/text/l10n/error/";
 
     private MessageLocalization() {
     }
@@ -127,7 +127,7 @@ public final class MessageLocalization {
 			int i = 1;
 			for (Object o : param) {
 				if (null != o) {
-					msg = msg.replaceAll("\\{" + i + "\\}", o.toString());
+					msg = msg.replace("{" + i + "}", o.toString());
 				}
 				i++;
 			}
