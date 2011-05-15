@@ -1,8 +1,8 @@
 /*
- * $Id: RomanAlphabetFactory.java 4644 2010-12-15 13:35:05Z blowagie $
+ * $Id: RomanAlphabetFactory.java 4847 2011-05-05 19:46:13Z redlab_b $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -56,55 +56,64 @@ public class RomanAlphabetFactory {
 	 * Translates a positive integer (not equal to zero)
 	 * into a String using the letters 'a' to 'z';
 	 * 1 = a, 2 = b, ..., 26 = z, 27 = aa, 28 = ab,...
+	 * @param index the index
+	 * @return a translated string
 	 */
 	public static final String getString(int index) {
     	if (index < 1) throw new NumberFormatException(MessageLocalization.getComposedMessage("you.can.t.translate.a.negative.number.into.an.alphabetical.value"));
-    	
+
     	index--;
     	int bytes = 1;
     	int start = 0;
-    	int symbols = 26;  
+    	int symbols = 26;
     	while(index >= symbols + start) {
     		bytes++;
     	    start += symbols;
     		symbols *= 26;
     	}
-    	      
+
     	int c = index - start;
     	char[] value = new char[bytes];
     	while(bytes > 0) {
     		value[--bytes] = (char)( 'a' + (c % 26));
     		c /= 26;
     	}
-    	
+
     	return new String(value);
 	}
-	
+
 	/**
 	 * Translates a positive integer (not equal to zero)
 	 * into a String using the letters 'a' to 'z';
 	 * 1 = a, 2 = b, ..., 26 = z, 27 = aa, 28 = ab,...
+	 * @param index the int to translate
+	 * @return the string in lowercase
 	 */
-	public static final String getLowerCaseString(int index) {
-		return getString(index);		
+	public static final String getLowerCaseString(final int index) {
+		return getString(index);
 	}
-	
+
 	/**
 	 * Translates a positive integer (not equal to zero)
 	 * into a String using the letters 'A' to 'Z';
 	 * 1 = A, 2 = B, ..., 26 = Z, 27 = AA, 28 = AB,...
+	 * @param index the int to translate
+	 * @return the string in uppercase
 	 */
-	public static final String getUpperCaseString(int index) {
-		return getString(index).toUpperCase();		
+	public static final String getUpperCaseString(final int index) {
+		return getString(index).toUpperCase();
 	}
 
-	
+
 	/**
 	 * Translates a positive integer (not equal to zero)
 	 * into a String using the letters 'a' to 'z'
 	 * (a = 1, b = 2, ..., z = 26, aa = 27, ab = 28,...).
+	 * @param index the int to translate
+	 * @param lowercase true if the string sshould be lowercase false otherwise
+	 * @return the translated string
 	 */
-	public static final String getString(int index, boolean lowercase) {
+	public static final String getString(final int index, final boolean lowercase) {
 		if (lowercase) {
 			return getLowerCaseString(index);
 		}

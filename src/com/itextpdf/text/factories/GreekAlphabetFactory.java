@@ -1,8 +1,8 @@
 /*
- * $Id: GreekAlphabetFactory.java 4644 2010-12-15 13:35:05Z blowagie $
+ * $Id: GreekAlphabetFactory.java 4847 2011-05-05 19:46:13Z redlab_b $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -56,51 +56,52 @@ import com.itextpdf.text.SpecialSymbol;
  * @since 2.0.7 (was called GreekNumberFactory in earlier versions)
  */
 public class GreekAlphabetFactory {
-	/** 
+	/**
 	 * Changes an int into a lower case Greek letter combination.
 	 * @param index the original number
 	 * @return the letter combination
 	 */
-	public static final String getString(int index) {
+	public static final String getString(final int index) {
 		return getString(index, true);
 	}
-	
-	/** 
+
+	/**
 	 * Changes an int into a lower case Greek letter combination.
 	 * @param index the original number
 	 * @return the letter combination
 	 */
-	public static final String getLowerCaseString(int index) {
-		return getString(index);		
+	public static final String getLowerCaseString(final int index) {
+		return getString(index);
 	}
-	
-	/** 
+
+	/**
 	 * Changes an int into a upper case Greek letter combination.
 	 * @param index the original number
 	 * @return the letter combination
 	 */
-	public static final String getUpperCaseString(int index) {
-		return getString(index).toUpperCase();		
+	public static final String getUpperCaseString(final int index) {
+		return getString(index).toUpperCase();
 	}
 
-	/** 
+	/**
 	 * Changes an int into a Greek letter combination.
 	 * @param index the original number
+	 * @param lowercase set to lowercase
 	 * @return the letter combination
 	 */
-	public static final String getString(int index, boolean lowercase) {
+	public static final String getString(int index, final boolean lowercase) {
 		if (index < 1) return "";
 	    index--;
-	    	
+
 	    int bytes = 1;
 	    int start = 0;
-	    int symbols = 24;  
+	    int symbols = 24;
 	   	while(index >= symbols + start) {
 	   		bytes++;
 	   	    start += symbols;
 	   		symbols *= 24;
 	   	}
-	   	      
+
 	   	int c = index - start;
 	   	char[] value = new char[bytes];
 	   	while(bytes > 0) {
@@ -111,7 +112,7 @@ public class GreekAlphabetFactory {
 	   		value[bytes] = SpecialSymbol.getCorrespondingSymbol(value[bytes]);
 	   		c /= 24;
 	   	}
-	   	
+
 	   	return String.valueOf(value);
 	}
 }

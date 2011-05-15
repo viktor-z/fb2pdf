@@ -1,8 +1,8 @@
 /*
- * $Id: RomanNumberFactory.java 4644 2010-12-15 13:35:05Z blowagie $
+ * $Id: RomanNumberFactory.java 4847 2011-05-05 19:46:13Z redlab_b $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -66,13 +66,13 @@ public class RomanNumberFactory {
 		 * @param value the value
 		 * @param pre can it be used as a prefix
 		 */
-		RomanDigit(char digit, int value, boolean pre) {
+		RomanDigit(final char digit, final int value, final boolean pre) {
 			this.digit = digit;
 			this.value = value;
 			this.pre = pre;
 		}
 	}
-	
+
 	/**
 	 * Array with Roman digits.
 	 */
@@ -85,8 +85,8 @@ public class RomanNumberFactory {
 		new RomanDigit('v', 5, false),
 		new RomanDigit('i', 1, true)
 	};
-	
-	/** 
+
+	/**
 	 * Changes an int into a lower case roman number.
 	 * @param index the original number
 	 * @return the roman number (lower case)
@@ -136,31 +136,32 @@ public class RomanNumberFactory {
 		}
 		return buf.toString();
 	}
-	
-	/** 
+
+	/**
 	 * Changes an int into a lower case roman number.
 	 * @param index the original number
 	 * @return the roman number (lower case)
 	 */
-	public static final String getLowerCaseString(int index) {
-		return getString(index);		
+	public static final String getLowerCaseString(final int index) {
+		return getString(index);
 	}
-	
-	/** 
+
+	/**
 	 * Changes an int into an upper case roman number.
 	 * @param index the original number
 	 * @return the roman number (lower case)
 	 */
-	public static final String getUpperCaseString(int index) {
-		return getString(index).toUpperCase();		
+	public static final String getUpperCaseString(final int index) {
+		return getString(index).toUpperCase();
 	}
 
-	/** 
+	/**
 	 * Changes an int into a roman number.
 	 * @param index the original number
+	 * @param lowercase true for lowercase, false otherwise
 	 * @return the roman number (lower case)
 	 */
-	public static final String getString(int index, boolean lowercase) {
+	public static final String getString(final int index, final boolean lowercase) {
 		if (lowercase) {
 			return getLowerCaseString(index);
 		}
