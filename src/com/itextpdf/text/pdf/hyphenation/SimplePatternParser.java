@@ -1,8 +1,8 @@
 /*
- * $Id: SimplePatternParser.java 4672 2011-01-30 10:38:33Z blowagie $
+ * $Id: SimplePatternParser.java 4784 2011-03-15 08:33:00Z blowagie $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -46,7 +46,7 @@ package com.itextpdf.text.pdf.hyphenation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import com.itextpdf.text.ExceptionConverter;
@@ -211,7 +211,7 @@ public class SimplePatternParser implements SimpleXMLDocHandler,
 	public void startDocument() {
 	}
 
-	public void startElement(String tag, HashMap<String, String> h) {
+	public void startElement(String tag, Map<String, String> h) {
 		if (tag.equals("hyphen-char")) {
 			String hh = h.get("value");
 			if (hh != null && hh.length() == 1) {

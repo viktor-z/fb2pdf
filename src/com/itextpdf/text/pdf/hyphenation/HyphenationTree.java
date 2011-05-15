@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/* $Id: HyphenationTree.java 4242 2010-01-02 23:22:20Z xlv $ */
+/* $Id: HyphenationTree.java 4749 2011-02-14 11:25:32Z blowagie $ */
 
 package com.itextpdf.text.pdf.hyphenation;
 
@@ -172,7 +172,7 @@ public class HyphenationTree extends TernaryTree
      * at index an update interletter values. In other words, it
      * does something like:</p>
      * <code>
-     * for(i=0; i<patterns.length; i++) {
+     * for(i=0; i &lt; patterns.length; i++) {
      * if ( word.substring(index).startsWidth(patterns[i]) )
      * update_interletter_values(patterns[i]);
      * }
