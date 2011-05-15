@@ -1,8 +1,8 @@
 /*
- * $Id: SimpleXMLParser.java 4691 2011-02-02 15:27:12Z redlab_b $
+ * $Id: SimpleXMLParser.java 4784 2011-03-15 08:33:00Z blowagie $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -253,10 +253,25 @@ public final class SimpleXMLParser {
                     entity.setLength(0);
                     state = ENTITY;
                     nowhite = true;
+                } else if (character == ' ') {
+                	if (html && nowhite) {
+                		text.append(' ');
+                		nowhite = false;
+                	} else {
+                		if (nowhite){
+                			text.append((char)character);
+                		}
+                		nowhite = false;
+                	}
                 } else if (Character.isWhitespace((char)character)) {
-                	if (nowhite)
-                		text.append((char)character);
-                	nowhite = false;
+                	if (html) {
+                		// totally ignore other whitespace
+                	} else {
+                		if (nowhite){
+                			text.append((char)character);
+                		}
+                		nowhite = false;
+                	}
                 } else {
                     text.append((char)character);
                     nowhite = true;
@@ -603,7 +618,7 @@ public final class SimpleXMLParser {
         int count = in.read(b4);
         if (count != 4)
             throw new IOException(MessageLocalization.getComposedMessage("insufficient.length"));
-        String encoding = XMLUtil.getInstance().getEncodingName(b4);
+        String encoding = XMLUtil.getEncodingName(b4);
         String decl = null;
         if (encoding.equals("UTF-8")) {
             StringBuffer sb = new StringBuffer();
@@ -681,7 +696,7 @@ public final class SimpleXMLParser {
 	 */
 	@Deprecated
 	public static String escapeXML(final String s, final boolean onlyASCII) {
-		return XMLUtil.getInstance().escapeXML(s, onlyASCII);
+		return XMLUtil.escapeXML(s, onlyASCII);
 	}
 
 }
