@@ -1,6 +1,4 @@
 /*
- * $Id: ARCFOUREncryption.java 4784 2011-03-15 08:33:00Z blowagie $
- *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
@@ -43,58 +41,37 @@
  */
 package com.itextpdf.text.pdf.crypto;
 
-public class ARCFOUREncryption {
-    private byte state[] = new byte[256];
-    private int x;
-    private int y;
+import org.bouncycastle.crypto.BlockCipher;
+import org.bouncycastle.crypto.engines.AESFastEngine;
+import org.bouncycastle.crypto.modes.CBCBlockCipher;
+import org.bouncycastle.crypto.params.KeyParameter;
 
-    /** Creates a new instance of ARCFOUREncryption */
-    public ARCFOUREncryption() {
+/**
+ * Creates an AES Cipher with CBC and no padding.
+ * @author Paulo Soares
+ */
+public class AESCipherCBCnoPad {
+    private BlockCipher cbc;
+    
+    /** Creates a new instance of AESCipher */
+    public AESCipherCBCnoPad(boolean forEncryption, byte[] key) {
+        BlockCipher aes = new AESFastEngine();
+        cbc = new CBCBlockCipher(aes);
+        KeyParameter kp = new KeyParameter(key);
+        cbc.init(forEncryption, kp);
     }
     
-    public void prepareARCFOURKey(byte key[]) {
-        prepareARCFOURKey(key, 0, key.length);
-    }
-
-    public void prepareARCFOURKey(byte key[], int off, int len) {
-        int index1 = 0;
-        int index2 = 0;
-        for (int k = 0; k < 256; ++k)
-            state[k] = (byte)k;
-        x = 0;
-        y = 0;
-        byte tmp;
-        for (int k = 0; k < 256; ++k) {
-            index2 = (key[index1 + off] + state[k] + index2) & 255;
-            tmp = state[k];
-            state[k] = state[index2];
-            state[index2] = tmp;
-            index1 = (index1 + 1) % len;
+    public byte[] processBlock(byte[] inp, int inpOff, int inpLen) {
+        if ((inpLen % cbc.getBlockSize()) != 0)
+            throw new IllegalArgumentException("Not multiple of block: " + inpLen);
+        byte[] outp = new byte[inpLen];
+        int baseOffset = 0;
+        while (inpLen > 0) {
+            cbc.processBlock(inp, inpOff, outp, baseOffset);
+            inpLen -= cbc.getBlockSize();
+            baseOffset += cbc.getBlockSize();
+            inpOff += cbc.getBlockSize();
         }
+        return outp;
     }
-
-    public void encryptARCFOUR(byte dataIn[], int off, int len, byte dataOut[], int offOut) {
-        int length = len + off;
-        byte tmp;
-        for (int k = off; k < length; ++k) {
-            x = (x + 1) & 255;
-            y = (state[x] + y) & 255;
-            tmp = state[x];
-            state[x] = state[y];
-            state[y] = tmp;
-            dataOut[k - off + offOut] = (byte)(dataIn[k] ^ state[(state[x] + state[y]) & 255]);
-        }
-    }
-
-    public void encryptARCFOUR(byte data[], int off, int len) {
-        encryptARCFOUR(data, off, len, data, off);
-    }
-
-    public void encryptARCFOUR(byte dataIn[], byte dataOut[]) {
-        encryptARCFOUR(dataIn, 0, dataIn.length, dataOut, 0);
-    }
-
-    public void encryptARCFOUR(byte data[]) {
-        encryptARCFOUR(data, 0, data.length, data, 0);
-    }   
 }
