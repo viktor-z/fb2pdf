@@ -1,8 +1,8 @@
 /*
- * $Id: DocumentFont.java 4645 2011-01-06 15:16:40Z redlab_b $
+ * $Id: DocumentFont.java 4784 2011-03-15 08:33:00Z blowagie $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -48,6 +48,9 @@ import java.util.HashMap;
 
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.ExceptionConverter;
+import com.itextpdf.text.pdf.fonts.cmaps.CMap;
+import com.itextpdf.text.pdf.fonts.cmaps.CMapParser;
+import java.io.ByteArrayInputStream;
 
 /**
  *
@@ -298,6 +301,7 @@ public class DocumentFont extends BaseFont {
                     fillEncoding((PdfName)enc);
                 PdfArray diffs = encDic.getAsArray(PdfName.DIFFERENCES);
                 if (diffs != null) {
+                    CMap toUnicode = null;
                     diffmap = new IntHashtable();
                     int currentNumber = 0;
                     for (int k = 0; k < diffs.size(); ++k) {
@@ -309,6 +313,19 @@ public class DocumentFont extends BaseFont {
                             if (c != null && c.length > 0) {
                                 uni2byte.put(c[0], currentNumber);
                                 diffmap.put(c[0], currentNumber);
+                            }
+                            else {
+                                if (toUnicode == null) {
+                                    toUnicode = processToUnicode();
+                                    if (toUnicode == null) {
+                                        toUnicode = new CMap();
+                                    }
+                                }
+                                final String unicode = toUnicode.lookup(new byte[]{(byte) currentNumber}, 0, 1);
+                                if ((unicode != null) && (unicode.length() == 1)) {
+                                    this.uni2byte.put(unicode.charAt(0), currentNumber);
+                                    this.diffmap.put(unicode.charAt(0), currentNumber);
+                                }
                             }
                             ++currentNumber;
                         }
@@ -356,6 +373,20 @@ public class DocumentFont extends BaseFont {
             }
         }
         fillFontDesc(font.getAsDict(PdfName.FONTDESCRIPTOR));
+    }
+
+    private CMap processToUnicode() {
+        CMap cmapRet = null;
+        PdfObject toUni = PdfReader.getPdfObject(this.font.get(PdfName.TOUNICODE));
+        if (toUni != null) {
+            try {
+                byte[] touni = PdfReader.getStreamBytes((PRStream) PdfReader.getPdfObjectRelease(toUni));
+                CMapParser cmapParser = new CMapParser();
+                cmapRet = cmapParser.parse(new ByteArrayInputStream(touni));
+            } catch (Exception e) {
+            }
+        }
+        return cmapRet;
     }
 
     private void fillFontDesc(PdfDictionary fontDesc) {

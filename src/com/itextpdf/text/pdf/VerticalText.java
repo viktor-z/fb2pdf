@@ -1,8 +1,8 @@
 /*
- * $Id: VerticalText.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: VerticalText.java 4827 2011-05-02 22:34:16Z mstorer $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -254,6 +254,8 @@ public class VerticalText {
         return status;
     }
 
+    private Float curCharSpace = 0f;
+
     void writeLine(PdfLine line, PdfContentByte text, PdfContentByte graphics) {
         PdfFont currentFont = null;
         PdfChunk chunk;
@@ -265,9 +267,17 @@ public class VerticalText {
                 text.setFontAndSize(currentFont.getFont(), currentFont.size());
             }
             BaseColor color = chunk.color();
+            Float charSpace = (Float)chunk.getAttribute(Chunk.CHAR_SPACING);
+            // no char space setting means "leave it as is".
+            if (charSpace != null && !curCharSpace.equals(charSpace)) {
+            	curCharSpace = charSpace.floatValue();
+            	text.setCharacterSpacing(curCharSpace);
+            }
             if (color != null)
                 text.setColorFill(color);
+            
             text.showText(chunk.toString());
+            
             if (color != null)
                 text.resetRGBColorFill();
         }

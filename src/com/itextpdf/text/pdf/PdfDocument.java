@@ -1,8 +1,8 @@
 /*
- * $Id: PdfDocument.java 4634 2010-11-24 15:08:13Z blowagie $
+ * $Id: PdfDocument.java 4847 2011-05-05 19:46:13Z redlab_b $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -77,8 +77,6 @@ import com.itextpdf.text.pdf.collection.PdfCollection;
 import com.itextpdf.text.pdf.draw.DrawInterface;
 import com.itextpdf.text.pdf.internal.PdfAnnotationsImp;
 import com.itextpdf.text.pdf.internal.PdfViewerPreferencesImp;
-import java.util.Deque;
-import java.util.LinkedList;
 
 /**
  * <CODE>PdfDocument</CODE> is the class that is used by <CODE>PdfWriter</CODE>
@@ -127,7 +125,7 @@ public class PdfDocument extends Document {
          * @param		subject		subject of the document
          */
 
-        PdfInfo(String author, String title, String subject) {
+        PdfInfo(final String author, final String title, final String subject) {
             this();
             addTitle(title);
             addSubject(subject);
@@ -140,7 +138,7 @@ public class PdfDocument extends Document {
          * @param	title		the title of the document
          */
 
-        void addTitle(String title) {
+        void addTitle(final String title) {
             put(PdfName.TITLE, new PdfString(title, PdfObject.TEXT_UNICODE));
         }
 
@@ -150,7 +148,7 @@ public class PdfDocument extends Document {
          * @param	subject		the subject of the document
          */
 
-        void addSubject(String subject) {
+        void addSubject(final String subject) {
             put(PdfName.SUBJECT, new PdfString(subject, PdfObject.TEXT_UNICODE));
         }
 
@@ -160,7 +158,7 @@ public class PdfDocument extends Document {
          * @param	keywords		the keywords of the document
          */
 
-        void addKeywords(String keywords) {
+        void addKeywords(final String keywords) {
             put(PdfName.KEYWORDS, new PdfString(keywords, PdfObject.TEXT_UNICODE));
         }
 
@@ -170,7 +168,7 @@ public class PdfDocument extends Document {
          * @param	author		the name of the author
          */
 
-        void addAuthor(String author) {
+        void addAuthor(final String author) {
             put(PdfName.AUTHOR, new PdfString(author, PdfObject.TEXT_UNICODE));
         }
 
@@ -180,7 +178,7 @@ public class PdfDocument extends Document {
          * @param	creator		the name of the creator
          */
 
-        void addCreator(String creator) {
+        void addCreator(final String creator) {
             put(PdfName.CREATOR, new PdfString(creator, PdfObject.TEXT_UNICODE));
         }
 
@@ -202,7 +200,7 @@ public class PdfDocument extends Document {
             put(PdfName.MODDATE, date);
         }
 
-        void addkey(String key, String value) {
+        void addkey(final String key, final String value) {
             if (key.equals("Producer") || key.equals("CreationDate"))
                 return;
             put(new PdfName(key), new PdfString(value, PdfObject.TEXT_UNICODE));
@@ -235,7 +233,7 @@ public class PdfDocument extends Document {
          * @param writer the writer the catalog applies to
          */
 
-        PdfCatalog(PdfIndirectReference pages, PdfWriter writer) {
+        PdfCatalog(final PdfIndirectReference pages, final PdfWriter writer) {
             super(CATALOG);
             this.writer = writer;
             put(PdfName.PAGES, pages);
@@ -248,7 +246,7 @@ public class PdfDocument extends Document {
          * @param documentFileAttachment	the attached files
          * @param writer the writer the catalog applies to
          */
-        void addNames(TreeMap<String, Destination> localDestinations, HashMap<String, PdfObject> documentLevelJS, HashMap<String, PdfObject> documentFileAttachment, PdfWriter writer) {
+        void addNames(final TreeMap<String, Destination> localDestinations, final HashMap<String, PdfObject> documentLevelJS, final HashMap<String, PdfObject> documentFileAttachment, final PdfWriter writer) {
             if (localDestinations.isEmpty() && documentLevelJS.isEmpty() && documentFileAttachment.isEmpty())
                 return;
             try {
@@ -289,7 +287,7 @@ public class PdfDocument extends Document {
          * Adds an open action to the catalog.
          * @param	action	the action that will be triggered upon opening the document
          */
-        void setOpenAction(PdfAction action) {
+        void setOpenAction(final PdfAction action) {
             put(PdfName.OPENACTION, action);
         }
 
@@ -298,7 +296,7 @@ public class PdfDocument extends Document {
          * Sets the document level additional actions.
          * @param actions   dictionary of actions
          */
-        void setAdditionalActions(PdfDictionary actions) {
+        void setAdditionalActions(final PdfDictionary actions) {
             try {
                 put(PdfName.AA, writer.addToBody(actions).getIndirectReference());
             } catch (Exception e) {
@@ -328,7 +326,7 @@ public class PdfDocument extends Document {
      *                     what is added to this document to an outputstream.
      * @throws DocumentException on error
      */
-    public void addWriter(PdfWriter writer) throws DocumentException {
+    public void addWriter(final PdfWriter writer) throws DocumentException {
         if (this.writer == null) {
             this.writer = writer;
             annotationsImp = new PdfAnnotationsImp(writer);
@@ -364,7 +362,7 @@ public class PdfDocument extends Document {
      * @param	leading the current leading
      * @since	2.1.6
      */
-    void setLeading(float leading) {
+    void setLeading(final float leading) {
     	this.leading = leading;
     }
 
@@ -397,7 +395,7 @@ public class PdfDocument extends Document {
      * @throws DocumentException when a document isn't open yet, or has been closed
      */
     @Override
-    public boolean add(Element element) throws DocumentException {
+    public boolean add(final Element element) throws DocumentException {
         if (writer != null && writer.isPaused()) {
             return false;
         }
@@ -793,14 +791,22 @@ public class PdfDocument extends Document {
     protected int textEmptySize;
 
     // [C9] Metadata for the page
-    /** XMP Metadata for the page. */
-    protected byte[] xmpMetadata = null;
 	/**
 	 * Use this method to set the XMP Metadata.
 	 * @param xmpMetadata The xmpMetadata to set.
+	 * @throws IOException
 	 */
-	public void setXmpMetadata(byte[] xmpMetadata) {
-		this.xmpMetadata = xmpMetadata;
+	public void setXmpMetadata(final byte[] xmpMetadata) throws IOException {
+    	PdfStream xmp = new PdfStream(xmpMetadata);
+    	xmp.put(PdfName.TYPE, PdfName.METADATA);
+    	xmp.put(PdfName.SUBTYPE, PdfName.XML);
+    	PdfEncryption crypto = writer.getEncryption();
+        if (crypto != null && !crypto.isMetadataEncrypted()) {
+            PdfArray ar = new PdfArray();
+            ar.add(PdfName.CRYPT);
+            xmp.put(PdfName.FILTER, ar);
+        }
+    	writer.addPageDictEntry(PdfName.METADATA, writer.addToBody(xmp).getIndirectReference());
 	}
 
     /**
@@ -863,46 +869,15 @@ public class PdfDocument extends Document {
 
         	PdfPage page = new PdfPage(new PdfRectangle(pageSize, rotation), thisBoxSize, resources, rotation);
         	page.put(PdfName.TABS, writer.getTabs());
+        	page.putAll(writer.getPageDictEntries());
+        	writer.resetPageDictEntries();
 
             // we complete the page dictionary
 
-            // [C9] if there is XMP data to add: add it
-            if (xmpMetadata != null) {
-            	PdfStream xmp = new PdfStream(xmpMetadata);
-            	xmp.put(PdfName.TYPE, PdfName.METADATA);
-            	xmp.put(PdfName.SUBTYPE, PdfName.XML);
-            	PdfEncryption crypto = writer.getEncryption();
-                if (crypto != null && !crypto.isMetadataEncrypted()) {
-                    PdfArray ar = new PdfArray();
-                    ar.add(PdfName.CRYPT);
-                    xmp.put(PdfName.FILTER, ar);
-                }
-            	page.put(PdfName.METADATA, writer.addToBody(xmp).getIndirectReference());
-            }
-
-        	// [U3] page actions: transition, duration, additional actions
-        	if (this.transition!=null) {
-        		page.put(PdfName.TRANS, this.transition.getTransitionDictionary());
-        		transition = null;
-        	}
-        	if (this.duration>0) {
-        		page.put(PdfName.DUR,new PdfNumber(this.duration));
-        		duration = 0;
-        	}
+        	// [U3] page actions: additional actions
         	if (pageAA != null) {
         		page.put(PdfName.AA, writer.addToBody(pageAA).getIndirectReference());
         		pageAA = null;
-        	}
-
-        	// [U4] we add the thumbs
-        	if (thumb != null) {
-        		page.put(PdfName.THUMB, thumb);
-        		thumb = null;
-        	}
-
-        	// [U8] we check if the userunit is defined
-        	if (writer.getUserunit() > 0f) {
-        		page.put(PdfName.USERUNIT, new PdfNumber(writer.getUserunit()));
         	}
 
         	// [C5] and [C8] we add the annotations
@@ -943,7 +918,7 @@ public class PdfDocument extends Document {
      * @return <CODE>true</CODE> if the page size was set
      */
     @Override
-    public boolean setPageSize(Rectangle pageSize) {
+    public boolean setPageSize(final Rectangle pageSize) {
         if (writer != null && writer.isPaused()) {
             return false;
         }
@@ -975,7 +950,7 @@ public class PdfDocument extends Document {
      * @return	a <CODE>boolean</CODE>
      */
     @Override
-    public boolean setMargins(float marginLeft, float marginRight, float marginTop, float marginBottom) {
+    public boolean setMargins(final float marginLeft, final float marginRight, final float marginTop, final float marginBottom) {
         if (writer != null && writer.isPaused()) {
             return false;
         }
@@ -996,7 +971,7 @@ public class PdfDocument extends Document {
      * @see com.itextpdf.text.DocListener#setMarginMirroring(boolean)
      */
     @Override
-    public boolean setMarginMirroring(boolean MarginMirroring) {
+    public boolean setMarginMirroring(final boolean MarginMirroring) {
         if (writer != null && writer.isPaused()) {
             return false;
         }
@@ -1008,7 +983,7 @@ public class PdfDocument extends Document {
      * @since	2.1.6
      */
     @Override
-    public boolean setMarginMirroringTopBottom(boolean MarginMirroringTopBottom) {
+    public boolean setMarginMirroringTopBottom(final boolean MarginMirroringTopBottom) {
         if (writer != null && writer.isPaused()) {
             return false;
         }
@@ -1023,7 +998,7 @@ public class PdfDocument extends Document {
      * @param	pageN		the new page number
      */
     @Override
-    public void setPageCount(int pageN) {
+    public void setPageCount(final int pageN) {
         if (writer != null && writer.isPaused()) {
             return;
         }
@@ -1139,7 +1114,6 @@ public class PdfDocument extends Document {
         }
         // If the current line is not null or empty
         if (line != null && line.size() > 0) {
-
             // we check if the end of the page is reached (bugfix by Francois Gravel)
             //if (currentHeight + line.height() + leading > indentTop() - indentBottom()) {   //VIKTORZ --
             if (currentHeight  + line.height() - line.getDescender() > indentTop() - indentBottom()) { //VIKTORZ ++
@@ -1164,7 +1138,7 @@ public class PdfDocument extends Document {
         // a new current line is constructed
         line = new PdfLine(indentLeft(), indentRight(), alignment, leading);
     }
-    
+
     /**
      * Gets the current vertical page position.
      * @param ensureNewLine Tells whether a new line shall be enforced. This may cause side effects
@@ -1172,7 +1146,7 @@ public class PdfDocument extends Document {
      *   terminated.
      * @return The current vertical page position.
      */
-    public float getVerticalPosition(boolean ensureNewLine) {
+    public float getVerticalPosition(final boolean ensureNewLine) {
         // ensuring that a new line has been started.
         if (ensureNewLine) {
           ensureNewLine();
@@ -1254,7 +1228,6 @@ public class PdfDocument extends Document {
     public static String hangingPunctuation = ".,;:'-"; //VIKTORZ ++
     public static boolean preventWidows = true;         //VIKTORZ ++
     public static int maxFootnoteLines = 5;             //VIKTORZ ++
-
     /**
      * Writes a text line to the document. It takes care of all the attributes.
      * <P>
@@ -1268,7 +1241,7 @@ public class PdfDocument extends Document {
      * @throws DocumentException on error
      * @since 5.0.3 returns a float instead of void
      */
-    float writeLineToContent(PdfLine line, PdfContentByte text, PdfContentByte graphics, Object currentValues[], float ratio)  throws DocumentException {
+    float writeLineToContent(final PdfLine line, final PdfContentByte text, final PdfContentByte graphics, final Object currentValues[], final float ratio)  throws DocumentException {
         PdfFont currentFont = (PdfFont)currentValues[0];
         float lastBaseFactor = ((Float)currentValues[1]).floatValue();
         PdfChunk chunk;
@@ -1735,7 +1708,7 @@ public class PdfDocument extends Document {
      * @return <CODE>PdfCatalog</CODE>
      */
 
-    PdfCatalog getCatalog(PdfIndirectReference pages) {
+    PdfCatalog getCatalog(final PdfIndirectReference pages) {
         PdfCatalog catalog = new PdfCatalog(pages, writer);
 
         // [C1] outlines
@@ -1800,7 +1773,7 @@ public class PdfDocument extends Document {
      * @param outline the outline to be added
      * @param name the name of this local destination
      */
-    void addOutline(PdfOutline outline, String name) {
+    void addOutline(final PdfOutline outline, final String name) {
         localDestination(name, outline.getPdfDestination());
     }
 
@@ -1826,7 +1799,7 @@ public class PdfDocument extends Document {
     /**
      * Recursive method to update the count in the outlines.
      */
-    void traverseOutlineCount(PdfOutline outline) {
+    void traverseOutlineCount(final PdfOutline outline) {
         ArrayList<PdfOutline> kids = outline.getKids();
         PdfOutline parent = outline.parent();
         if (kids.isEmpty()) {
@@ -1863,7 +1836,7 @@ public class PdfDocument extends Document {
     /**
      * Recursive method used to write outlines.
      */
-    void outlineTree(PdfOutline outline) throws IOException {
+    void outlineTree(final PdfOutline outline) throws IOException {
         outline.setIndirectReference(writer.getPdfIndirectReference());
         if (outline.parent() != null)
             outline.put(PdfName.PARENT, outline.parent().indirectReference());
@@ -1892,12 +1865,12 @@ public class PdfDocument extends Document {
 	/** Contains the Viewer preferences of this PDF document. */
     protected PdfViewerPreferencesImp viewerPreferences = new PdfViewerPreferencesImp();
     /** @see com.itextpdf.text.pdf.interfaces.PdfViewerPreferences#setViewerPreferences(int) */
-    void setViewerPreferences(int preferences) {
+    void setViewerPreferences(final int preferences) {
         this.viewerPreferences.setViewerPreferences(preferences);
     }
 
     /** @see com.itextpdf.text.pdf.interfaces.PdfViewerPreferences#addViewerPreference(com.itextpdf.text.pdf.PdfName, com.itextpdf.text.pdf.PdfObject) */
-    void addViewerPreference(PdfName key, PdfObject value) {
+    void addViewerPreference(final PdfName key, final PdfObject value) {
     	this.viewerPreferences.addViewerPreference(key, value);
     }
 
@@ -1908,7 +1881,7 @@ public class PdfDocument extends Document {
      * Sets the page labels
      * @param pageLabels the page labels
      */
-    void setPageLabels(PdfPageLabels pageLabels) {
+    void setPageLabels(final PdfPageLabels pageLabels) {
         this.pageLabels = pageLabels;
     }
 
@@ -1923,7 +1896,7 @@ public class PdfDocument extends Document {
      * @param urx the upper right x corner of the activation area
      * @param ury the upper right y corner of the activation area
      */
-    void localGoto(String name, float llx, float lly, float urx, float ury) {
+    void localGoto(final String name, final float llx, final float lly, final float urx, final float ury) {
         PdfAction action = getLocalGotoAction(name);
         annotationsImp.addPlainAnnotation(new PdfAnnotation(writer, llx, lly, urx, ury, action));
     }
@@ -1937,7 +1910,7 @@ public class PdfDocument extends Document {
      * @param urx the upper right x corner of the activation area
      * @param ury the upper right y corner of the activation area
      */
-    void remoteGoto(String filename, String name, float llx, float lly, float urx, float ury) {
+    void remoteGoto(final String filename, final String name, final float llx, final float lly, final float urx, final float ury) {
         annotationsImp.addPlainAnnotation(new PdfAnnotation(writer, llx, lly, urx, ury, new PdfAction(filename, name)));
     }
 
@@ -1950,7 +1923,7 @@ public class PdfDocument extends Document {
      * @param urx the upper right x corner of the activation area
      * @param ury the upper right y corner of the activation area
      */
-    void remoteGoto(String filename, int page, float llx, float lly, float urx, float ury) {
+    void remoteGoto(final String filename, final int page, final float llx, final float lly, final float urx, final float ury) {
         addAnnotation(new PdfAnnotation(writer, llx, lly, urx, ury, new PdfAction(filename, page)));
     }
 
@@ -1961,7 +1934,7 @@ public class PdfDocument extends Document {
      * @param urx the upper right x corner of the activation area
      * @param ury the upper right y corner of the activation area
      */
-    void setAction(PdfAction action, float llx, float lly, float urx, float ury) {
+    void setAction(final PdfAction action, final float llx, final float lly, final float urx, final float ury) {
         addAnnotation(new PdfAnnotation(writer, llx, lly, urx, ury, action));
     }
 
@@ -1970,7 +1943,7 @@ public class PdfDocument extends Document {
      */
     protected TreeMap<String, Destination> localDestinations = new TreeMap<String, Destination>();
 
-    PdfAction getLocalGotoAction(String name) {
+    PdfAction getLocalGotoAction(final String name) {
         PdfAction action;
         Destination dest = localDestinations.get(name);
         if (dest == null)
@@ -1998,7 +1971,7 @@ public class PdfDocument extends Document {
      * <CODE>false</CODE> if a local destination with the same name
      * already existed
      */
-    boolean localDestination(String name, PdfDestination destination) {
+    boolean localDestination(final String name, final PdfDestination destination) {
         Destination dest = localDestinations.get(name);
         if (dest == null)
             dest = new Destination();
@@ -2017,7 +1990,7 @@ public class PdfDocument extends Document {
     int jsCounter;
     protected HashMap<String, PdfObject> documentLevelJS = new HashMap<String, PdfObject>();
     protected static final DecimalFormat SIXTEEN_DIGITS = new DecimalFormat("0000000000000000");
-    void addJavaScript(PdfAction js) {
+    void addJavaScript(final PdfAction js) {
         if (js.get(PdfName.JS) == null)
             throw new RuntimeException(MessageLocalization.getComposedMessage("only.javascript.actions.are.allowed"));
         try {
@@ -2027,7 +2000,7 @@ public class PdfDocument extends Document {
             throw new ExceptionConverter(e);
         }
     }
-    void addJavaScript(String name, PdfAction js) {
+    void addJavaScript(final String name, final PdfAction js) {
         if (js.get(PdfName.JS) == null)
             throw new RuntimeException(MessageLocalization.getComposedMessage("only.javascript.actions.are.allowed"));
         try {
@@ -2044,7 +2017,7 @@ public class PdfDocument extends Document {
 
     protected HashMap<String, PdfObject> documentFileAttachment = new HashMap<String, PdfObject>();
 
-    void addFileAttachment(String description, PdfFileSpecification fs) throws IOException {
+    void addFileAttachment(String description, final PdfFileSpecification fs) throws IOException {
         if (description == null) {
         	PdfString desc = (PdfString)fs.get(PdfName.DESC);
         	if (desc == null) {
@@ -2074,19 +2047,19 @@ public class PdfDocument extends Document {
 
     protected String openActionName;
 
-    void setOpenAction(String name) {
+    void setOpenAction(final String name) {
         openActionName = name;
         openActionAction = null;
     }
 
     protected PdfAction openActionAction;
-    void setOpenAction(PdfAction action) {
+    void setOpenAction(final PdfAction action) {
         openActionAction = action;
         openActionName = null;
     }
 
     protected PdfDictionary additionalActions;
-    void addAdditionalAction(PdfName actionType, PdfAction action)  {
+    void addAdditionalAction(final PdfName actionType, final PdfAction action)  {
         if (additionalActions == null)  {
             additionalActions = new PdfDictionary();
         }
@@ -2106,7 +2079,7 @@ public class PdfDocument extends Document {
      * Sets the collection dictionary.
      * @param collection a dictionary of type PdfCollection
      */
-	public void setCollection(PdfCollection collection) {
+	public void setCollection(final PdfCollection collection) {
 		this.collection = collection;
 	}
 
@@ -2122,15 +2095,15 @@ public class PdfDocument extends Document {
         return annotationsImp.getAcroForm();
     }
 
-    void setSigFlags(int f) {
+    void setSigFlags(final int f) {
         annotationsImp.setSigFlags(f);
     }
 
-    void addCalculationOrder(PdfFormField formField) {
+    void addCalculationOrder(final PdfFormField formField) {
         annotationsImp.addCalculationOrder(formField);
     }
 
-    void addAnnotation(PdfAnnotation annot) {
+    void addAnnotation(final PdfAnnotation annot) {
         pageEmpty = false;
         annotationsImp.addAnnotation(annot);
     }
@@ -2159,11 +2132,11 @@ public class PdfDocument extends Document {
      * the next page. */
     protected HashMap<String, PdfRectangle> boxSize = new HashMap<String, PdfRectangle>();
 
-    void setCropBoxSize(Rectangle crop) {
+    void setCropBoxSize(final Rectangle crop) {
         setBoxSize("crop", crop);
     }
 
-    void setBoxSize(String boxName, Rectangle size) {
+    void setBoxSize(final String boxName, final Rectangle size) {
         if (size == null)
             boxSize.remove(boxName);
         else
@@ -2200,7 +2173,7 @@ public class PdfDocument extends Document {
      * Gives the size of a trim, art, crop or bleed box, or null if not defined.
      * @param boxName crop, trim, art or bleed
      */
-    Rectangle getBoxSize(String boxName) {
+    Rectangle getBoxSize(final String boxName) {
     	PdfRectangle r = thisBoxSize.get(boxName);
     	if (r != null) return r.getRectangle();
     	return null;
@@ -2211,7 +2184,7 @@ public class PdfDocument extends Document {
     /** This checks if the page is empty. */
     private boolean pageEmpty = true;
 
-    void setPageEmpty(boolean pageEmpty) {
+    void setPageEmpty(final boolean pageEmpty) {
         this.pageEmpty = pageEmpty;
     }
 
@@ -2221,33 +2194,25 @@ public class PdfDocument extends Document {
 
 //	[U3] page actions
 
-    /** The duration of the page */
-    protected int duration=-1; // negative values will indicate no duration
-
-    /** The page transition */
-    protected PdfTransition transition=null;
-
     /**
      * Sets the display duration for the page (for presentations)
      * @param seconds   the number of seconds to display the page
      */
-    void setDuration(int seconds) {
+    void setDuration(final int seconds) {
         if (seconds > 0)
-            this.duration=seconds;
-        else
-            this.duration=-1;
+        	writer.addPageDictEntry(PdfName.DUR, new PdfNumber(seconds));
     }
 
     /**
      * Sets the transition for the page
      * @param transition   the PdfTransition object
      */
-    void setTransition(PdfTransition transition) {
-        this.transition=transition;
+    void setTransition(final PdfTransition transition) {
+        writer.addPageDictEntry(PdfName.TRANS, transition.getTransitionDictionary());
     }
 
     protected PdfDictionary pageAA = null;
-    void setPageAction(PdfName actionType, PdfAction action) {
+    void setPageAction(final PdfName actionType, final PdfAction action) {
         if (pageAA == null) {
             pageAA = new PdfDictionary();
         }
@@ -2256,9 +2221,8 @@ public class PdfDocument extends Document {
 
 //	[U8] thumbnail images
 
-    protected PdfIndirectReference thumb;
-    void setThumbnail(Image image) throws PdfException, DocumentException {
-        thumb = writer.getImageReference(writer.addDirectImageSimple(image));
+    void setThumbnail(final Image image) throws PdfException, DocumentException {
+        writer.addPageDictEntry(PdfName.THUMB, writer.getImageReference(writer.addDirectImageSimple(image)));
     }
 
 //	[M0] Page resources contain references to fonts, extgstate, images,...
@@ -2287,7 +2251,7 @@ public class PdfDocument extends Document {
      * @param strictImageSequence New value of property strictImageSequence.
      *
      */
-    void setStrictImageSequence(boolean strictImageSequence) {
+    void setStrictImageSequence(final boolean strictImageSequence) {
         this.strictImageSequence = strictImageSequence;
     }
 
@@ -2297,7 +2261,7 @@ public class PdfDocument extends Document {
 	/**
 	 * Method added by Pelikan Stephan
 	 */
-	public void clearTextWrap() throws DocumentException {
+	public void clearTextWrap() {
 		float tmpHeight = imageEnd - currentHeight;
 		if (line != null) {
 			tmpHeight += line.height();
@@ -2318,7 +2282,7 @@ public class PdfDocument extends Document {
      * @throws DocumentException on error
      */
 
-    protected void add(Image image) throws PdfException, DocumentException {
+    protected void add(final Image image) throws PdfException, DocumentException {
 
         if (image.hasAbsoluteY()) {
             graphics.addImage(image);
@@ -2389,19 +2353,15 @@ public class PdfDocument extends Document {
      * @param ptable the <CODE>PdfPTable</CODE> to be added to the document.
      * @throws DocumentException on error
      */
-    void addPTable(PdfPTable ptable) throws DocumentException {
+    void addPTable(final PdfPTable ptable) throws DocumentException {
         ColumnText ct = new ColumnText(writer.getDirectContent());
         // if the table prefers to be on a single page, and it wouldn't
         //fit on the current page, start a new page.
         if (ptable.getKeepTogether() && !fitsPage(ptable, 0f) && currentHeight > 0)  {
         	newPage();
         }
-        // add dummy paragraph if we aren't at the top of a page, so that
-        // spacingBefore will be taken into account by ColumnText
-        if (currentHeight > 0) {
-	        Paragraph p = new Paragraph();
-	        p.setLeading(0);
-	        ct.addElement(p);
+        if (currentHeight == 0) {
+        	ct.setAdjustFirstLine(false);
         }
         ct.addElement(ptable);
         boolean he = ptable.isHeadersInEvent();
@@ -2435,7 +2395,7 @@ public class PdfDocument extends Document {
      * @return	<CODE>true</CODE> if the <CODE>PdfPTable</CODE> fits the page, <CODE>false</CODE> otherwise.
      */
 
-    boolean fitsPage(PdfPTable table, float margin) {
+    boolean fitsPage(final PdfPTable table, final float margin) {
     	if (!table.isLockedWidth()) {
     		float totalWidth = (indentRight() - indentLeft()) * table.getWidthPercentage() / 100;
     		table.setTotalWidth(totalWidth);

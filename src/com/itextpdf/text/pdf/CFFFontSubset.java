@@ -1,8 +1,8 @@
 /*
- * $Id: CFFFontSubset.java 4689 2011-02-02 11:45:40Z redlab_b $
+ * $Id: CFFFontSubset.java 4784 2011-03-15 08:33:00Z blowagie $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -1433,8 +1433,8 @@ public class CFFFontSubset extends CFFFont {
 	    // Else do nothing
 	    // At the end of each object mark its ending (Even if wasn't written)
 		for (int k=0; k<fonts[Font].FDArrayOffsets.length-1; k++) {
-			if (FDArrayUsed.contains(Integer.valueOf(k)))
-			{
+//			if (FDArrayUsed.contains(Integer.valueOf(k)))
+//			{
 				// Goto beginning of objects
 	            seek(fonts[Font].FDArrayOffsets[k]);
 	            while (getPosition() < fonts[Font].FDArrayOffsets[k+1])
@@ -1464,7 +1464,7 @@ public class CFFFontSubset extends CFFFont {
 	            	else  // other than private
 	            		OutputList.addLast(new RangeItem(buf,p1,p2-p1));
 	            }
-			}
+//			}
             // Mark the ending of the object (even if wasn't written)
             OutputList.addLast(new IndexMarkerItem(fdOffsets[k],fdArrayBase));
         }
@@ -1485,8 +1485,8 @@ public class CFFFontSubset extends CFFFont {
 	    // Else do nothing
 		for (int i=0;i<fonts[Font].fdprivateOffsets.length;i++)
 		{
-			if (FDArrayUsed.contains(Integer.valueOf(i)))
-			{
+//			if (FDArrayUsed.contains(Integer.valueOf(i)))
+//			{
 				// Mark beginning
 		        OutputList.addLast(new MarkerItem(fdPrivate[i]));
 		        fdPrivateBase[i] = new IndexBaseItem();
@@ -1509,7 +1509,7 @@ public class CFFFontSubset extends CFFFont {
 	            	else
 	            		OutputList.addLast(new RangeItem(buf,p1,p2-p1));
 	            }
-			}
+//			}
 		}
 	}
 

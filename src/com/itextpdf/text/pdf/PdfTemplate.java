@@ -1,8 +1,8 @@
 /*
- * $Id: PdfTemplate.java 4113 2009-12-01 11:08:59Z blowagie $
+ * $Id: PdfTemplate.java 4798 2011-04-06 11:45:02Z blowagie $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -70,7 +70,13 @@ public class PdfTemplate extends PdfContentByte {
     protected PdfTransparencyGroup group;
     
     protected PdfOCG layer;
-    
+
+	/**
+	 * A dictionary with additional information
+	 * @since 5.1.0
+	 */
+	private PdfDictionary additional = null;
+	
     /**
      *Creates a <CODE>PdfTemplate</CODE>.
      */
@@ -260,6 +266,7 @@ public class PdfTemplate extends PdfContentByte {
             tpl.matrix = new PdfArray(matrix);
         }
         tpl.separator = separator;
+        tpl.additional = additional;
         return tpl;
     }
     
@@ -286,5 +293,26 @@ public class PdfTemplate extends PdfContentByte {
     public void setGroup(PdfTransparencyGroup group) {
         this.group = group;
     }
-    
+
+
+	/**
+	 * Getter for the dictionary with additional information.
+	 *
+	 * @return a PdfDictionary with additional information.
+	 * @since 5.1.0
+	 */
+	public PdfDictionary getAdditional() {
+		return this.additional;
+	}
+
+	/**
+	 * Sets a dictionary with extra entries, for instance /Measure.
+	 *
+	 * @param additional
+	 *            a PdfDictionary with additional information.
+	 * @since 5.1.0
+	 */
+	public void setAdditional(PdfDictionary additional) {
+		this.additional = additional;
+	}
 }

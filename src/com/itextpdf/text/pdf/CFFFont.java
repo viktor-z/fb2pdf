@@ -1,8 +1,8 @@
 /*
- * $Id: CFFFont.java 4645 2011-01-06 15:16:40Z redlab_b $
+ * $Id: CFFFont.java 4784 2011-03-15 08:33:00Z blowagie $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -1138,10 +1138,13 @@ public class CFFFont {
                     fonts[j].charsetOffset = ((Integer)args[0]).intValue();
 
                 }
-                else if (key=="Encoding"){
-                    fonts[j].encodingOffset = ((Integer)args[0]).intValue();
-                    ReadEncoding(fonts[j].encodingOffset);
-                }
+//                else if (key=="Encoding"){
+//                    int encOffset = ((Integer)args[0]).intValue();
+//                    if (encOffset > 0) {
+//                        fonts[j].encodingOffset = encOffset;
+//                        ReadEncoding(fonts[j].encodingOffset);
+//                    }
+//                }
                 else if (key=="CharStrings") {
                     fonts[j].charstringsOffset = ((Integer)args[0]).intValue();
                     //System.err.println("charstrings "+fonts[j].charstringsOffset);
@@ -1181,13 +1184,13 @@ public class CFFFont {
 
                 for (int k=0; k<fdarrayOffsets.length-1; k++) {
                     seek(fdarrayOffsets[k]);
-                    while (getPosition() < fdarrayOffsets[k+1])
+                    while (getPosition() < fdarrayOffsets[k+1]) {
                         getDictItem();
-                    if (key=="Private") {
-                        fonts[j].fdprivateLengths[k]  = ((Integer)args[0]).intValue();
-                        fonts[j].fdprivateOffsets[k]  = ((Integer)args[1]).intValue();
+                        if (key=="Private") {
+                            fonts[j].fdprivateLengths[k]  = ((Integer)args[0]).intValue();
+                            fonts[j].fdprivateOffsets[k]  = ((Integer)args[1]).intValue();
+                        }
                     }
-
                 }
             }
         }

@@ -1,8 +1,8 @@
 /*
- * $Id: PdfArray.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: PdfArray.java 4793 2011-04-05 15:28:41Z blowagie $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
 
 /**
@@ -130,7 +131,7 @@ public class PdfArray extends PdfObject {
      *   something that isn't a <CODE>PdfObject</CODE>
      * @since 2.1.3
      */
-    public PdfArray(ArrayList<PdfObject> l) {
+    public PdfArray(List<PdfObject> l) {
         this();
         for (PdfObject element : l)
             add(element);

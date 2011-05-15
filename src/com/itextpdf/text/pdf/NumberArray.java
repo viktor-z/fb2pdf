@@ -1,5 +1,5 @@
 /*
- * $Id: DefaultSplitCharacter.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2011 1T3XT BVBA
@@ -43,59 +43,34 @@
  */
 package com.itextpdf.text.pdf;
 
-import com.itextpdf.text.SplitCharacter;
+import java.util.List;
+
 
 /**
- * The default class that is used to determine whether or not a character
- * is a split character. You can subclass this class to define your own
- * split characters.
- * @since	2.1.2
+ * A PdfArray object consisting of nothing but PdfNumber objects
+ * @since 5.1.0
  */
-public class DefaultSplitCharacter implements SplitCharacter {
-	
-	/**
-	 * An instance of the default SplitCharacter.
-	 */
-	public static final SplitCharacter DEFAULT = new DefaultSplitCharacter();
-	
-	/**
-	 * Checks if a character can be used to split a <CODE>PdfString</CODE>.
-	 * <P>
-	 * for the moment every character less than or equal to SPACE, the character '-'
-	 * and some specific unicode ranges are 'splitCharacters'.
-	 * 
-	 * @param start start position in the array
-	 * @param current current position in the array
-	 * @param end end position in the array
-	 * @param	cc		the character array that has to be checked
-	 * @param ck chunk array
-	 * @return	<CODE>true</CODE> if the character can be used to split a string, <CODE>false</CODE> otherwise
-	 */
-    public boolean isSplitCharacter(int start, int current, int end, char[] cc, PdfChunk[] ck) {
-        char c = getCurrentCharacter(current, cc, ck);
-        if (c <= ' ' || c == '-' || c == '\u2010') {
-            return true;
-        }
-        if (c < 0x2002)
-            return false;
-        return ((c >= 0x2002 && c <= 0x200b)
-        || (c >= 0x2e80 && c < 0xd7a0)
-        || (c >= 0xf900 && c < 0xfb00)
-        || (c >= 0xfe30 && c < 0xfe50)
-        || (c >= 0xff61 && c < 0xffa0));
-    }
+public class NumberArray extends PdfArray {
 
-    /**
-     * Returns the current character
-	 * @param current current position in the array
-	 * @param	cc		the character array that has to be checked
-	 * @param ck chunk array
-     * @return	the current character
-     */
-    protected char getCurrentCharacter(int current, char[] cc, PdfChunk[] ck) {
-    	if (ck == null) {
-    		return cc[current];
-    	}
-    	return (char)ck[Math.min(current, ck.length - 1)].getUnicodeEquivalent(cc[current]);
-    }
+	/**
+	 * Creates a PdfArray consisting of PdfNumber objects.
+	 * @param numbers float values
+	 */
+	public NumberArray(float... numbers) {
+		super();
+		for (float f : numbers) {
+			add(new PdfNumber(f));
+		}
+	}
+	
+	/**
+	 * Creates a PdfArray consisting of PdfNumber objects.
+	 * @param numbers a List containing PdfNumber objects
+	 */
+	public NumberArray(List<PdfNumber> numbers) {
+		super();
+		for (PdfNumber n : numbers) {
+			add(n);
+		}
+	}
 }

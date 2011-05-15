@@ -1,8 +1,8 @@
 /*
- * $Id: PdfEncodings.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: PdfEncodings.java 4784 2011-03-15 08:33:00Z blowagie $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -53,6 +53,10 @@ import java.util.StringTokenizer;
 
 import com.itextpdf.text.ExceptionConverter;
 import com.itextpdf.text.error_messages.MessageLocalization;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CodingErrorAction;
 /** Supports fast encodings for winansi and PDFDocEncoding.
  * Supports conversions from CJK encodings to CID.
  * Supports custom encodings.
@@ -189,9 +193,18 @@ public class PdfEncodings {
             return b;
         }
         try {
-            return text.getBytes(encoding);
+            Charset cc = Charset.forName(encoding);
+            CharsetEncoder ce = cc.newEncoder();
+            ce.onUnmappableCharacter(CodingErrorAction.IGNORE);
+            CharBuffer cb = CharBuffer.wrap(text.toCharArray());
+            java.nio.ByteBuffer bb = ce.encode(cb);
+            bb.rewind();
+            int lim = bb.limit();
+            byte[] br = new byte[lim];
+            bb.get(br);
+            return br;
         }
-        catch (UnsupportedEncodingException e) {
+        catch (IOException e) {
             throw new ExceptionConverter(e);
         }
     }
@@ -237,9 +250,18 @@ public class PdfEncodings {
             return b;
         }
         try {
-            return String.valueOf(char1).getBytes(encoding);
+            Charset cc = Charset.forName(encoding);
+            CharsetEncoder ce = cc.newEncoder();
+            ce.onUnmappableCharacter(CodingErrorAction.IGNORE);
+            CharBuffer cb = CharBuffer.wrap(new char[]{char1});
+            java.nio.ByteBuffer bb = ce.encode(cb);
+            bb.rewind();
+            int lim = bb.limit();
+            byte[] br = new byte[lim];
+            bb.get(br);
+            return br;
         }
-        catch (UnsupportedEncodingException e) {
+        catch (IOException e) {
             throw new ExceptionConverter(e);
         }
     }

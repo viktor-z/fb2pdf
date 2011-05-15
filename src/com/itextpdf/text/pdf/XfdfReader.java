@@ -1,8 +1,8 @@
 /*
- * $Id: XfdfReader.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: XfdfReader.java 4784 2011-03-15 08:33:00Z blowagie $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -50,6 +50,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import com.itextpdf.text.error_messages.MessageLocalization;
@@ -63,8 +64,8 @@ import com.itextpdf.text.xml.simpleparser.SimpleXMLParser;
 public class XfdfReader implements SimpleXMLDocHandler {
 	// stuff used during parsing to handle state
 	private boolean foundRoot = false;
-    private Stack<String> fieldNames = new Stack<String>();
-    private Stack<String> fieldValues = new Stack<String>();
+    private final Stack<String> fieldNames = new Stack<String>();
+    private final Stack<String> fieldValues = new Stack<String>();
 
     // storage for the field list and their values
 	HashMap<String, String>	fields;
@@ -165,7 +166,7 @@ public class XfdfReader implements SimpleXMLDocHandler {
      * @param tag the tag name
      * @param h the tag's attributes
      */
-    public void startElement(String tag, HashMap<String, String> h)
+    public void startElement(String tag, Map<String, String> h)
     {
         if ( !foundRoot ) {
             if (!tag.equals("xfdf"))

@@ -1,8 +1,8 @@
 /*
- * $Id: StandardDecryption.java 4113 2009-12-01 11:08:59Z blowagie $
+ * $Id: StandardDecryption.java 4784 2011-03-15 08:33:00Z blowagie $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -51,6 +51,7 @@ public class StandardDecryption {
     protected AESCipher cipher;
     private byte[] key;
     private static final int AES_128 = 4;
+    private static final int AES_256 = 5;
     private boolean aes;
     private boolean initiated;
     private byte[] iv = new byte[16];
@@ -58,7 +59,7 @@ public class StandardDecryption {
 
     /** Creates a new instance of StandardDecryption */
     public StandardDecryption(byte key[], int off, int len, int revision) {
-        aes = revision == AES_128;
+        aes = (revision == AES_128 || revision == AES_256);
         if (aes) {
             this.key = new byte[len];
             System.arraycopy(key, off, this.key, 0, len);
