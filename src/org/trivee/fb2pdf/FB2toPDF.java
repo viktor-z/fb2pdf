@@ -249,7 +249,7 @@ public class FB2toPDF {
         addLine(chunk, currentStyle);
     }
 
-    protected void addCenteredImage(Image image) throws DocumentException {
+    protected void addCenteredImage(Image image) throws DocumentException, FB2toPDFException {
         Rectangle pageSize = doc.getPageSize();
         float dpi = stylesheet.getGeneralSettings().imageDpi;
         float scaleWidth = pageSize.getWidth() - doc.leftMargin() - doc.rightMargin();
@@ -264,7 +264,7 @@ public class FB2toPDF {
         addImage(image);
     }
 
-    protected void addImage(Image image) throws DocumentException {
+    protected void addImage(Image image) throws DocumentException, FB2toPDFException {
         rescaleImage(image);
         image.setAlignment(Image.MIDDLE);
         doc.add(image);
@@ -297,15 +297,19 @@ public class FB2toPDF {
         linkPageNumTemplates.put(currentReference, new LinkPageNumTemplate(template, currentStyle));
     }
 
-    private float rescaleImage(Image image) {
+    private float rescaleImage(Image image) throws FB2toPDFException {
         return rescaleImage(image, 1.0f);
     }
 
-    private float rescaleImage(Image image, float zoomFactor) {
+    private float rescaleImage(Image image, float zoomFactor) throws FB2toPDFException {
         Rectangle pageSize = doc.getPageSize();
         float dpi = stylesheet.getGeneralSettings().imageDpi;
-        float scaleWidth = (pageSize.getWidth() - doc.leftMargin() - doc.rightMargin()) * 0.95f;
-        float scaleHeight = (pageSize.getHeight() - doc.topMargin() - doc.bottomMargin()) * 0.95f;
+        float hSpace = doc.topMargin() + doc.bottomMargin() + image.getSpacingAfter() + image.getSpacingBefore();
+        float wSpace = doc.leftMargin() + doc.rightMargin();
+        hSpace = Math.max(hSpace, currentStyle.getAbsoluteLeading() + currentStyle.getFontSize().getPoints());
+        wSpace = Math.max(wSpace, hSpace * image.getWidth() / pageSize.getHeight());
+        float scaleWidth = pageSize.getWidth() - wSpace;
+        float scaleHeight = pageSize.getHeight() - hSpace;
         float imgWidth = image.getWidth() / dpi * 72 * zoomFactor;
         float imgHeight = image.getHeight() / dpi * 72 * zoomFactor;
         if ((imgWidth <= scaleWidth) && (imgHeight <= scaleHeight)) {
