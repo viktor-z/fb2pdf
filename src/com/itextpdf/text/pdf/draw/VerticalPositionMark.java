@@ -1,8 +1,8 @@
 /*
- * $Id: VerticalPositionMark.java 4242 2010-01-02 23:22:20Z xlv $
+ * $Id: VerticalPositionMark.java 4784 2011-03-15 08:33:00Z blowagie $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -43,6 +43,7 @@
  */
 package com.itextpdf.text.pdf.draw;
 
+import java.util.List;
 import java.util.ArrayList;
 
 import com.itextpdf.text.Chunk;
@@ -79,7 +80,7 @@ public class VerticalPositionMark implements DrawInterface, Element {
 	 * @param	drawInterface	the drawInterface for this vertical position mark.
 	 * @param	offset			the offset for this vertical position mark.
 	 */
-	public VerticalPositionMark(DrawInterface drawInterface, float offset) {
+	public VerticalPositionMark(final DrawInterface drawInterface, final float offset) {
 		this.drawInterface = drawInterface;
 		this.offset = offset;
 	}
@@ -87,7 +88,7 @@ public class VerticalPositionMark implements DrawInterface, Element {
 	/**
 	 * @see com.itextpdf.text.pdf.draw.DrawInterface#draw(com.itextpdf.text.pdf.PdfContentByte, float, float, float, float, float)
 	 */
-	public void draw(PdfContentByte canvas, float llx, float lly, float urx, float ury, float y) {
+	public void draw(final PdfContentByte canvas, final float llx, final float lly, final float urx, final float ury, final float y) {
 		if (drawInterface != null) {
 			drawInterface.draw(canvas, llx, lly, urx, ury, y + offset);
 		}
@@ -96,7 +97,7 @@ public class VerticalPositionMark implements DrawInterface, Element {
     /**
      * @see com.itextpdf.text.Element#process(com.itextpdf.text.ElementListener)
      */
-    public boolean process(ElementListener listener) {
+    public boolean process(final ElementListener listener) {
 		try {
 			return listener.add(this);
 		} catch (DocumentException e) {
@@ -128,8 +129,8 @@ public class VerticalPositionMark implements DrawInterface, Element {
     /**
      * @see com.itextpdf.text.Element#getChunks()
      */
-    public ArrayList<Chunk> getChunks() {
-    	ArrayList<Chunk> list = new ArrayList<Chunk>();
+    public List<Chunk> getChunks() {
+    	List<Chunk> list = new ArrayList<Chunk>();
     	list.add(new Chunk(this, true));
         return list;
     }
@@ -146,7 +147,7 @@ public class VerticalPositionMark implements DrawInterface, Element {
      * Setter for the interface with the overruling draw() method.
      * @param drawInterface a DrawInterface implementation
      */
-    public void setDrawInterface(DrawInterface drawInterface) {
+    public void setDrawInterface(final DrawInterface drawInterface) {
         this.drawInterface = drawInterface;
     }
 
@@ -164,7 +165,7 @@ public class VerticalPositionMark implements DrawInterface, Element {
      * choose a negative offset.
      * @param offset	an offset
      */
-    public void setOffset(float offset) {
+    public void setOffset(final float offset) {
         this.offset = offset;
     }
 }
