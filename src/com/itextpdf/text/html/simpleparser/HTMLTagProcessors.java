@@ -1,8 +1,8 @@
 /*
  * $Id: HTMLWorker.java 4666 2011-01-29 12:53:09Z blowagie $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2010 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -106,9 +106,8 @@ public class HTMLTagProcessors extends HashMap<String, HTMLTagProcessor> {
 		 */
 		public void startElement(HTMLWorker worker, String tag, Map<String, String> attrs) {
 			tag = mapTag(tag);
-			attrs = new HashMap<String, String>();
 			attrs.put(tag, null);
-			worker.updateChain(tag, attrs);;
+			worker.updateChain(tag, attrs);
 		}
 		/**
 		 * @see com.itextpdf.text.html.simpleparser.HTMLTagProcessors#endElement(com.itextpdf.text.html.simpleparser.HTMLWorker, java.lang.String)
@@ -345,6 +344,9 @@ public class HTMLTagProcessors extends HashMap<String, HTMLTagProcessor> {
 			worker.setSkipText(true);
 			// Table alignment should not affect children elements, thus remove
 			attrs.remove(HtmlTags.ALIGN);
+            // In case this is a nested table reset colspan and rowspan
+			attrs.put(HtmlTags.COLSPAN, "1");
+			attrs.put(HtmlTags.ROWSPAN, "1");
 			worker.updateChain(tag, attrs);
 		}
 

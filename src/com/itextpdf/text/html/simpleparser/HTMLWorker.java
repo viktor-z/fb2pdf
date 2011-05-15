@@ -1,8 +1,8 @@
 /*
- * $Id: HTMLWorker.java 4695 2011-02-03 12:12:31Z redlab_b $
+ * $Id: HTMLWorker.java 4832 2011-05-04 13:35:36Z blowagie $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -173,9 +173,9 @@ public class HTMLWorker implements SimpleXMLDocHandler, DocListener {
 	}
 
     /**
-     * @see com.itextpdf.text.xml.simpleparser.SimpleXMLDocHandler#startElement(java.lang.String, java.util.HashMap)
+     * @see com.itextpdf.text.xml.simpleparser.SimpleXMLDocHandler#startElement(java.lang.String, java.util.Map)
      */
-    public void startElement(String tag, HashMap<String, String> attrs) {
+    public void startElement(String tag, Map<String, String> attrs) {
 		HTMLTagProcessor htmlTag = tags.get(tag);
 		if (htmlTag == null) {
 			return;
@@ -626,13 +626,19 @@ public class HTMLWorker implements SimpleXMLDocHandler, DocListener {
         	totalWidth = 100 - totalWidth;
             Collections.reverse(cellWidths);
             float[] widths = new float[cellWidths.size()];
+            boolean hasZero = false;
             for (int i = 0; i < widths.length; i++) {
                 widths[i] = cellWidths.get(i).floatValue();
                 if (widths[i] == 0 && percentage && zeroWidth > 0) {
                 	widths[i] = totalWidth / zeroWidth;
                 }
+                if (widths[i] == 0) {
+                    hasZero = true;
+                    break;
+                }
             }
-            table.setColWidths(widths);
+            if (!hasZero)
+                table.setColWidths(widths);
         }
 		stack.push(table);
 	}

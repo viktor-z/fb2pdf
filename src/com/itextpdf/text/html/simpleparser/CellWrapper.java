@@ -1,8 +1,8 @@
 /*
  * $Id: IncCell.java 4635 2010-11-28 17:38:03Z psoares33 $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -43,7 +43,7 @@
  */
 package com.itextpdf.text.html.simpleparser;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Element;
@@ -61,16 +61,16 @@ import com.itextpdf.text.pdf.PdfPCell;
  * @since 5.0.6 (renamed)
  */
 public class CellWrapper implements TextElementArray {
-	
+
 	/** The cell that is wrapped in this stub. */
-    private PdfPCell cell;
-    
+    private final PdfPCell cell;
+
     /**
      * The width of the cell.
      * @since iText 5.0.6
      */
     private float width;
-    
+
     /**
      * Indicates if the width is a percentage.
      * @since iText 5.0.6
@@ -83,7 +83,7 @@ public class CellWrapper implements TextElementArray {
      * @param	chain	properties such as width
      * @since	5.0.6
      */
-    public CellWrapper(String tag, ChainedProperties chain) {
+    public CellWrapper(final String tag, final ChainedProperties chain) {
         this.cell = createPdfPCell(tag, chain);
     	String value = chain.getProperty(HtmlTags.WIDTH);
         if (value != null) {
@@ -95,13 +95,14 @@ public class CellWrapper implements TextElementArray {
             width = Float.parseFloat(value);
         }
     }
-    
+
     /**
      * Creates a PdfPCell element based on a tag and its properties.
      * @param	tag		a cell tag
      * @param	chain	the hierarchy chain
+     * @return the created PdfPCell
      */
-	public PdfPCell createPdfPCell(String tag, ChainedProperties chain) {
+	public PdfPCell createPdfPCell(final String tag, final ChainedProperties chain) {
 		PdfPCell cell = new PdfPCell((Phrase)null);
         // colspan
 		String value = chain.getProperty(HtmlTags.COLSPAN);
@@ -148,7 +149,7 @@ public class CellWrapper implements TextElementArray {
     public PdfPCell getCell() {
         return cell;
     }
-	
+
     /**
      * Getter for the cell width
      * @return the width
@@ -171,17 +172,17 @@ public class CellWrapper implements TextElementArray {
      * Implements the add method of the TextElementArray interface.
      * @param	o	an element that needs to be added to the cell.
      */
-    public boolean add(Element o) {
+    public boolean add(final Element o) {
         cell.addElement(o);
         return true;
     }
 
     // these Element methods are irrelevant for a table stub.
-    
+
     /**
      * @since 5.0.1
      */
-    public ArrayList<Chunk> getChunks() {
+    public List<Chunk> getChunks() {
         return null;
     }
 
@@ -202,7 +203,7 @@ public class CellWrapper implements TextElementArray {
     /**
      * @since 5.0.1
      */
-    public boolean process(ElementListener listener) {
+    public boolean process(final ElementListener listener) {
         return false;
     }
 

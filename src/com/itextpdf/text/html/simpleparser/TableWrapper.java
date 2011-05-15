@@ -1,8 +1,8 @@
 /*
  * $Id: IncTable.java 4632 2010-11-24 14:44:42Z blowagie $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -68,12 +68,12 @@ public class TableWrapper implements Element {
 	 * The styles that need to be applied to the table
 	 * @since 5.0.6 renamed from props
 	 */
-    private Map<String, String> styles = new HashMap<String, String>();
+    private final Map<String, String> styles = new HashMap<String, String>();
     /**
      * Nested list containing the PdfPCell elements that are part of this table.
      */
-    private List<List<PdfPCell>> rows = new ArrayList<List<PdfPCell>>();
-    
+    private final List<List<PdfPCell>> rows = new ArrayList<List<PdfPCell>>();
+
     /**
      * Array containing the widths of the columns.
      * @since iText 5.0.6
@@ -84,7 +84,7 @@ public class TableWrapper implements Element {
      * Creates a new instance of IncTable.
      * @param	attrs	a Map containing attributes
      */
-    public TableWrapper(Map<String, String> attrs) {
+    public TableWrapper(final Map<String, String> attrs) {
         this.styles.putAll(attrs);
     }
 
@@ -104,7 +104,7 @@ public class TableWrapper implements Element {
      * Setter for the column widths
      * @since iText 5.0.6
      */
-    public void setColWidths(float[] colWidths) {
+    public void setColWidths(final float[] colWidths) {
         this.colWidths = colWidths;
     }
 
@@ -159,11 +159,11 @@ public class TableWrapper implements Element {
     }
 
     // these Element methods are irrelevant for a table stub.
-    
+
     /**
      * @since 5.0.1
      */
-    public ArrayList<Chunk> getChunks() {
+    public List<Chunk> getChunks() {
         return null;
     }
 
@@ -184,7 +184,7 @@ public class TableWrapper implements Element {
     /**
      * @since 5.0.1
      */
-    public boolean process(ElementListener listener) {
+    public boolean process(final ElementListener listener) {
         return false;
     }
 

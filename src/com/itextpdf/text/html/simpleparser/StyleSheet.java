@@ -1,8 +1,8 @@
 /*
- * $Id: StyleSheet.java 4697 2011-02-03 17:08:03Z blowagie $
+ * $Id: StyleSheet.java 4784 2011-03-15 08:33:00Z blowagie $
  *
- * This file is part of the iText project.
- * Copyright (c) 1998-2009 1T3XT BVBA
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2011 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,8 +27,8 @@
  * Section 5 of the GNU Affero General Public License.
  *
  * In accordance with Section 7(b) of the GNU Affero General Public License,
- * you must retain the producer line in every PDF that is created or manipulated
- * using iText.
+ * a covered work must retain the producer line in every PDF that is created
+ * or manipulated using iText.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
@@ -52,13 +52,13 @@ import com.itextpdf.text.html.HtmlTags;
 import com.itextpdf.text.html.HtmlUtilities;
 
 public class StyleSheet {
-	
+
 	/**
 	 * Map storing tags and their corresponding styles.
 	 * @since 5.0.6 (changed HashMap => Map)
 	 */
 	protected Map<String, Map<String, String>> tagMap = new HashMap<String, Map<String, String>>();
-	
+
 	/**
 	 * Map storing possible names of the "class" attribute
 	 * and their corresponding styles.
@@ -130,7 +130,7 @@ public class StyleSheet {
 	 * @param	tag		the tag that needs to be resolved
 	 * @param	attrs	existing style map that will be updated
 	 */
-	public void applyStyle(String tag, HashMap<String, String> attrs) {
+	public void applyStyle(String tag, Map<String, String> attrs) {
 		// first fetch the styles corresponding with the tag name
 		Map<String, String> map = tagMap.get(tag.toLowerCase());
 		if (map != null) {
