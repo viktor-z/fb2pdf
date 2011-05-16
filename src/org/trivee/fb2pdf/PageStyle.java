@@ -20,6 +20,7 @@ public class PageStyle
     public boolean footnotes = false;
     public int footnotesMaxLines = 5;
     public int footnoteMaxLines = Integer.MAX_VALUE;
+    public boolean tableCellsAutoWidth = false;
 
     public String backgroundColor = "0xFFFFFF";
 

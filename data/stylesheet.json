@@ -105,6 +105,7 @@
         footnotes:      "false",
         footnotesMaxLines:      7,
         footnoteMaxLines:       999,
+        tableCellsAutoWidth:    false,
         preventWidows:	"true"
     },
     hyphenationSettings: {

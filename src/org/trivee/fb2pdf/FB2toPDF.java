@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
@@ -268,6 +269,40 @@ public class FB2toPDF {
         rescaleImage(image);
         image.setAlignment(Image.MIDDLE);
         doc.add(image);
+    }
+
+    private int[] getCellWidths(int colNumber, NodeList rows) throws DOMException {
+        int[] lengths = new int[colNumber];
+        for (int i = 0; i < rows.getLength(); i++) {
+            int curcol = 0;
+            Element row = (Element) rows.item(i);
+            NodeList cols = row.getChildNodes();
+            for (int j = 0; j < cols.getLength(); j++) {
+
+                String nodeName = cols.item(j).getNodeName();
+                if (!nodeName.equals("th") && !nodeName.equals("td")) {
+                    continue;
+                }
+
+                Element cellElement = (Element) cols.item(j);
+                int length = cellElement.getTextContent().length();
+                
+                int colspan = getCellElementSpan(cellElement, "colspan");
+                for (int k=0;k<colspan; k++) {
+                    lengths[curcol+k] = Math.max(length, lengths[curcol+k]);
+                }
+
+                curcol += colspan;
+            }
+        }
+        int totalMaxLength = 0;
+        for (int l : lengths) {
+            totalMaxLength += l;
+        }
+        for (int i=0; i<colNumber; i++) {
+            lengths[i] = Math.round((float)lengths[i] / (float)totalMaxLength * 100f);
+        }
+        return lengths;
     }
 
     private void saveLinkPageNumber(String currentAnchorName) {
@@ -502,7 +537,7 @@ public class FB2toPDF {
 
                 currentParagraph = null;
                 currentReference = null;
-
+                
                 cells.add(cell);
                 curcol += colspan;
             }
@@ -518,6 +553,10 @@ public class FB2toPDF {
         pdftable.setSpacingAfter(tableStyle.getSpacingAfter());
         float pageWidth = doc.getPageSize().getWidth() - doc.leftMargin() - doc.rightMargin();
         pdftable.setWidthPercentage((pageWidth - tableStyle.getLeftIndent() - tableStyle.getRightIndent())/pageWidth*100f);
+        if (stylesheet.getPageStyle().tableCellsAutoWidth) {
+            int[] widths = getCellWidths(maxcol, rows);
+            pdftable.setWidths(widths);
+        }
         doc.add(pdftable);
     }
 
@@ -540,13 +579,12 @@ public class FB2toPDF {
             }
         };
 
-        String colspanAttr = cellElement.getAttribute("colspan");
-        String rowspanAttr = cellElement.getAttribute("rowspan");
+        
+        int colspan = getCellElementSpan(cellElement, "colspan");
+        int rowspan = getCellElementSpan(cellElement, "rowspan");
+
         String alignAttr = cellElement.getAttribute("align");
         String valignAttr = cellElement.getAttribute("valign");
-
-        int colspan = isNullOrEmpty(colspanAttr) ? 1 : Integer.parseInt(colspanAttr);
-        int rowspan = isNullOrEmpty(rowspanAttr) ? 1 : Integer.parseInt(rowspanAttr);
         int hAlign = isNullOrEmpty(alignAttr) ? PdfPCell.ALIGN_CENTER : hAlignMap.get(alignAttr);
         int vAlign = isNullOrEmpty(valignAttr) ? PdfPCell.ALIGN_MIDDLE : vAlignMap.get(valignAttr);
 
@@ -556,6 +594,11 @@ public class FB2toPDF {
         cell.setVerticalAlignment(vAlign);
 
         return colspan;
+    }
+    
+    private int getCellElementSpan(Element cellElement, String attrName) {
+        String spanAttr = cellElement.getAttribute(attrName);
+        return isNullOrEmpty(spanAttr) ? 1 : Integer.parseInt(spanAttr);
     }
 
     private class PageSizeEnforceHelper extends PdfPageEventHelper {
