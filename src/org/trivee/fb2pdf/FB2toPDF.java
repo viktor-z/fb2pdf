@@ -365,8 +365,10 @@ public class FB2toPDF {
         float dpi = stylesheet.getGeneralSettings().imageDpi;
         float hSpace = doc.topMargin() + doc.bottomMargin() + image.getSpacingAfter() + image.getSpacingBefore();
         float wSpace = doc.leftMargin() + doc.rightMargin();
-        hSpace = Math.max(hSpace, currentStyle.getAbsoluteLeading() + currentStyle.getFontSize().getPoints());
-        wSpace = Math.max(wSpace, hSpace * image.getWidth() / pageSize.getHeight());
+        if (currentStyle != null) {
+            hSpace = Math.max(hSpace, currentStyle.getAbsoluteLeading() + currentStyle.getFontSize().getPoints());
+            wSpace = Math.max(wSpace, hSpace * image.getWidth() / pageSize.getHeight());
+        }
         float scaleWidth = pageSize.getWidth() - wSpace;
         float scaleHeight = pageSize.getHeight() - hSpace;
         float imgWidth = image.getWidth() / dpi * 72 * zoomFactor;
