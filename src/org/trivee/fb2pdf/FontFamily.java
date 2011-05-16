@@ -54,8 +54,10 @@ public class FontFamily
             try
             {
                 String[] parts = json.getAsString().split("#");
-                String filename = getValidatedFileName(parts[0]);
+                String[] parts2 = parts[0].split(",");
+                String filename =  getValidatedFileName(parts2[0]);
                 String encoding = parts.length > 1 ? parts[1] : null;
+                filename += parts2.length > 1 ? "," + parts2[1] : "";
                 if (encoding == null)
                     return new FontInfo(filename);
                 else
