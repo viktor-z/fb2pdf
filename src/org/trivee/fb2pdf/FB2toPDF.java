@@ -509,7 +509,6 @@ public class FB2toPDF {
             maxcol = Math.max(curcol, maxcol);
         }
         PdfPTable pdftable = new PdfPTable(maxcol);
-        pdftable.setWidthPercentage(95);
         for (PdfPCell cell : cells) {
             pdftable.addCell(cell);
         }
@@ -517,6 +516,8 @@ public class FB2toPDF {
         ParagraphStyle tableStyle = stylesheet.getParagraphStyle("table");
         pdftable.setSpacingBefore(tableStyle.getSpacingBefore());
         pdftable.setSpacingAfter(tableStyle.getSpacingAfter());
+        float pageWidth = doc.getPageSize().getWidth() - doc.leftMargin() - doc.rightMargin();
+        pdftable.setWidthPercentage((pageWidth - tableStyle.getLeftIndent() - tableStyle.getRightIndent())/pageWidth*100f);
         doc.add(pdftable);
     }
 

@@ -491,6 +491,8 @@
         {
             name:             "table",
             baseStyle:        "body",
+            leftIndent:       "0.5em",  
+            rightIndent:      "0.5em",  
             spacingBefore:    "0.5em",
             spacingAfter:     "0.5em"
         },
