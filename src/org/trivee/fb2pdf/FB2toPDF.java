@@ -296,11 +296,35 @@ public class FB2toPDF {
             }
         }
         int totalMaxLength = 0;
+        int maxLength = 0;
         for (int l : lengths) {
             totalMaxLength += l;
+            maxLength = Math.max(maxLength, l);
+        }
+        
+        int increment = Math.round(100f / colNumber);
+        int sizeOne, sizeTwo, sizeThree;
+        sizeOne = sizeTwo = sizeThree = 0;
+        for (int i=1;i<=maxLength;i++) {
+            if (i <= maxLength * 0.25) {
+                sizeOne = i;
+            } else if (i <= maxLength * 0.5) {
+                sizeTwo = i;
+            } else if (i <= maxLength * 0.75) {
+                sizeThree = i;
+            }
         }
         for (int i=0; i<colNumber; i++) {
-            lengths[i] = Math.round((float)lengths[i] / (float)totalMaxLength * 100f);
+            int l = lengths[i];
+            if (l <= sizeOne) {
+                lengths[i] = increment * 1;
+            } else if (l <= sizeTwo) {
+                lengths[i] = increment * 2;
+            }  else if (l <= sizeThree) {
+                lengths[i] = increment * 3;
+            } else {
+                lengths[i] = increment * 4;
+            }
         }
         return lengths;
     }
