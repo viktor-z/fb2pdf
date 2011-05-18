@@ -92,6 +92,7 @@
         marginRight:  "1.0pt",
         marginTop:    "0.0pt",
         marginBottom: "1.0pt",
+        imageExtraMargins: "10pt",
         marginMirroring: "false",
         sectionNewPage: {
         	"0": 1.0,

@@ -12,6 +12,7 @@ public class PageStyle
     private Dimension marginRight;
     private Dimension marginTop;
     private Dimension marginBottom;
+    private Dimension imageExtraMargins;
     private boolean marginMirroring;
 
     public boolean enforcePageSize;
@@ -28,6 +29,11 @@ public class PageStyle
 
     public PageStyle()
     {
+        try {
+            imageExtraMargins = new Dimension("0pt");
+        } catch (FB2toPDFException ex) {
+            
+        }
     }
 
     public float getPageWidth()     { return pageWidth.getPoints(); }
@@ -38,5 +44,6 @@ public class PageStyle
     public float getMarginRight()   { return marginRight.getPoints(); }
     public float getMarginTop()     { return marginTop.getPoints(); }
     public float getMarginBottom()  { return marginBottom.getPoints(); }
+    public float getImageExtraMargins()  { return imageExtraMargins.getPoints(); }
     public boolean getMarginMirroring() { return marginMirroring; }
 }
