@@ -45,6 +45,12 @@ public class CLIDriver {
     private static PrintWriter outWriter = new PrintWriter(System.out, true);
     private static String logEncoding;
 
+    private static void printNameVersion() {
+        String id = CLIDriver.class.getPackage().getImplementationVersion();
+        id = id == null ? "" : "fb2pdf-j." + id;
+        System.out.println(id);
+    }
+
     /**
      * Prints out the specified string to user-visible output, never to the log.
      */
@@ -81,11 +87,13 @@ public class CLIDriver {
 
         HelpFormatter formatter = new HelpFormatter();
         if(args.length == 0 || cl.hasOption('h')){
+                printNameVersion();
                 formatter.printHelp(hlpText, options);
                 return;
         }
 
         if (cl.getArgs().length < 1 || cl.getArgs().length > 2) {
+                printNameVersion();
                 formatter.printHelp(hlpText, options);
                 return;
         }

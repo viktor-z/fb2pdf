@@ -1211,9 +1211,10 @@ public class FB2toPDF {
                     frontMatter);
         }
 
-        addLine("PDF: org.trivee.fb2pdf.FB2toPDF 1.0, "
-                + java.text.DateFormat.getDateInstance().format(new java.util.Date()),
-                frontMatter);
+        String buildDate = CLIDriver.class.getPackage().getImplementationVersion();
+        String convertDate = java.text.DateFormat.getDateInstance().format(new java.util.Date());
+        addLine(String.format("PDF: fb2pdf%s, %s", 
+                (buildDate == null ? "" : "-j."+buildDate), convertDate), frontMatter);
     }
 
     private Image getImage(String href) {
