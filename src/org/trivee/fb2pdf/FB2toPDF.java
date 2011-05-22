@@ -47,8 +47,6 @@ import nu.xom.Nodes;
 import nu.xom.ParentNode;
 import nu.xom.Text;
 import nu.xom.XPathContext;
-import nux.xom.xquery.XQuery;
-import nux.xom.xquery.XQueryUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.tools.zip.ZipEntry;
@@ -184,7 +182,7 @@ public class FB2toPDF {
         }
     }
 
-    private void extractTextFromElement(Element element, StringBuilder text, boolean skipTitle) {
+    private void getNoteText(Element element, StringBuilder text, boolean skipTitle) {
         Elements children = element.getChildElements();
         for (int i = 0; i < children.size(); i++) {
             Element child = children.get(i);
@@ -193,7 +191,7 @@ public class FB2toPDF {
                 continue;
             }
             if(localName.equals("poem") || localName.equals("stanza")){
-                extractTextFromElement(child, text, false);
+                getNoteText(child, text, false);
             } else if (localName.equals("p") || localName.equals("v") || localName.equals("text-author") ||
                     localName.equals("date") || localName.equals("epigraph") ||
                     (!skipTitle && localName.equals("title"))) {
@@ -306,29 +304,11 @@ public class FB2toPDF {
             maxLength = Math.max(maxLength, l);
         }
         
-        int increment = Math.round(100f / colNumber);
-        int sizeOne, sizeTwo, sizeThree;
-        sizeOne = sizeTwo = sizeThree = 0;
-        for (int i=1;i<=maxLength;i++) {
-            if (i <= maxLength * 0.25) {
-                sizeOne = i;
-            } else if (i <= maxLength * 0.5) {
-                sizeTwo = i;
-            } else if (i <= maxLength * 0.75) {
-                sizeThree = i;
-            }
-        }
+        int numOfUnits = 10;
+        int unit = Math.round(100f / numOfUnits);
         for (int i=0; i<colNumber; i++) {
             int l = lengths[i];
-            if (l <= sizeOne) {
-                lengths[i] = increment * 1;
-            } else if (l <= sizeTwo) {
-                lengths[i] = increment * 2;
-            }  else if (l <= sizeThree) {
-                lengths[i] = increment * 3;
-            } else {
-                lengths[i] = increment * 4;
-            }
+            lengths[i] = Math.round((float)l / totalMaxLength * numOfUnits);
         }
         return lengths;
     }
@@ -447,7 +427,7 @@ public class FB2toPDF {
         }
         if (sections.size() > 0) {
             StringBuilder text = new StringBuilder();
-            extractTextFromElement((Element)sections.get(0), text, true);
+            getNoteText((Element)sections.get(0), text, true);
             return text.toString();
         }
 
@@ -602,7 +582,7 @@ public class FB2toPDF {
         cell.setRowspan(rowspan);
         cell.setHorizontalAlignment(hAlign);
         cell.setVerticalAlignment(vAlign);
-
+        
         return colspan;
     }
     
