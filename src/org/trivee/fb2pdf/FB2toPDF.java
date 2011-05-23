@@ -309,6 +309,7 @@ public class FB2toPDF {
         for (int i=0; i<colNumber; i++) {
             int l = lengths[i];
             lengths[i] = Math.round((float)l / totalMaxLength * numOfUnits);
+            lengths[i] = Math.max(lengths[i], 1);
         }
         return lengths;
     }
