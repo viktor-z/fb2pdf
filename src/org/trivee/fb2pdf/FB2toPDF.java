@@ -785,15 +785,22 @@ public class FB2toPDF {
             System.exit(-1);
         }
 
+        /*
         try {
-            is = Transformation.transform(is, stylesheet.getTransformationSettings());
+            is = Transformation.transformToInputStream(is, stylesheet.getTransformationSettings());
         } catch (Exception ex) {
             throw new RuntimeException("Error processing transformation. " + ex.getMessage());
         }
+         */
         try {
             fb2 = new Builder(false).build(is);
         } catch (ParsingException e) {
             System.err.println("XML parsing error at line " + e.getLineNumber() + "#" + e.getColumnNumber() + ": " + e.getMessage());
+        }
+        try {
+            Transformation.transform(fb2, stylesheet.getTransformationSettings());
+        } catch (Exception ex) {
+            throw new RuntimeException("Error processing transformation. " + ex.getMessage());
         }
     }
 

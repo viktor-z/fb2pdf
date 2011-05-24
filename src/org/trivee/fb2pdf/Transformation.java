@@ -27,30 +27,42 @@ import org.trivee.fb2pdf.TransformationSettings.Entry;
  */
 public class Transformation {
 
-    public static InputStream transform(InputStream inputStream, TransformationSettings settings) throws ParsingException, ValidityException, IOException, XQueryException {
+    /*
+    public static InputStream transformToInputStream(InputStream inputStream, TransformationSettings settings) throws ParsingException, ValidityException, IOException, XQueryException {
 
         if (!settings.enabled) {
             return inputStream;
         }
+        Document xdoc = new Builder(false).build(inputStream);
+        transform(xdoc, settings);
+        byte[] result = serialize(xdoc);
+        if (settings.outputDebugFile) {
+            (new FileOutputStream("transformation-result.xml")).write(result);
+        }
+        return new ByteArrayInputStream(result);
+    }
+     */
 
+    private static byte[] serialize(Document xdoc) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Serializer ser = new Serializer(out);
+        ser.write(xdoc);
+        out.close();
+        return out.toByteArray();
+    }
+
+    public static void transform(Document xdoc, TransformationSettings settings) throws ParsingException, XQueryException, IOException {
         String queryProlog = settings.queryProlog;
         String morpherProlog = settings.morpherProlog;
-        Document xdoc = new Builder().build(inputStream);
-
         for (Entry entry : settings.transformationsMap)
         {
             if (entry == null) continue;
             transform(queryProlog + entry.query, morpherProlog + entry.morpher, xdoc);
         }
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Serializer ser = new Serializer(out);
-        ser.write(xdoc);
-        out.close();
         if (settings.outputDebugFile) {
-            (new FileOutputStream("transformation-result.xml")).write(out.toByteArray());
+            byte[] result = serialize(xdoc);
+            (new FileOutputStream("transformation-result.xml")).write(result);
         }
-        return new ByteArrayInputStream(out.toByteArray());
     }
 
     private static void transform(String query, String morpher, Document xdoc) throws IOException, XQueryException, ParsingException {
