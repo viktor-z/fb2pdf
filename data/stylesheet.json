@@ -99,7 +99,8 @@
         	"1": 0.5
         },
 
-        backgroundColor: "0xFFFFFF",
+        backgroundColor: "",
+        backgroundImage: "",
 
         enforcePageSize: "false",
         pageSizeEnforcerColor: "0x7F7F7F",

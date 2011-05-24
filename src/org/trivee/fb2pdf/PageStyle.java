@@ -23,7 +23,8 @@ public class PageStyle
     public int footnoteMaxLines = Integer.MAX_VALUE;
     public boolean tableCellsAutoWidth = false;
 
-    public String backgroundColor = "0xFFFFFF";
+    public String backgroundColor = null;
+    public String backgroundImage = null;
 
     public HashMap<Integer, Float> sectionNewPage = new HashMap<Integer, Float>();
 

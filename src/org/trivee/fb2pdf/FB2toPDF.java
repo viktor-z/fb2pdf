@@ -677,6 +677,30 @@ public class FB2toPDF {
         }
     }
 
+    private class BackgroundImageHelper extends PdfPageEventHelper {
+        
+        private Image image;
+
+        public BackgroundImageHelper(String path) {
+            try {
+                image = Image.getInstance(getValidatedFileName(path));
+                rescaleImage(image);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+        
+        @Override
+        public void onEndPage(PdfWriter writer, Document document) {
+            try {
+                image.setAbsolutePosition(0, 0);
+                writer.getDirectContentUnder().addImage(image);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
     protected int getDropCapCount(String text) {
         int idx = 1;
         if (Character.isDigit(text.charAt(0))) {
@@ -821,15 +845,33 @@ public class FB2toPDF {
         }
     }
 
+    private String getValidatedFileName(String filename) throws IOException {
+        File file = new File(filename);
+        if (file.exists()) {
+            return filename;
+        }
+
+        String baseDir = CLIDriver.getBaseDir();
+        file = new File(new File(baseDir).getParent() + "/" + filename);
+        String fullFilename = file.getCanonicalPath();
+        if (!file.exists()) {
+            throw new IOException(String.format("File not found [%s or %s]", filename, fullFilename));
+        }
+        return fullFilename;
+    }
+
     private void createPDFDoc()
             throws DocumentException, FileNotFoundException {
         final PageStyle pageStyle = stylesheet.getPageStyle();
         final GeneralSettings generalSettings = stylesheet.getGeneralSettings();
 
         Rectangle pageSize = new Rectangle(pageStyle.getPageWidth(), pageStyle.getPageHeight(), pageStyle.getPageRotation());
-        pageSize.setBackgroundColor(new BaseColor(Color.decode(pageStyle.backgroundColor)));
-        System.out.println("Page size is " + pageSize);
+        if(!isNullOrEmpty(pageStyle.backgroundColor)) {
+            pageSize.setBackgroundColor(new BaseColor(Color.decode(pageStyle.backgroundColor)));
+        }
 
+        System.out.println("Page size is " + pageSize);
+        
         doc = new com.itextpdf.text.Document(pageSize,
                 pageStyle.getMarginLeft(), pageStyle.getMarginRight(),
                 pageStyle.getMarginTop(), pageStyle.getMarginBottom());
@@ -841,6 +883,12 @@ public class FB2toPDF {
             pageSizeEnforceHelper.pageSizeEnforcerColor = Color.decode(pageStyle.pageSizeEnforcerColor);
             writer.setPageEvent(pageSizeEnforceHelper);
         }
+        
+        if (!isNullOrEmpty(pageStyle.backgroundImage)){
+            BackgroundImageHelper backgroundImageHelper = new BackgroundImageHelper(pageStyle.backgroundImage);
+            writer.setPageEvent(backgroundImageHelper);
+        }
+
         writer.setSpaceCharRatio(generalSettings.trackingSpaceCharRatio);
         writer.setStrictImageSequence(generalSettings.strictImageSequence);
         PdfDocument.preventWidows = pageStyle.preventWidows;
