@@ -114,6 +114,7 @@ public class ParagraphStyle {
     private transient Stylesheet stylesheet;
     private String name;
     private String baseStyle;
+    private String xPath;
     private String fontFamily;
     private FontStyleInfo fontStyle;
     private transient boolean boldToggle;
@@ -152,6 +153,10 @@ public class ParagraphStyle {
 
     public String getName() {
         return name;
+    }
+    
+    public String getXPath(){
+        return xPath;
     }
 
     public BaseFont getBaseFont() throws FB2toPDFException {

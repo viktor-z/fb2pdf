@@ -182,6 +182,35 @@ public class FB2toPDF {
         }
     }
 
+    private void applyTransformations() throws RuntimeException {
+        try {
+            Transformation.transform(fb2, stylesheet.getTransformationSettings());
+        } catch (Exception ex) {
+            throw new RuntimeException("Error processing transformation. " + ex.getMessage());
+        }
+    }
+
+    private void applyXPathStyles() throws RuntimeException {
+        String prolog = "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\"; "
+        + "declare namespace l = \"http://www.w3.org/1999/xlink\"; ";
+        String morpher1 = prolog + "attribute {'fb2pdf-style'} {'%s'}";
+        String morpher2 = prolog + "(., attribute {'fb2pdf-style'} {'%s'})";
+        for (ParagraphStyle style : stylesheet.getParagraphStyles()) {
+                String xpath = style.getXPath();
+                String name = style.getName();
+                if (isNullOrEmpty(xpath)) continue;
+                
+            try {
+                Transformation.transform(fb2, prolog + xpath + "/@fb2pdf-style", String.format(morpher1, name));
+                Transformation.transform(fb2, prolog + xpath + "/*[last()]", String.format(morpher2, name));
+                Transformation.transform(fb2, prolog + xpath + "/text()[last()]", String.format(morpher2, name));
+                Transformation.outputDebugInfo(fb2, stylesheet.getTransformationSettings(), "styling-result.xml");
+            } catch (Exception ex) {
+                throw new RuntimeException("Error applying styles. " + ex.getMessage());
+            }
+        }
+    }
+
     private void getNoteText(Element element, StringBuilder text, boolean skipTitle) {
         Elements children = element.getChildElements();
         for (int i = 0; i < children.size(); i++) {
@@ -476,7 +505,7 @@ public class FB2toPDF {
 
         ParagraphStyle result = currentStyle;
 
-        String elementStyleAttr = element.getAttributeValue("fb2pdf-style", NS_FB2);
+        String elementStyleAttr = element.getAttributeValue("fb2pdf-style");
 
         if (isNullOrEmpty(elementStyleAttr)) {
             return result;
@@ -574,8 +603,8 @@ public class FB2toPDF {
         int colspan = getCellElementSpan(cellElement, "colspan");
         int rowspan = getCellElementSpan(cellElement, "rowspan");
 
-        String alignAttr = cellElement.getAttributeValue("align", NS_FB2);
-        String valignAttr = cellElement.getAttributeValue("valign", NS_FB2);
+        String alignAttr = cellElement.getAttributeValue("align");
+        String valignAttr = cellElement.getAttributeValue("valign");
         int hAlign = isNullOrEmpty(alignAttr) ? PdfPCell.ALIGN_CENTER : hAlignMap.get(alignAttr);
         int vAlign = isNullOrEmpty(valignAttr) ? PdfPCell.ALIGN_MIDDLE : vAlignMap.get(valignAttr);
 
@@ -785,22 +814,10 @@ public class FB2toPDF {
             System.exit(-1);
         }
 
-        /*
-        try {
-            is = Transformation.transformToInputStream(is, stylesheet.getTransformationSettings());
-        } catch (Exception ex) {
-            throw new RuntimeException("Error processing transformation. " + ex.getMessage());
-        }
-         */
         try {
             fb2 = new Builder(false).build(is);
         } catch (ParsingException e) {
             System.err.println("XML parsing error at line " + e.getLineNumber() + "#" + e.getColumnNumber() + ": " + e.getMessage());
-        }
-        try {
-            Transformation.transform(fb2, stylesheet.getTransformationSettings());
-        } catch (Exception ex) {
-            throw new RuntimeException("Error processing transformation. " + ex.getMessage());
         }
     }
 
@@ -927,9 +944,11 @@ public class FB2toPDF {
 
     private void run(InputStream stylesheetInputStream)
             throws IOException, DocumentException, FB2toPDFException {
-        loadData(stylesheetInputStream);
 
+        loadData(stylesheetInputStream);
         readFB2();
+        applyTransformations();
+        applyXPathStyles();
         createPDFDoc();
 
         nu.xom.Element root = fb2.getRootElement();
@@ -983,7 +1002,7 @@ public class FB2toPDF {
 
         public BinaryAttachment(nu.xom.Element binary) {
             this.href = "#" + binary.getAttributeValue("id");
-            this.contentType = binary.getAttributeValue("content-type", NS_FB2);
+            this.contentType = binary.getAttributeValue("content-type");
             this.binary = binary;
         }
 
@@ -1616,7 +1635,7 @@ public class FB2toPDF {
 
     private void processParagraph(Element paragraph, boolean bFirst, boolean bLast)
             throws DocumentException, FB2toPDFException {
-        currentParagraph = currentStyle.createParagraph(bFirst, bLast);
+        currentParagraph = getStyleForElement(paragraph).createParagraph(bFirst, bLast);
 
         addInvisibleAnchor(paragraph);
         processParagraphContent(paragraph, bFirst);
@@ -1755,7 +1774,7 @@ public class FB2toPDF {
                     flushCurrentChunk();
                     currentReference = child.getAttributeValue("href", NS_XLINK);
                     if (currentReference.length() == 0) {
-                        currentReference = child.getAttributeValue("href", NS_FB2);
+                        currentReference = child.getAttributeValue("href");
                     }
                     processParagraphContent(child);
                     flushCurrentChunk();
@@ -1763,7 +1782,7 @@ public class FB2toPDF {
                     addFootnote(child);
                     currentReference = null;
                 } else if (child.getLocalName().equals("style")) {
-                    String styleName = child.getAttributeValue("name", NS_FB2);
+                    String styleName = child.getAttributeValue("name");
                     System.out.println("Style tag " + styleName + " ignored.");
                     processParagraphContent(child);
                 } else if (child.getLocalName().equals("image")) {

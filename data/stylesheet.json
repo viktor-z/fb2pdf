@@ -177,12 +177,6 @@
                 }
                 */
                 /*
-                {   // change note links style
-                    "query":   "//a[@type='note']",
-                    "morpher": "declare variable $hid := ./@l:href; <a l:href=\"{$hid}\" type=\"note\" fb2pdf-style=\"notesLink\">{./* | text()}</a>"
-                }
-                */
-                /*
                 {   // remove square brackets from note link
                     "query":   "//a[@type='note']/text()",
                     "morpher": "replace(., '[\\[\\]]', '')"
@@ -234,12 +228,6 @@
                 {   //remove images
                     "query":   "//image",
                     "morpher": "()"
-                }
-                */
-                /*
-                {   // change style of notes text
-                    "query":   "//body[@name='notes']//section/p",
-                    "morpher": "<p fb2pdf-style=\"notes\">{./* | text()}</p>"
                 }
                 */
                 /*
@@ -485,10 +473,21 @@
         {
             name:               "code",
             baseStyle:          "body",
+            fontFamily:         "monospaced"
+        },
+        {
+            name:               "codeParagraph",
+            xPath:              "//p[code and count(*) = 1]",
+            baseStyle:          "code",
+            alignment:          "left",
             disableHyphenation: "true",
             preserveWhitespaces: "true",
-            fontFamily:         "monospaced",
-            fontSize:         "6.0pt"
+            fontSize:           "6.0pt"
+        },
+        {
+            name:               "codeParagraphCode",
+            xPath:              "//p[count(*) = 1]/code",
+            baseStyle:          "codeParagraph"
         },
         {
             name:             "table",

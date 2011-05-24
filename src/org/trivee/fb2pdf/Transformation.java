@@ -27,6 +27,13 @@ import org.trivee.fb2pdf.TransformationSettings.Entry;
  */
 public class Transformation {
 
+    public static void outputDebugInfo(Document xdoc, TransformationSettings settings, final String fileName) throws IOException {
+        if (settings.outputDebugFile) {
+            byte[] result = serialize(xdoc);
+            (new FileOutputStream(fileName)).write(result);
+        }
+    }
+
     /*
     public static InputStream transformToInputStream(InputStream inputStream, TransformationSettings settings) throws ParsingException, ValidityException, IOException, XQueryException {
 
@@ -57,15 +64,12 @@ public class Transformation {
         for (Entry entry : settings.transformationsMap)
         {
             if (entry == null) continue;
-            transform(queryProlog + entry.query, morpherProlog + entry.morpher, xdoc);
+            transform(xdoc, queryProlog + entry.query, morpherProlog + entry.morpher);
         }
-        if (settings.outputDebugFile) {
-            byte[] result = serialize(xdoc);
-            (new FileOutputStream("transformation-result.xml")).write(result);
-        }
+        outputDebugInfo(xdoc, settings, "transformation-result.xml");
     }
 
-    private static void transform(String query, String morpher, Document xdoc) throws IOException, XQueryException, ParsingException {
+    public static void transform(Document xdoc, String query, String morpher) throws IOException, XQueryException, ParsingException {
         XQuery xselect = XQueryPool.GLOBAL_POOL.getXQuery(query, null);
         XQuery xmorpher = XQueryPool.GLOBAL_POOL.getXQuery(morpher, null);
         Nodes nodes = xselect.execute(xdoc).toNodes();

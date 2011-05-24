@@ -64,6 +64,10 @@ public class Stylesheet
         return generalSettings;
     }
 
+    public LinkedList<ParagraphStyle> getParagraphStyles() {
+        return paragraphStyles;
+    }
+    
     public ParagraphStyle getParagraphStyle(String name)
         throws FB2toPDFException
     {
