@@ -1434,17 +1434,27 @@ class TrueTypeFont extends BaseFont {
      * @return an <CODE>int</CODE> array with {glyph index, width}
      */
     public int[] getMetricsTT(int c) {
+        int[] metrics = null;                           //VIKTORZ +++
         if (cmapExt != null)
-            return cmapExt.get(Integer.valueOf(c));
+            //return cmapExt.get(Integer.valueOf(c));   //VIKTORZ ---
+            metrics = cmapExt.get(Integer.valueOf(c));  //VIKTORZ +++
         if (!fontSpecific && cmap31 != null)
-            return cmap31.get(Integer.valueOf(c));
+            //return cmap31.get(Integer.valueOf(c));    //VIKTORZ ---
+            metrics = cmapExt.get(Integer.valueOf(c));  //VIKTORZ +++
         if (fontSpecific && cmap10 != null)
-            return cmap10.get(Integer.valueOf(c));
+            //return cmap10.get(Integer.valueOf(c));    //VIKTORZ ---
+            metrics = cmapExt.get(Integer.valueOf(c));  //VIKTORZ +++
         if (cmap31 != null)
-            return cmap31.get(Integer.valueOf(c));
+            //return cmap31.get(Integer.valueOf(c));    //VIKTORZ ---
+            metrics = cmapExt.get(Integer.valueOf(c));  //VIKTORZ +++
         if (cmap10 != null)
-            return cmap10.get(Integer.valueOf(c));
-        return null;
+            //return cmap10.get(Integer.valueOf(c));    //VIKTORZ ---
+            metrics = cmapExt.get(Integer.valueOf(c));  //VIKTORZ +++
+        //return null;                                  //VIKTORZ ---
+        if (metrics == null) {                          //VIKTORZ +++
+            metrics = new int[]{0, 500};                //VIKTORZ +++
+        }                                               //VIKTORZ +++
+        return metrics;                                 //VIKTORZ +++
     }
 
     /** Gets the postscript font name.

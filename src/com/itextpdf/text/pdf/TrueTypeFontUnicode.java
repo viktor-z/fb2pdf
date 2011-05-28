@@ -450,14 +450,24 @@ class TrueTypeFontUnicode extends TrueTypeFont implements Comparator<int[]>{
             map = cmap31;
         if (map == null)
             return null;
+
+        int[] metrics = null;                                   //VIKTORZ +++
         if (fontSpecific) {
             if ((c & 0xffffff00) == 0 || (c & 0xffffff00) == 0xf000)
-                return map.get(Integer.valueOf(c & 0xff));
-            else
-                return null;
+                //return map.get(Integer.valueOf(c & 0xff));    //VIKTORZ ---
+                metrics =  map.get(Integer.valueOf(c & 0xff));  //VIKTORZ +++
+            //else                                              //VIKTORZ ---
+            //    return null;                                  //VIKTORZ ---
         }
-        else
-            return map.get(Integer.valueOf(c));
+        else {
+            //return map.get(Integer.valueOf(c));               //VIKTORZ ---
+            metrics = map.get(Integer.valueOf(c));              //VIKTORZ +++
+        }
+        
+        if (metrics == null) {                                  //VIKTORZ +++
+                metrics = new int[]{0, 500};                    //VIKTORZ +++
+        }                                                       //VIKTORZ +++
+        return metrics;                                         //VIKTORZ +++
     }
 
     /**
