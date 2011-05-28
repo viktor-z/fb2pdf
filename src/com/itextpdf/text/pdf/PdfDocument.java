@@ -2434,6 +2434,11 @@ public class PdfDocument extends Document {
         return footNoteLine.getHeight();
     }
 
+    private BaseColor getFootnoteSeparatorColor() {
+        FootnoteLineImage footNoteLine = footnoteImages.getFirst();
+        return footNoteLine.getBorderColor();
+    }
+
     private float getFootnoteSeparatorH() {
         return getFootnoteLineH() * 0.25f;
     }
@@ -2445,6 +2450,7 @@ public class PdfDocument extends Document {
         float allFootnotesH = footnoteLineH * footnotesNum + sepHeight;
         PdfTemplate tp = graphics.createTemplate(sepWidth, sepHeight);
         tp.setLineWidth(0.5f);
+        tp.setColorStroke(getFootnoteSeparatorColor());
         //tp.moveTo(0,0);
         //tp.lineTo(sepWidth, 0);
         //tp.moveTo(0,sepHeight);

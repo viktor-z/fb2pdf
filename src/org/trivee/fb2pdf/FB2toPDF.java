@@ -492,6 +492,7 @@ public class FB2toPDF {
                 image.setSpacingBefore(0);
                 image.setSpacingAfter(0);
                 image.setAlignment(Image.MIDDLE);
+                image.setBorderColor(stylesheet.getParagraphStyle("footnote").getColor());
                 result.add(image);
             }
         } catch (Exception ex) {
