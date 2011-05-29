@@ -53,6 +53,10 @@ public class Dimension
         }
     }
 
+    public void setDimension(float points) {
+        this.points = points;
+    }
+
     public String getDimension()
     {
         return dimension;

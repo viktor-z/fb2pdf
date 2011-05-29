@@ -14,6 +14,7 @@ import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.FootnoteLineImage;
+import com.itextpdf.text.Phrase;
 
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -206,6 +207,25 @@ public class FB2toPDF {
         }
     }
 
+    private PdfPTable createHeaderTable() throws DocumentException, FB2toPDFException {
+        PdfPTable table = new PdfPTable(2);
+        table.setTotalWidth(doc.getPageSize().getWidth() - doc.leftMargin() - doc.rightMargin());
+        table.setWidths(new float[]{0.5f, 0.5f});
+        table.getDefaultCell().setBorder(Rectangle.BOTTOM);
+        table.getDefaultCell().setPaddingBottom(4);
+        final ParagraphStyle headerStyle = stylesheet.getParagraphStyle("header");
+        Chunk chunk = headerStyle.createChunk();
+        String author = getTextContent(fb2.query("//fb:title-info//fb:author//fb:first-name | //fb:title-info//fb:author//fb:last-name", xCtx), "", "");
+        chunk.append(author);
+        table.addCell(new Phrase(chunk));
+        table.getDefaultCell().setHorizontalAlignment(com.itextpdf.text.Element.ALIGN_RIGHT);
+        chunk = stylesheet.getParagraphStyle("header").createChunk();
+        String title = getTextContent(fb2.query("//fb:title-info//fb:book-title", xCtx), "", "");
+        chunk.append(title);
+        table.addCell(new Phrase(chunk));
+        return table;
+    }
+
     private void getNoteText(Element element, StringBuilder text, boolean skipTitle) {
         Elements children = element.getChildElements();
         for (int i = 0; i < children.size(); i++) {
@@ -375,7 +395,7 @@ public class FB2toPDF {
         float hSpace = doc.topMargin() + doc.bottomMargin() + image.getSpacingAfter() + image.getSpacingBefore();
         float wSpace = doc.leftMargin() + doc.rightMargin() + stylesheet.getPageStyle().getImageExtraMargins();
         if (currentStyle != null) {
-            hSpace = Math.max(hSpace, currentStyle.getAbsoluteLeading() + currentStyle.getFontSize().getPoints());
+            hSpace += currentStyle.getAbsoluteLeading() + currentStyle.getFontSize().getPoints();
         }
         float scaleWidth = pageSize.getWidth() - wSpace;
         float scaleHeight = pageSize.getHeight() - hSpace;
@@ -948,7 +968,10 @@ public class FB2toPDF {
         }
         currentOutline.put(0, writer.getDirectContent().getRootOutline());
 
-
+        if (stylesheet.getPageStyle().header) {
+            setupHeader();
+        }
+                
         Element body = bodies.get(0);
         if (stylesheet.getGeneralSettings().generateTOC) {
             makeTOCPage(body);
@@ -962,6 +985,15 @@ public class FB2toPDF {
         }
 
         closePDF();
+    }
+
+    private void setupHeader() throws FB2toPDFException, DocumentException, BadElementException {
+        PdfPTable table = createHeaderTable();
+        float adjustedMargin =  doc.topMargin() + table.getTotalHeight();
+        stylesheet.getPageStyle().setMarginTop(adjustedMargin);
+        doc.setMargins(doc.leftMargin(), doc.rightMargin(), adjustedMargin , doc.bottomMargin());
+        HeaderHelper footerHelper = new HeaderHelper(doc, writer, table);
+        writer.setPageEvent(footerHelper);
     }
 
     private static class BinaryAttachment {

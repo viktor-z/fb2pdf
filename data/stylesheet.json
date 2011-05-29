@@ -101,6 +101,7 @@
 
         backgroundColor: "",
         backgroundImage: "",
+        header:          "false",
 
         enforcePageSize: "false",
         pageSizeEnforcerColor: "0x7F7F7F",
@@ -470,6 +471,13 @@
             leading:          "1.2em",
             firstFirstLineIndent:  "0em",
             dropcapStyle:	  "bodyDropCap"	
+        },
+        {
+            name:             "header",
+            baseStyle:        "default",
+            fontFamily:       "serif",
+            fontSize:         "8pt",
+            fontStyle:        "italic"
         },
         {
             name:               "code",

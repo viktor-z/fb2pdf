@@ -22,6 +22,7 @@ public class PageStyle
     public int footnotesMaxLines = 5;
     public int footnoteMaxLines = Integer.MAX_VALUE;
     public boolean tableCellsAutoWidth = false;
+    public boolean header = false;
 
     public String backgroundColor = null;
     public String backgroundImage = null;
@@ -47,4 +48,8 @@ public class PageStyle
     public float getMarginBottom()  { return marginBottom.getPoints(); }
     public float getImageExtraMargins()  { return imageExtraMargins.getPoints(); }
     public boolean getMarginMirroring() { return marginMirroring; }
+
+    public void setMarginTop(float adjustedMargin) throws FB2toPDFException {
+        marginTop.setDimension(adjustedMargin);
+    }
 }
