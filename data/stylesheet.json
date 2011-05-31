@@ -486,7 +486,7 @@
         },
         {
             name:               "codeParagraph",
-            xPath:              "//p[code and count(*) = 1]",
+            selector:           "//p[code and count(*) = 1]",
             baseStyle:          "code",
             alignment:          "left",
             disableHyphenation: "true",
@@ -495,7 +495,7 @@
         },
         {
             name:               "codeParagraphCode",
-            xPath:              "//p[count(*) = 1]/code",
+            selector:           "//p[count(*) = 1]/code",
             baseStyle:          "codeParagraph"
         },
         {

@@ -192,7 +192,7 @@ public class FB2toPDF {
         String morpher1 = prolog + "attribute {'fb2pdf-style'} {'%s'}";
         String morpher2 = prolog + "(., attribute {'fb2pdf-style'} {'%s'})";
         for (ParagraphStyle style : stylesheet.getParagraphStyles()) {
-                String xpath = style.getXPath();
+                String xpath = style.getSelector();
                 String name = style.getName();
                 if (isNullOrEmpty(xpath)) continue;
                 
