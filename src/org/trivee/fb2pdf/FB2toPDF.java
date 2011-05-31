@@ -208,21 +208,26 @@ public class FB2toPDF {
     }
 
     private PdfPTable createHeaderTable() throws DocumentException, FB2toPDFException {
-        PdfPTable table = new PdfPTable(2);
+        //PdfPTable table = new PdfPTable(2);
+        //table.setWidths(new float[]{0.5f, 0.5f});
+        PdfPTable table = new PdfPTable(1);
+        table.setWidths(new float[]{1.0f});
         table.setTotalWidth(doc.getPageSize().getWidth() - doc.leftMargin() - doc.rightMargin());
-        table.setWidths(new float[]{0.5f, 0.5f});
         table.getDefaultCell().setBorder(Rectangle.BOTTOM);
         table.getDefaultCell().setPaddingBottom(4);
+        table.getDefaultCell().setNoWrap(true);
+        
         final ParagraphStyle headerStyle = stylesheet.getParagraphStyle("header");
+        table.getDefaultCell().setBorderColor(headerStyle.getColor());
         Chunk chunk = headerStyle.createChunk();
-        String author = getTextContent(fb2.query("//fb:title-info//fb:author//fb:first-name | //fb:title-info//fb:author//fb:last-name", xCtx), "", "");
-        chunk.append(author);
-        table.addCell(new Phrase(chunk));
-        table.getDefaultCell().setHorizontalAlignment(com.itextpdf.text.Element.ALIGN_RIGHT);
-        chunk = stylesheet.getParagraphStyle("header").createChunk();
+        String author = getTextContent(fb2.query("//fb:title-info//fb:author[1]//fb:first-name | //fb:title-info//fb:author[1]//fb:last-name", xCtx), "", "");
         String title = getTextContent(fb2.query("//fb:title-info//fb:book-title", xCtx), "", "");
-        chunk.append(title);
+        chunk.append(author + ", " + title);
         table.addCell(new Phrase(chunk));
+        //table.getDefaultCell().setHorizontalAlignment(com.itextpdf.text.Element.ALIGN_RIGHT);
+        //chunk = stylesheet.getParagraphStyle("header").createChunk();
+        //chunk.append(title);
+        //table.addCell(new Phrase(chunk));
         return table;
     }
 

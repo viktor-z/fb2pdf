@@ -5,16 +5,12 @@
 package org.trivee.fb2pdf;
 
 import com.itextpdf.text.BadElementException;
-import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Image;
-import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.text.pdf.draw.DrawInterface;
 
 /**
  *
@@ -42,6 +38,7 @@ public class HeaderHelper extends PdfPageEventHelper {
         //tp.fillStroke();
         //stp.restoreState();
         Image footer = Image.getInstance(tp);
+        footer.setAbsolutePosition(0, 0);
         this.image = footer;
     }
 
@@ -53,7 +50,6 @@ public class HeaderHelper extends PdfPageEventHelper {
         }
     
         try {
-            image.setAbsolutePosition(0, 0);
             writer.getDirectContent().addImage(image);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
