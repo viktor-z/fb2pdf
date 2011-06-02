@@ -1246,14 +1246,8 @@ public class FB2toPDF {
                     java.awt.Image img = toolkit.createImage(attachment.getData());
                     return Image.getInstance(img, Color.decode(overrideTransparency));
                 }
-            } catch (BadElementException e) {
-                e.printStackTrace();
-                return null;
-            } catch (java.net.MalformedURLException e1) {
-                e1.printStackTrace();
-                return null;
-            } catch (IOException e2) {
-                e2.printStackTrace();
+            } catch (Exception ex) {
+                System.out.println(ex);
                 return null;
             }
         }
@@ -1905,7 +1899,7 @@ public class FB2toPDF {
             }
             translate(args[0], args[1]);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e);
         }
     }
 
