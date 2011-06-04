@@ -166,6 +166,7 @@ public class FB2toPDF {
     private ParagraphStyle currentStyle;
     private Map<Integer, PdfOutline> currentOutline = new HashMap<Integer, PdfOutline>();
     private ArrayList<BinaryAttachment> attachments = new ArrayList<BinaryAttachment>();
+    private List<PdfTemplate> footnoteTemplates = new ArrayList<PdfTemplate>();
 
     private FB2toPDF(String fromName, String toName) {
         this.fromName = fromName;
@@ -450,8 +451,14 @@ public class FB2toPDF {
         refname = refname.substring(1);
         System.out.println("Adding footnote " + refname);
         String body = marker + " " + getNoteBody(refname);
-        byte[] noteDoc = FootnoteRenderer.renderNoteDoc(stylesheet, body, hyphenation);
-        List<Image> noteLineImages = getLinesImages(noteDoc, refname);
+        //byte[] noteDoc = FootnoteRenderer.renderNoteDoc(stylesheet, body, hyphenation);
+        //List<Image> noteLineImages = getLinesImages(noteDoc, refname);
+        float w = FootnoteRenderer.pageSize.getWidth();
+        float h = FootnoteRenderer.pageSize.getHeight();
+        int footnoteNumber = FootnoteRenderer.getPageNumber();
+        FootnoteRenderer.addFootnote(body, hyphenation);
+        footnoteNumber = FootnoteRenderer.getPageNumber() - footnoteNumber;
+        List<Image> noteLineImages = prepareFootnoteLineImages(footnoteNumber, refname, w, h);
         for (Image image : noteLineImages) {
             doc.add(image);
         }
@@ -483,6 +490,32 @@ public class FB2toPDF {
 
         System.out.printf("WARNING: note %s not found\n", refname);
         return "";
+    }
+
+    private List<Image> prepareFootnoteLineImages(int numPages, String refname, float pageWidth, float pageHeight) {
+
+        List<Image> result = new ArrayList<Image>();
+        try {
+            int maxLines = stylesheet.getPageStyle().footnoteMaxLines;
+            int numLines = Math.min(maxLines, numPages);
+            System.out.printf("Footnote has %d lines, maximum in settings is %d, will render %d\n", numPages, maxLines, numLines);
+
+            for (int i = 1; i <= numLines; i++) {
+                Image image = null;
+                PdfTemplate tmp = PdfTemplate.createTemplate(writer, pageWidth, pageHeight);
+                image = FootnoteLineImage.getInstance(tmp, refname);
+                image.setSpacingBefore(0);
+                image.setSpacingAfter(0);
+                image.setAlignment(Image.MIDDLE);
+                image.setBorderColor(stylesheet.getParagraphStyle("footnote").getColor());
+                result.add(image);
+                footnoteTemplates.add(tmp);
+        }
+        } catch (Exception ex) {
+            System.out.println("WARNING: failed to produce footnote lines: " + ex);
+        }
+
+        return result;
     }
 
     private List<Image> getLinesImages(byte[] noteDoc, String refname) {
@@ -844,13 +877,15 @@ public class FB2toPDF {
         doc.setMarginMirroring(pageStyle.getMarginMirroring());
     }
 
-    private void closePDF() throws FB2toPDFException {
+    private void closePDF() throws FB2toPDFException, IOException {
 
         for (String destination : linkPageNumbers.keySet()) {
             if (linkPageNumTemplates.containsKey(destination)) {
                 fillPageNumTemplate(destination);
             }
         }
+        
+        fillFootnoteTemplates();
 
         doc.close();
     }
@@ -945,6 +980,9 @@ public class FB2toPDF {
         applyTransformations();
         applyXPathStyles();
         createPDFDoc();
+        if (stylesheet.getPageStyle().footnotes) {
+            FootnoteRenderer.init(stylesheet);
+        }
 
         nu.xom.Element root = fb2.getRootElement();
         if (!root.getLocalName().equals("FictionBook")) {
@@ -999,6 +1037,20 @@ public class FB2toPDF {
         doc.setMargins(doc.leftMargin(), doc.rightMargin(), adjustedMargin , doc.bottomMargin());
         HeaderHelper footerHelper = new HeaderHelper(doc, writer, table);
         writer.setPageEvent(footerHelper);
+    }
+
+    private void fillFootnoteTemplates() throws IOException {
+        
+        byte[] noteDoc = FootnoteRenderer.close();
+
+        PdfReader reader = new PdfReader(noteDoc);
+
+
+        for (int i=0; i<footnoteTemplates.size();i++) {
+            PdfImportedPage page = writer.getImportedPage(reader, i+1);
+            footnoteTemplates.get(i).addTemplate(page, 0 ,0);
+        }
+            
     }
 
     private static class BinaryAttachment {

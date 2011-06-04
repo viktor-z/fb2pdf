@@ -105,7 +105,7 @@
 
         enforcePageSize: "false",
         pageSizeEnforcerColor: "0x7F7F7F",
-        footnotes:      "false",
+        footnotes:      "true",
         footnotesMaxLines:      7,
         footnoteMaxLines:       999,
         tableCellsAutoWidth:    false,
