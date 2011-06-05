@@ -30,6 +30,7 @@ public class GeneralSettings {
     public String linkPageNumFormat = "[%04d]";
     public int linkPageNumMax = 9999;
     public ArrayList<Integer> bodiesToSkip = new ArrayList<Integer>();
+    public boolean fullCompression = false;
 
     public GeneralSettings()
     {

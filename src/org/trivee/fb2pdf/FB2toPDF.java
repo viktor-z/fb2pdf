@@ -918,6 +918,10 @@ public class FB2toPDF {
                 System.out.println(ex);
             }
         }
+        
+        if (generalSettings.fullCompression) {
+            writer.setFullCompression();
+        }
 
         writer.setSpaceCharRatio(generalSettings.trackingSpaceCharRatio);
         writer.setStrictImageSequence(generalSettings.strictImageSequence);

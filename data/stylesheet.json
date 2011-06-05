@@ -11,6 +11,7 @@
         //imageDpi: 150,    // Kindle DX
         stretchCover: "true",
         enableInlineImages: "false",
+        fullCompression: "false",
         trackingSpaceCharRatio: 5.0,
         overrideImageTransparency: "",
         ignoreEmptyLineBeforeImage: "true",
