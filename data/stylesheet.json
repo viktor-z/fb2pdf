@@ -1,5 +1,6 @@
 {
     generalSettings: {
+        bodiesToSkip:   [],
         generateTOC:	"true",
         generateFrontMatter:	"true",
         generateNoteBackLinks:	"true",

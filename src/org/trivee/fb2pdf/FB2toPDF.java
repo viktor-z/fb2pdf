@@ -1038,8 +1038,10 @@ public class FB2toPDF {
         for (int i = 0; i < bodies.size(); ++i) {
             body = (Element) bodies.get(i);
             bodyIndex = i;
-            processBody(body);
-            doc.newPage();
+            if (!stylesheet.getGeneralSettings().bodiesToSkip.contains(i)) {
+                processBody(body);
+                doc.newPage();
+            }
         }
 
         closePDF();
