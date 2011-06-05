@@ -491,6 +491,9 @@ public class FB2toPDF {
     }
     
     private Element getSectionById(Element root, String id) {
+        if (id.equals(root.getAttributeValue("id"))) {
+            return root;
+        }
         Elements sections = root.getChildElements("section", NS_FB2);
         for (int i=0; i<sections.size(); i++) {
             Element section = sections.get(i);
