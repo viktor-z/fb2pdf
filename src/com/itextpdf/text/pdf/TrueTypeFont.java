@@ -1452,6 +1452,9 @@ class TrueTypeFont extends BaseFont {
             metrics = cmapExt.get(Integer.valueOf(c));  //VIKTORZ +++
         //return null;                                  //VIKTORZ ---
         if (metrics == null) {                          //VIKTORZ +++
+                metrics = cmapExt.get(0xFFFD);          //VIKTORZ +++
+        }                                               //VIKTORZ +++
+        if (metrics == null) {                          //VIKTORZ +++
             metrics = new int[]{0, 500};                //VIKTORZ +++
         }                                               //VIKTORZ +++
         return metrics;                                 //VIKTORZ +++

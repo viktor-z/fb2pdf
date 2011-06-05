@@ -465,6 +465,9 @@ class TrueTypeFontUnicode extends TrueTypeFont implements Comparator<int[]>{
         }
         
         if (metrics == null) {                                  //VIKTORZ +++
+                metrics = map.get(0xFFFD);                      //VIKTORZ +++
+        }                                                       //VIKTORZ +++
+        if (metrics == null) {                                  //VIKTORZ +++
                 metrics = new int[]{0, 500};                    //VIKTORZ +++
         }                                                       //VIKTORZ +++
         return metrics;                                         //VIKTORZ +++
