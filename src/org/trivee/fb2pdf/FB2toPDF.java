@@ -476,7 +476,7 @@ public class FB2toPDF {
             return "";
         }
         
-        String query = String.format("//fb:body[@name]//fb:section[@id='%s']", refname);
+        String query = String.format("/*/fb:body[@name]/fb:section[@id='%s'] | /*/fb:body[@name]/fb:section/fb:section[@id='%s']", refname, refname);
         Nodes sections = fb2.getRootElement().query(query, xCtx);
         if (sections.size() > 1) {
             System.out.printf("WARNING: more than one note %s found\n", refname);
