@@ -451,14 +451,13 @@ public class FB2toPDF {
         refname = refname.substring(1);
         System.out.println("Adding footnote " + refname);
         String body = marker + " " + getNoteBody(refname);
-        //byte[] noteDoc = FootnoteRenderer.renderNoteDoc(stylesheet, body, hyphenation);
-        //List<Image> noteLineImages = getLinesImages(noteDoc, refname);
         float w = FootnoteRenderer.pageSize.getWidth();
         float h = FootnoteRenderer.pageSize.getHeight();
+        float cutW = FootnoteRenderer.cutMarkerWidth;
         int footnoteNumber = FootnoteRenderer.getPageNumber();
         FootnoteRenderer.addFootnote(body, hyphenation);
-        footnoteNumber = FootnoteRenderer.getPageNumber() - footnoteNumber;
-        List<Image> noteLineImages = prepareFootnoteLineImages(footnoteNumber, refname, w, h);
+        footnoteNumber = FootnoteRenderer.getPageNumber() - footnoteNumber - 1;
+        List<Image> noteLineImages = prepareFootnoteLineImages(footnoteNumber, refname, w, h, cutW);
         for (Image image : noteLineImages) {
             doc.add(image);
         }
@@ -492,7 +491,7 @@ public class FB2toPDF {
         return "";
     }
 
-    private List<Image> prepareFootnoteLineImages(int numPages, String refname, float pageWidth, float pageHeight) {
+    private List<Image> prepareFootnoteLineImages(int numPages, String refname, float pageWidth, float pageHeight, float cutMarkerWidth) {
 
         List<Image> result = new ArrayList<Image>();
         try {
@@ -500,17 +499,31 @@ public class FB2toPDF {
             int numLines = Math.min(maxLines, numPages);
             System.out.printf("Footnote has %d lines, maximum in settings is %d, will render %d\n", numPages, maxLines, numLines);
 
-            for (int i = 1; i <= numLines; i++) {
+            PdfTemplate cutImg = PdfTemplate.createTemplate(writer, 100, pageHeight);
+            for (int i = 1; i <= numPages; i++) {
                 Image image = null;
+                
                 PdfTemplate tmp = PdfTemplate.createTemplate(writer, pageWidth, pageHeight);
-                image = FootnoteLineImage.getInstance(tmp, refname);
-                image.setSpacingBefore(0);
-                image.setSpacingAfter(0);
-                image.setAlignment(Image.MIDDLE);
-                image.setBorderColor(stylesheet.getParagraphStyle("footnote").getColor());
-                result.add(image);
+                if (numLines < numPages && i == numLines) {
+                    PdfTemplate tmp2 = PdfTemplate.createTemplate(writer, pageWidth, pageHeight);
+                    tmp.setWidth(tmp.getWidth() - cutMarkerWidth);
+                    tmp2.addTemplate(tmp, 0, 0);
+                    tmp2.addTemplate(cutImg, tmp.getWidth(), 0);
+                    image = FootnoteLineImage.getInstance(tmp2, refname);
+                } else {
+                    image = FootnoteLineImage.getInstance(tmp, refname);
+                }
+                
+                if (i <= numLines) {
+                    image.setSpacingBefore(0);
+                    image.setSpacingAfter(0);
+                    image.setAlignment(Image.MIDDLE);
+                    image.setBorderColor(stylesheet.getParagraphStyle("footnote").getColor());
+                    result.add(image);
+                }
                 footnoteTemplates.add(tmp);
-        }
+            }
+            footnoteTemplates.add(cutImg);
         } catch (Exception ex) {
             System.out.println("WARNING: failed to produce footnote lines: " + ex);
         }
@@ -518,6 +531,7 @@ public class FB2toPDF {
         return result;
     }
 
+    /*
     private List<Image> getLinesImages(byte[] noteDoc, String refname) {
 
         List<Image> result = new ArrayList<Image>();
@@ -554,6 +568,7 @@ public class FB2toPDF {
 
         return result;
     }
+    */
 
     private ParagraphStyle getStyleForElement(Element element) {
 
@@ -1040,6 +1055,8 @@ public class FB2toPDF {
     }
 
     private void fillFootnoteTemplates() throws IOException {
+        
+        if (!stylesheet.getPageStyle().footnotes) return;
         
         byte[] noteDoc = FootnoteRenderer.close();
 

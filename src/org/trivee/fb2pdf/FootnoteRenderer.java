@@ -29,6 +29,7 @@ public class FootnoteRenderer {
     static BaseFont basefont;
     static Rectangle pageSize;
     static ByteArrayOutputStream output;
+    static float cutMarkerWidth = 0;
         
     private static byte[] renderNoteDoc(Stylesheet stylesheet, String body, HyphenationAuto hyphenation) throws FB2toPDFException, DocumentException {
         
@@ -56,8 +57,7 @@ public class FootnoteRenderer {
         paragraph.add(chunk);
         doc.add(paragraph);
 
-        /*
-        doc.setPageSize(new Rectangle(basefont.getWidthPointKerned("  <…> ", fontSize), pageSize.getHeight()));
+        doc.setPageSize(new Rectangle(cutMarkerWidth, pageSize.getHeight()));
         doc.setMargins(0,0,0,0);
         doc.newPage();
         paragraph = noteStyle.createParagraph();
@@ -69,7 +69,7 @@ public class FootnoteRenderer {
         
         doc.setPageSize(pageSize);
         doc.setMargins(0,0,0,0);
-        */
+
         doc.newPage();
     }
 
@@ -79,6 +79,7 @@ public class FootnoteRenderer {
         float pageWidth = pageStyle.getPageWidth() - pageStyle.getMarginLeft() - pageStyle.getMarginRight();
         fontSize = noteStyle.getFontSize().getPoints();
         basefont = noteStyle.getBaseFont();
+        cutMarkerWidth = basefont.getWidthPointKerned("  <…> ", fontSize);
         float ascent = basefont.getFontDescriptor(BaseFont.ASCENT, fontSize);
         float descent = basefont.getFontDescriptor(BaseFont.DESCENT, fontSize);
         //float capheight = basefont.getFontDescriptor(BaseFont.CAPHEIGHT, fontSize);
