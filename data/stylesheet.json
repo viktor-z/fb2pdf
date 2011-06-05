@@ -24,10 +24,10 @@
     fontFamilies: [
         {
             name:         "sansSerif",
-            regular:      "./data/DroidSans.ttf",
-            bold:         "./data/DroidSans-Bold.ttf",
-            italic:       "./data/DroidSans.ttf",
-            boldItalic:   "./data/DroidSans-Bold.ttf"
+            regular:      "./data/FreeSans.ttf",
+            bold:         "./data/FreeSansBold.ttf",
+            italic:       "./data/FreeSansOblique.ttf",
+            boldItalic:   "./data/FreeSansBoldOblique.ttf"
         },
         {
             name:         "serif",
@@ -38,10 +38,10 @@
         },
         {
             name:         "monospaced",
-            regular:      "./data/DroidSansMono.ttf",
-            bold:         "./data/DroidSansMono.ttf",
-            italic:       "./data/DroidSansMono.ttf",
-            boldItalic:   "./data/DroidSansMono.ttf"
+            regular:      "./data/LiberationMono-Regular.ttf",
+            bold:         "./data/LiberationMono-Bold.ttf",
+            italic:       "./data/LiberationMono-Italic.ttf",
+            boldItalic:   "./data/LiberationMono-BoldItalic.ttf"
         }
     ],
     pageStyle: {
