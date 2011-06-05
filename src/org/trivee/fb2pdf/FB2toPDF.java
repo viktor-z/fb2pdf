@@ -476,19 +476,51 @@ public class FB2toPDF {
             return "";
         }
         
-        String query = String.format("/*/fb:body[@name]/fb:section[@id='%s'] | /*/fb:body[@name]/fb:section/fb:section[@id='%s']", refname, refname);
+        String query = "/*/fb:body[@name]/fb:section";
         Nodes sections = fb2.getRootElement().query(query, xCtx);
-        if (sections.size() > 1) {
-            System.out.printf("WARNING: more than one note %s found\n", refname);
-        }
-        if (sections.size() > 0) {
+        Element section = getSectionById(sections, refname);
+
+        if (section != null) {
             StringBuilder text = new StringBuilder();
-            getNoteText((Element)sections.get(0), text, true);
+            getNoteText(section, text, true);
             return text.toString();
         }
 
         System.out.printf("WARNING: note %s not found\n", refname);
         return "";
+    }
+    
+    private Element getSectionById(Element root, String id) {
+        Elements sections = root.getChildElements("section", NS_FB2);
+        for (int i=0; i<sections.size(); i++) {
+            Element section = sections.get(i);
+            if (id.equals(section.getAttributeValue("id"))) {
+                return section;
+            }
+        }
+        return getSectionById(sections, id);
+    }
+
+    private Element getSectionById(Elements sections, String id) {
+        for (int i=0; i<sections.size(); i++) {
+            Element section = sections.get(i);
+            Element result = getSectionById(section, id);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
+    }
+
+    private Element getSectionById(Nodes sections, String id) {
+        for (int i=0; i<sections.size(); i++) {
+            Element section = (Element)sections.get(i);
+            Element result = getSectionById(section, id);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
     }
 
     private List<Image> prepareFootnoteLineImages(int numPages, String refname, float pageWidth, float pageHeight, float cutMarkerWidth) {
