@@ -484,11 +484,12 @@
         {
             name:               "code",
             baseStyle:          "body",
+            dropcapStyle:	    "",	
             fontFamily:         "monospaced"
         },
         {
             name:               "codeParagraph",
-            selector:           "//p[code and count(*) = 1]",
+            selector:           "//p[code and count(*) = 1 and empty(text())]",
             baseStyle:          "code",
             alignment:          "left",
             disableHyphenation: "true",
@@ -497,7 +498,7 @@
         },
         {
             name:               "codeParagraphCode",
-            selector:           "//p[count(*) = 1]/code",
+            selector:           "//p[code and count(*) = 1 and empty(text())]/code",
             baseStyle:          "codeParagraph"
         },
         {
