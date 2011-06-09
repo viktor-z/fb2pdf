@@ -30,6 +30,13 @@ public class FootnoteRenderer {
     static Rectangle pageSize;
     static ByteArrayOutputStream output;
     static float cutMarkerWidth = 0;
+
+    private static Paragraph createParagraph() throws FB2toPDFException {
+        float ascent = basefont.getFontDescriptor(BaseFont.ASCENT, fontSize);
+        Paragraph paragraph = noteStyle.createParagraph();
+        paragraph.setLeading(ascent);
+        return paragraph;
+    }
         
     private static byte[] renderNoteDoc(Stylesheet stylesheet, String body, HyphenationAuto hyphenation) throws FB2toPDFException, DocumentException {
         
@@ -50,7 +57,7 @@ public class FootnoteRenderer {
     }
 
     public static void addFootnote(String body, HyphenationAuto hyphenation) throws FB2toPDFException, DocumentException {
-        Paragraph paragraph = noteStyle.createParagraph();
+        Paragraph paragraph = createParagraph();
         Chunk chunk = noteStyle.createChunk();
         chunk.setHyphenation(hyphenation);
         chunk.append(body);
@@ -60,7 +67,7 @@ public class FootnoteRenderer {
         doc.setPageSize(new Rectangle(cutMarkerWidth, pageSize.getHeight()));
         doc.setMargins(0,0,0,0);
         doc.newPage();
-        paragraph = noteStyle.createParagraph();
+        paragraph = createParagraph();
         paragraph.setAlignment(Paragraph.ALIGN_RIGHT);
         chunk = noteStyle.createChunk();
         chunk.append("<…> ");
@@ -72,7 +79,7 @@ public class FootnoteRenderer {
 
         doc.newPage();
     }
-
+    
     public static void init(Stylesheet stylesheet) throws FB2toPDFException, DocumentException {
         pageStyle = stylesheet.getPageStyle();
         noteStyle = stylesheet.getParagraphStyle("footnote");
@@ -82,8 +89,7 @@ public class FootnoteRenderer {
         cutMarkerWidth = basefont.getWidthPointKerned("  <…> ", fontSize);
         float ascent = basefont.getFontDescriptor(BaseFont.ASCENT, fontSize);
         float descent = basefont.getFontDescriptor(BaseFont.DESCENT, fontSize);
-        //float capheight = basefont.getFontDescriptor(BaseFont.CAPHEIGHT, fontSize);
-        float pageHeight = ascent - descent + noteStyle.getAbsoluteLeading() / 2;
+        float pageHeight = Math.max(ascent - descent, noteStyle.getAbsoluteLeading());
         pageSize = new Rectangle(pageWidth, pageHeight);
         //pageSize.setBackgroundColor(BaseColor.LIGHT_GRAY);
         doc = new Document(pageSize, pageStyle.getMarginLeft(), pageStyle.getMarginRight(), 0, 0);
