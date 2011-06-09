@@ -4,17 +4,13 @@
  */
 package org.trivee.fb2pdf;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Nodes;
 import nu.xom.ParsingException;
 import nu.xom.Serializer;
-import nu.xom.ValidityException;
 import nux.xom.pool.XQueryPool;
 import nux.xom.xquery.XQuery;
 import nux.xom.xquery.XQueryException;

@@ -187,7 +187,7 @@ public class FB2toPDF {
         }
     }
 
-    private void applyXPathStyles() throws RuntimeException {
+    private void applyXPathStyles() throws RuntimeException, IOException {
         String prolog = "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\"; "
         + "declare namespace l = \"http://www.w3.org/1999/xlink\"; ";
         String morpher1 = prolog + "attribute {'fb2pdf-style'} {'%s'}";
@@ -201,11 +201,11 @@ public class FB2toPDF {
                 Transformation.transform(fb2, prolog + xpath + "/@fb2pdf-style", String.format(morpher1, name));
                 Transformation.transform(fb2, prolog + xpath + "/*[last()]", String.format(morpher2, name));
                 Transformation.transform(fb2, prolog + xpath + "/text()[last()]", String.format(morpher2, name));
-                Transformation.outputDebugInfo(fb2, stylesheet.getTransformationSettings(), "styling-result.xml");
             } catch (Exception ex) {
                 throw new RuntimeException("Error applying styles. " + ex.getMessage());
             }
         }
+        Transformation.outputDebugInfo(fb2, stylesheet.getTransformationSettings(), "styling-result.xml");
     }
 
     private PdfPTable createHeaderTable() throws DocumentException, FB2toPDFException {
