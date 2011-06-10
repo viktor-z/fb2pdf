@@ -240,7 +240,7 @@ public class FB2toPDF {
             if(isNullOrEmpty(localName)) {
                 continue;
             }
-            if(localName.equals("poem") || localName.equals("stanza")){
+            if(localName.equals("poem") || localName.equals("stanza") || localName.equals("cite")){
                 getNoteText(child, text, false);
             } else if (localName.equals("p") || localName.equals("v") || localName.equals("text-author") ||
                     localName.equals("date") || localName.equals("epigraph") ||
