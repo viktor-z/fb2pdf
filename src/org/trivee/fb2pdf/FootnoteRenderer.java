@@ -65,7 +65,6 @@ public class FootnoteRenderer {
         doc.add(paragraph);
 
         doc.setPageSize(new Rectangle(cutMarkerWidth, pageSize.getHeight()));
-        doc.setMargins(0,0,0,0);
         doc.newPage();
         paragraph = createParagraph();
         paragraph.setAlignment(Paragraph.ALIGN_RIGHT);
@@ -78,7 +77,6 @@ public class FootnoteRenderer {
         doc.add(paragraph);
         
         doc.setPageSize(pageSize);
-        doc.setMargins(0,0,0,0);
 
         doc.newPage();
     }
@@ -95,7 +93,7 @@ public class FootnoteRenderer {
         float pageHeight = Math.max(ascent - descent, noteStyle.getAbsoluteLeading());
         pageSize = new Rectangle(pageWidth, pageHeight);
         //pageSize.setBackgroundColor(BaseColor.LIGHT_GRAY);
-        doc = new Document(pageSize, pageStyle.getMarginLeft(), pageStyle.getMarginRight(), 0, 0);
+        doc = new Document(pageSize, 0, 0, 0, 0);
         PdfDocument.preventWidows = false;
         output = new ByteArrayOutputStream();
         writer = PdfWriter.getInstance(doc, output);
