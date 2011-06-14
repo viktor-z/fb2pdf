@@ -69,6 +69,9 @@ public class FootnoteRenderer {
         doc.newPage();
         paragraph = createParagraph();
         paragraph.setAlignment(Paragraph.ALIGN_RIGHT);
+        paragraph.setIndentationLeft(0);
+        paragraph.setIndentationRight(0);
+        paragraph.setFirstLineIndent(0);
         chunk = noteStyle.createChunk();
         chunk.append("<…> ");
         paragraph.add(chunk);
