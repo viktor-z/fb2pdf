@@ -18,6 +18,7 @@ public class GeneralSettings {
     public boolean stretchCover = true;
     public boolean enableInlineImages;
     public String overrideImageTransparency;
+    public boolean cacheImages = true;
     public boolean ignoreEmptyLineBeforeImage;
     public boolean ignoreEmptyLineAfterImage;
     public boolean generateTOC;

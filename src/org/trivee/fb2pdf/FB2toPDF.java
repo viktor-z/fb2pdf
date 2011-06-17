@@ -1,6 +1,7 @@
 package org.trivee.fb2pdf;
 
 import java.io.*;
+import java.net.MalformedURLException;
 import java.util.StringTokenizer;
 import nu.xom.ParsingException;
 import nu.xom.Element;
@@ -1116,6 +1117,7 @@ public class FB2toPDF {
         private String href;
         private String contentType;
         private nu.xom.Element binary;
+        private Image image;
 
         public BinaryAttachment(nu.xom.Element binary) {
             this.href = "#" + binary.getAttributeValue("id");
@@ -1131,9 +1133,27 @@ public class FB2toPDF {
             return contentType;
         }
 
-        public byte[] getData() {
+        private byte[] getData() {
             System.out.println("Loaded binary " + this.href + " (" + this.contentType + ")");
             return Base64.decodeBase64(this.binary.getValue().getBytes());
+        }
+        
+        public Image getImage(String overrideTransparency, boolean cacheImage) throws BadElementException, MalformedURLException, IOException {
+            Image tmp = image;
+            if (tmp == null) {
+                if (overrideTransparency == null || overrideTransparency.isEmpty()) {
+                    tmp = Image.getInstance(getData());
+                } else {
+                    Toolkit toolkit = Toolkit.getDefaultToolkit();
+                    java.awt.Image img = toolkit.createImage(getData());
+                    tmp = Image.getInstance(img, Color.decode(overrideTransparency));
+                }
+            }
+            if (cacheImage) {
+                image = tmp;
+            } 
+            
+            return tmp;
         }
     };
 
@@ -1341,7 +1361,7 @@ public class FB2toPDF {
     }
 
     private Image getImage(String href) {
-        System.out.println("Loading image at " + href);
+        System.out.println("Adding image " + href);
         for (int i = 0; i < attachments.size(); ++i) {
             BinaryAttachment attachment = attachments.get(i);
             if (!attachment.getHREF().equals(href)) {
@@ -1349,13 +1369,8 @@ public class FB2toPDF {
             }
             try {
                 String overrideTransparency = stylesheet.getGeneralSettings().overrideImageTransparency;
-                if (overrideTransparency == null || overrideTransparency.isEmpty()) {
-                    return Image.getInstance(attachment.getData());
-                } else {
-                    Toolkit toolkit = Toolkit.getDefaultToolkit();
-                    java.awt.Image img = toolkit.createImage(attachment.getData());
-                    return Image.getInstance(img, Color.decode(overrideTransparency));
-                }
+                boolean cacheImage = stylesheet.getGeneralSettings().cacheImages;
+                return attachment.getImage(overrideTransparency, cacheImage);
             } catch (Exception ex) {
                 System.out.println(ex);
                 return null;

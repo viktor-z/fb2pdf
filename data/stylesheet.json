@@ -14,6 +14,7 @@
         fullCompression: "false",
         trackingSpaceCharRatio: 5.0,
         overrideImageTransparency: "",
+        cacheImages:    "false",
         ignoreEmptyLineBeforeImage: "true",
         ignoreEmptyLineAfterImage: "true",
         strictImageSequence:	"false",
