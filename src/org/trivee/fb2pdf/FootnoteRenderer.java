@@ -14,6 +14,9 @@ import com.itextpdf.text.pdf.PdfDocument;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
 import java.io.ByteArrayOutputStream;
+import nu.xom.Element;
+import nu.xom.Elements;
+import org.apache.commons.lang.StringUtils;
 
 /**
  *
@@ -54,6 +57,56 @@ public class FootnoteRenderer {
     
     public static int getPageNumber() {
         return writer.getPageNumber();
+    }
+    
+    private static String getNoteText(Element section) {
+        
+        if (section == null) {
+            return "";
+        }
+
+        StringBuilder text = new StringBuilder();
+        getNoteText(section, text, true);
+        return text.toString();
+    }
+    
+    private static void getNoteText(Element element, StringBuilder text, boolean skipTitle) {
+        Elements children = element.getChildElements();
+        for (int i = 0; i < children.size(); i++) {
+            Element child = children.get(i);
+            String localName = child.getLocalName();
+            if(StringUtils.isBlank(localName)) {
+                continue;
+            }
+            if(localName.equals("poem") || localName.equals("stanza") || localName.equals("cite")){
+                getNoteText(child, text, false);
+            } else if (localName.equals("p") || localName.equals("v") || localName.equals("text-author") ||
+                    localName.equals("date") || localName.equals("epigraph") ||
+                    (!skipTitle && localName.equals("title"))) {
+                Element paragraph = child;
+                String paragraphText = paragraph.getValue();
+                paragraphText = paragraphText.replaceAll("\n", " ").replaceAll("  ", " ").trim();
+                if (paragraphText.isEmpty()) {
+                    continue;
+                }
+                if (text.length() > 0) {
+                    text.append("    ");
+                }
+                text.append(paragraphText);
+                text.append("\n");
+            }
+        }
+    }
+
+    public static void addFootnote(String marker, String refname, Element section, HyphenationAuto hyphenation) throws FB2toPDFException, DocumentException {
+        String noteText = getNoteText(section);
+   
+        if (StringUtils.isBlank(noteText)) {
+            System.out.printf("WARNING: note %s not found\n", refname);
+            return;
+        }
+        
+        FootnoteRenderer.addFootnote(marker + " " + noteText, hyphenation);
     }
 
     public static void addFootnote(String body, HyphenationAuto hyphenation) throws FB2toPDFException, DocumentException {

@@ -196,7 +196,7 @@ public class FB2toPDF {
         for (ParagraphStyle style : stylesheet.getParagraphStyles()) {
                 String xpath = style.getSelector();
                 String name = style.getName();
-                if (isNullOrEmpty(xpath)) continue;
+                if (isBlank(xpath)) continue;
                 
             try {
                 Transformation.transform(fb2, prolog + xpath + "/@fb2pdf-style", String.format(morpher1, name));
@@ -233,32 +233,14 @@ public class FB2toPDF {
         return table;
     }
 
-    private void getNoteText(Element element, StringBuilder text, boolean skipTitle) {
-        Elements children = element.getChildElements();
-        for (int i = 0; i < children.size(); i++) {
-            Element child = children.get(i);
-            String localName = child.getLocalName();
-            if(isNullOrEmpty(localName)) {
-                continue;
-            }
-            if(localName.equals("poem") || localName.equals("stanza") || localName.equals("cite")){
-                getNoteText(child, text, false);
-            } else if (localName.equals("p") || localName.equals("v") || localName.equals("text-author") ||
-                    localName.equals("date") || localName.equals("epigraph") ||
-                    (!skipTitle && localName.equals("title"))) {
-                Element paragraph = child;
-                String paragraphText = paragraph.getValue();
-                paragraphText = paragraphText.replaceAll("\n", " ").replaceAll("  ", " ").trim();
-                if (paragraphText.isEmpty()) {
-                    continue;
-                }
-                if (text.length() > 0) {
-                    text.append("    ");
-                }
-                text.append(paragraphText);
-                text.append("\n");
-            }
+    private Element getNoteSection(String refname) {
+        if (StringUtils.isBlank(refname)) {
+            return null;
         }
+        String query = "/*/fb:body[@name]/fb:section";
+        Nodes sections = fb2.getRootElement().query(query, xCtx);
+        Element section = getSectionById(sections, refname);
+        return section;
     }
 
     private void fillPageNumTemplate(String referenceName) throws FB2toPDFException {
@@ -445,52 +427,31 @@ public class FB2toPDF {
     }
 
     private void addFootnote(String marker, String refname) throws DocumentException, FB2toPDFException {
-        if (isNullOrEmpty(refname)) {
+        if (isBlank(refname)) {
             System.out.println("Skipping footnote with empty reference");
             return;
         }
         refname = refname.substring(1);
         System.out.println("Adding footnote " + refname);
-        String body = marker + " " + getNoteBody(refname);
+
         float w = FootnoteRenderer.pageSize.getWidth();
         float h = FootnoteRenderer.pageSize.getHeight();
         float cutW = FootnoteRenderer.cutMarkerWidth;
         int footnoteNumber = FootnoteRenderer.getPageNumber();
-        FootnoteRenderer.addFootnote(body, hyphenation);
+
+        Element section = getNoteSection(refname);
+        FootnoteRenderer.addFootnote(marker, refname, section, hyphenation);
+        
         footnoteNumber = FootnoteRenderer.getPageNumber() - footnoteNumber - 1;
+        if (footnoteNumber < 1) {
+            return;
+        }
         List<Image> noteLineImages = prepareFootnoteLineImages(footnoteNumber, refname, w, h, cutW);
         for (Image image : noteLineImages) {
             doc.add(image);
         }
     }
 
-    /*
-    private void appendLF() throws FB2toPDFException, DocumentException {
-    flushCurrentChunk();
-    currentChunk = currentStyle.createChunk();
-    currentChunk.append("\n");
-    flushCurrentChunk();
-    }
-     */
-    private String getNoteBody(String refname) {
-        if (StringUtils.isBlank(refname)) {
-            return "";
-        }
-        
-        String query = "/*/fb:body[@name]/fb:section";
-        Nodes sections = fb2.getRootElement().query(query, xCtx);
-        Element section = getSectionById(sections, refname);
-
-        if (section != null) {
-            StringBuilder text = new StringBuilder();
-            getNoteText(section, text, true);
-            return text.toString();
-        }
-
-        System.out.printf("WARNING: note %s not found\n", refname);
-        return "";
-    }
-    
     private Element getSectionById(Element root, String id) {
         if (id.equals(root.getAttributeValue("id"))) {
             return root;
@@ -612,7 +573,7 @@ public class FB2toPDF {
 
         String elementStyleAttr = element.getAttributeValue("fb2pdf-style");
 
-        if (isNullOrEmpty(elementStyleAttr)) {
+        if (isBlank(elementStyleAttr)) {
             return result;
         }
 
@@ -710,8 +671,8 @@ public class FB2toPDF {
 
         String alignAttr = cellElement.getAttributeValue("align");
         String valignAttr = cellElement.getAttributeValue("valign");
-        int hAlign = isNullOrEmpty(alignAttr) ? PdfPCell.ALIGN_CENTER : hAlignMap.get(alignAttr);
-        int vAlign = isNullOrEmpty(valignAttr) ? PdfPCell.ALIGN_MIDDLE : vAlignMap.get(valignAttr);
+        int hAlign = isBlank(alignAttr) ? PdfPCell.ALIGN_CENTER : hAlignMap.get(alignAttr);
+        int vAlign = isBlank(valignAttr) ? PdfPCell.ALIGN_MIDDLE : vAlignMap.get(valignAttr);
 
         cell.setColspan(colspan);
         cell.setRowspan(rowspan);
@@ -723,7 +684,7 @@ public class FB2toPDF {
     
     private int getCellElementSpan(Element cellElement, String attrName) {
         String spanAttr = cellElement.getAttributeValue(attrName);
-        return isNullOrEmpty(spanAttr) ? 1 : Integer.parseInt(spanAttr);
+        return isBlank(spanAttr) ? 1 : Integer.parseInt(spanAttr);
     }
 
     protected int getDropCapCount(String text) {
@@ -818,20 +779,20 @@ public class FB2toPDF {
         String seqname = seq.getAttributeValue("name");
         String seqnumber = seq.getAttributeValue("number");
         String subtitle = "";
-        if (!isNullOrEmpty(seqname)) {
+        if (!isBlank(seqname)) {
             subtitle += seqname;
         }
-        if (!isNullOrEmpty(seqnumber)) {
+        if (!isBlank(seqnumber)) {
             subtitle += " #" + seqnumber;
         }
-        if (!isNullOrEmpty(subtitle)) {
+        if (!isBlank(subtitle)) {
             subtitle = "(" + subtitle + ")";
         }
         return subtitle;
     }
 
-    private boolean isNullOrEmpty(String str) {
-        return str == null || str.trim().length() == 0;
+    private boolean isBlank(String str) {
+        return StringUtils.isBlank(str);
     }
 
     private void loadData(InputStream stylesheetInputStream)
@@ -891,7 +852,7 @@ public class FB2toPDF {
         final GeneralSettings generalSettings = stylesheet.getGeneralSettings();
 
         Rectangle pageSize = new Rectangle(pageStyle.getPageWidth(), pageStyle.getPageHeight(), pageStyle.getPageRotation());
-        if(!isNullOrEmpty(pageStyle.backgroundColor)) {
+        if(!isBlank(pageStyle.backgroundColor)) {
             pageSize.setBackgroundColor(new BaseColor(Color.decode(pageStyle.backgroundColor)));
         }
 
@@ -909,7 +870,7 @@ public class FB2toPDF {
             writer.setPageEvent(pageSizeEnforceHelper);
         }
         
-        if (!isNullOrEmpty(pageStyle.backgroundImage)){
+        if (!isBlank(pageStyle.backgroundImage)){
             try {
                 Image image = Image.getInstance(getValidatedFileName(pageStyle.backgroundImage));
                 rescaleImage(image);
@@ -1430,7 +1391,7 @@ public class FB2toPDF {
             chunk.append(TextPreprocessor.process(title, stylesheet.getTextPreprocessorSettings(), currentStyle));
 
             String ref = section.getAttributeValue("id");
-            if (isNullOrEmpty(ref)) {
+            if (isBlank(ref)) {
                 ref = "section" + i;
             }
             addGoToActionToChunk(ref, chunk);
@@ -1472,11 +1433,11 @@ public class FB2toPDF {
         }
 
         String id = section.getAttributeValue("id");
-        if (isNullOrEmpty(id) && bodyIndex == 0 && level == 0) {
+        if (isBlank(id) && bodyIndex == 0 && level == 0) {
             id = "section" + index;
         }
 
-        if (!isNullOrEmpty(id)) {
+        if (!isBlank(id)) {
             addInvisibleAnchor(id);
         }
 
@@ -1823,7 +1784,7 @@ public class FB2toPDF {
             throws DocumentException, FB2toPDFException {
         if (currentChunk != null) {
             String currentAnchorName = anchorStack.isEmpty() ? null : anchorStack.pop();
-            if (!isNullOrEmpty(currentReference)) {
+            if (!isBlank(currentReference)) {
                 Anchor anchor = currentStyle.createAnchor();
                 if (currentReference.charAt(0) == '#') {
                     //Unlike Anchor, Action won't fail even when local destination does not exist
@@ -2047,7 +2008,7 @@ public class FB2toPDF {
         if (hyphSettings.hyphenate) {
             System.out.println("Hyphenation is on");
             String bookLang = getLang(description);
-            if (isNullOrEmpty(bookLang) || hyphSettings.overrideLanguage) {
+            if (isBlank(bookLang) || hyphSettings.overrideLanguage) {
                 bookLang = hyphSettings.defaultLanguage;
             }
             hyphenation = new HyphenationAuto(bookLang, "none", 2, 2);
