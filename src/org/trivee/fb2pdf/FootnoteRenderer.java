@@ -34,22 +34,31 @@ public class FootnoteRenderer {
     static ByteArrayOutputStream output;
     static float cutMarkerWidth = 0;
 
+    private static void addCutMarker(Chunk chunk) throws FB2toPDFException, DocumentException {
+        doc.setPageSize(new Rectangle(cutMarkerWidth, pageSize.getHeight()));
+        doc.newPage();
+        Paragraph paragraph = createParagraph();
+        paragraph.setAlignment(Paragraph.ALIGN_RIGHT);
+        paragraph.setIndentationLeft(0);
+        paragraph.setIndentationRight(0);
+        paragraph.setFirstLineIndent(0);
+        chunk = noteStyle.createChunk();
+        chunk.append("<…> ");
+        paragraph.add(chunk);
+        doc.add(paragraph);
+        
+        doc.setPageSize(pageSize);
+
+        doc.newPage();
+    }
+
     private static Paragraph createParagraph() throws FB2toPDFException {
         float ascent = basefont.getFontDescriptor(BaseFont.ASCENT, fontSize);
         Paragraph paragraph = noteStyle.createParagraph();
         paragraph.setLeading(ascent);
         return paragraph;
     }
-        
-    private static byte[] renderNoteDoc(Stylesheet stylesheet, String body, HyphenationAuto hyphenation) throws FB2toPDFException, DocumentException {
-        
-        init(stylesheet);
-
-        addFootnote(body, hyphenation);
-
-        return close();
-    }
-
+   
     public static byte[] close() {
         doc.close();
         return output.toByteArray();
@@ -99,39 +108,55 @@ public class FootnoteRenderer {
     }
 
     public static void addFootnote(String marker, String refname, Element section, HyphenationAuto hyphenation) throws FB2toPDFException, DocumentException {
-        String noteText = getNoteText(section);
-   
-        if (StringUtils.isBlank(noteText)) {
-            System.out.printf("WARNING: note %s not found\n", refname);
-            return;
+        Chunk chunk = noteStyle.createChunk();
+        chunk.append(marker + " ");
+
+        boolean added = addFootnote(section, hyphenation, chunk, true);
+
+        if (added) {
+            addCutMarker(chunk);
         }
-        
-        FootnoteRenderer.addFootnote(marker + " " + noteText, hyphenation);
     }
 
-    public static void addFootnote(String body, HyphenationAuto hyphenation) throws FB2toPDFException, DocumentException {
-        Paragraph paragraph = createParagraph();
-        Chunk chunk = noteStyle.createChunk();
-        chunk.setHyphenation(hyphenation);
-        chunk.append(body);
-        paragraph.add(chunk);
-        doc.add(paragraph);
-
-        doc.setPageSize(new Rectangle(cutMarkerWidth, pageSize.getHeight()));
-        doc.newPage();
-        paragraph = createParagraph();
-        paragraph.setAlignment(Paragraph.ALIGN_RIGHT);
-        paragraph.setIndentationLeft(0);
-        paragraph.setIndentationRight(0);
-        paragraph.setFirstLineIndent(0);
-        chunk = noteStyle.createChunk();
-        chunk.append("<…> ");
-        paragraph.add(chunk);
-        doc.add(paragraph);
+    private static boolean addFootnote(Element element, HyphenationAuto hyphenation, Chunk firstChunk, boolean skipTitle) throws FB2toPDFException, DocumentException {
+        if (element == null) {
+            return false;
+        }
         
-        doc.setPageSize(pageSize);
+        boolean added = false;
 
-        doc.newPage();
+        Elements children = element.getChildElements();
+        for (int i = 0; i < children.size(); i++) {
+            Element child = children.get(i);
+            String localName = child.getLocalName();
+            if(StringUtils.isBlank(localName)) {
+                continue;
+            }
+            if(localName.equals("poem") || localName.equals("stanza") || localName.equals("cite")){
+                addFootnote(child, hyphenation, firstChunk, false);
+            } else if (localName.equals("p") || localName.equals("v") || localName.equals("text-author") ||
+                    localName.equals("date") || localName.equals("epigraph") ||
+                    (!skipTitle && localName.equals("title"))) {
+                Element childElement = child;
+                String paragraphText = childElement.getValue();
+                paragraphText = paragraphText.replaceAll("\n", " ").replaceAll("  ", " ").trim();
+                if (paragraphText.isEmpty()) {
+                    continue;
+                }
+                Paragraph paragraph = createParagraph();
+                if (firstChunk != null) {
+                    paragraph.add(firstChunk);
+                    firstChunk = null;
+                }
+                Chunk chunk = noteStyle.createChunk();
+                chunk.setHyphenation(hyphenation);
+                chunk.append(paragraphText);
+                paragraph.add(chunk);
+                doc.add(paragraph);
+                added = true;
+            }
+        }
+        return added;
     }
     
     public static void init(Stylesheet stylesheet) throws FB2toPDFException, DocumentException {
