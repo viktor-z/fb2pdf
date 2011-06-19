@@ -14,8 +14,10 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.SequenceInputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Vector;
 import java.util.regex.Pattern;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
@@ -171,7 +173,14 @@ public class CLIDriver {
     }
 
     private static void translate(String fb2name, String pdfname, String stylesheetName) throws FileNotFoundException, UnsupportedEncodingException {
-                FileInputStream stylesheet = new FileInputStream(stylesheetName);
+                
+                String[] names = stylesheetName.split(":");
+                Vector<FileInputStream> streams = new Vector<FileInputStream>(names.length);
+                for (String name : names) {
+                    FileInputStream stream = new FileInputStream(name);
+                    streams.add(stream);
+                }
+                SequenceInputStream stylesheet = new SequenceInputStream(streams.elements());
 
                 PrintStream saveOut =  System.out;
 
