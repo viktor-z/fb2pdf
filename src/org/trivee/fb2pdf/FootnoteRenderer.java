@@ -164,9 +164,10 @@ public class FootnoteRenderer {
                     (!skipTitle && localName.equals("title"))) {
                 Paragraph paragraph = createParagraph();
                 if (firstChunk != null) {
-                    paragraph.setFirstLineIndent(0);
+                    paragraph.setFirstLineIndent(noteStyle.getFirstFirstLineIndent());
+                    firstChunk.append(" ");
                     paragraph.add(firstChunk);
-                    paragraph.add(new Chunk(new VerticalPositionMark(), noteStyle.getFirstFirstLineIndent(), true));
+                    //paragraph.add(new Chunk(new VerticalPositionMark(), noteStyle.getFirstFirstLineIndent(), true));
                     firstChunk = null;
                 }
                 addNode(child, hyphenation, paragraph);

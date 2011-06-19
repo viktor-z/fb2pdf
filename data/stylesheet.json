@@ -525,7 +525,7 @@
             fontFamily:       "sansSerif",
             fontSize:         "7.5pt",
             alignment:        "justified",
-            firstFirstLineIndent:  "20pt",
+            firstFirstLineIndent:  "0pt",
             firstLineIndent:  "1em",
             leading:          "1.1em",
             dropcapStyle:	  ""	
