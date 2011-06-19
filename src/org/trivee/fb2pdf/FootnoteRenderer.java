@@ -101,6 +101,8 @@ public class FootnoteRenderer {
                 addNode(node, hyphenation, paragraph);
                 noteStyle.toggleHalfSize();
                 subscript = false;
+            } else {
+                addNode(node, hyphenation, paragraph);
             }
    
         }
