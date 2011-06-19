@@ -17,6 +17,8 @@ import com.itextpdf.text.pdf.draw.VerticalPositionMark;
 import java.io.ByteArrayOutputStream;
 import nu.xom.Element;
 import nu.xom.Elements;
+import nu.xom.Node;
+import nu.xom.Text;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -34,6 +36,8 @@ public class FootnoteRenderer {
     static Rectangle pageSize;
     static ByteArrayOutputStream output;
     static float cutMarkerWidth = 0;
+    private static boolean superscript;
+    private static boolean subscript;
 
     private static void addCutMarker(Chunk chunk) throws FB2toPDFException, DocumentException {
         doc.setPageSize(new Rectangle(cutMarkerWidth, pageSize.getHeight()));
@@ -51,6 +55,55 @@ public class FootnoteRenderer {
         doc.setPageSize(pageSize);
 
         doc.newPage();
+    }
+
+    private static void addNode(Node rootNode, HyphenationAuto hyphenation, Paragraph paragraph) throws FB2toPDFException {
+        for (int j=0; j<rootNode.getChildCount(); j++) {
+            Node node = rootNode.getChild(j);
+            if (node instanceof Text) {
+                Chunk chunk = noteStyle.createChunk();
+                chunk.setHyphenation(hyphenation);
+                if (superscript) {
+                    chunk.setTextRise(noteStyle.getFontSize().getPoints() / 3);
+                }
+                if (subscript) {
+                    chunk.setTextRise(-noteStyle.getFontSize().getPoints() / 6);
+                }
+                chunk.append(node.getValue());
+                paragraph.add(chunk);
+                continue;
+            } 
+            if (!(node instanceof Element)) {
+                continue;
+            }
+            Element element = (Element)node;
+            if (element.getLocalName().equals("emphasis")) {
+                noteStyle.toggleItalic();
+                addNode(node, hyphenation, paragraph);
+                noteStyle.toggleItalic();
+            } else if (element.getLocalName().equals("strong")) {
+                noteStyle.toggleBold();
+                addNode(node, hyphenation, paragraph);
+                noteStyle.toggleBold();
+            } else if (element.getLocalName().equals("strikethrough")) {
+                noteStyle.toggleStrikethrough();
+                addNode(node, hyphenation, paragraph);
+                noteStyle.toggleStrikethrough();
+            } else if (element.getLocalName().equals("sup")) {
+                noteStyle.toggleHalfSize();
+                superscript = true;
+                addNode(node, hyphenation, paragraph);
+                noteStyle.toggleHalfSize();
+                superscript = false;
+            } else if (element.getLocalName().equals("sub")) {
+                noteStyle.toggleHalfSize();
+                subscript = true;
+                addNode(node, hyphenation, paragraph);
+                noteStyle.toggleHalfSize();
+                subscript = false;
+            }
+   
+        }
     }
 
     private static Paragraph createParagraph() throws FB2toPDFException {
@@ -96,17 +149,17 @@ public class FootnoteRenderer {
             if(StringUtils.isBlank(localName)) {
                 continue;
             }
-            if(localName.equals("poem") || localName.equals("stanza") || localName.equals("cite")){
-                addFootnote(child, hyphenation, firstChunk, false);
-            } else if (localName.equals("p") || localName.equals("v") || localName.equals("text-author") ||
-                    localName.equals("date") || localName.equals("epigraph") ||
-                    (!skipTitle && localName.equals("title"))) {
-                Element childElement = child;
-                String paragraphText = childElement.getValue();
-                paragraphText = paragraphText.replaceAll("\n", " ").replaceAll("  ", " ").trim();
-                if (paragraphText.isEmpty()) {
-                    continue;
+            if(localName.equals("poem") || 
+               localName.equals("stanza") || 
+               localName.equals("epigraph") ||
+               localName.equals("cite")){
+                added = addFootnote(child, hyphenation, firstChunk, false);
+                if (added) {
+                    firstChunk = null;
                 }
+            } else if (localName.equals("p") || localName.equals("v") || localName.equals("text-author") ||
+                    localName.equals("date") || 
+                    (!skipTitle && localName.equals("title"))) {
                 Paragraph paragraph = createParagraph();
                 if (firstChunk != null) {
                     paragraph.setFirstLineIndent(0);
@@ -114,10 +167,7 @@ public class FootnoteRenderer {
                     paragraph.add(new Chunk(new VerticalPositionMark(), noteStyle.getFirstFirstLineIndent(), true));
                     firstChunk = null;
                 }
-                Chunk chunk = noteStyle.createChunk();
-                chunk.setHyphenation(hyphenation);
-                chunk.append(paragraphText);
-                paragraph.add(chunk);
+                addNode(child, hyphenation, paragraph);
                 doc.add(paragraph);
                 added = true;
             }
