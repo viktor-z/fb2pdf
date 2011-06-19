@@ -39,7 +39,7 @@ public class CLIDriver {
             "\n\n\tfb2pdf test.fb2" +
             "\n\n\tfb2pdf \"c:\\My Books\"" +
             "\n\n\tfb2pdf test.fb2 mybook.pdf" +
-            "\n\n\tfb2pdf -s data\\mystyle.json test.fb2" +
+            "\n\n\tfb2pdf -s data\\myStylePart1.json:data\\myStylePart2.json test.fb2" +
             "\n\n\tfb2pdf -l my_log.txt -e cp866 test.fb2";
     private static int succeeded = 0;
     private static int failed = 0;
