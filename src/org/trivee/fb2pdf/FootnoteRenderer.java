@@ -13,6 +13,7 @@ import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfDocument;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.draw.VerticalPositionMark;
 import java.io.ByteArrayOutputStream;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -72,7 +73,7 @@ public class FootnoteRenderer {
     
     public static void addFootnote(String marker, String refname, Element section, HyphenationAuto hyphenation) throws FB2toPDFException, DocumentException {
         Chunk chunk = noteStyle.createChunk();
-        chunk.append(marker + " ");
+        chunk.append(marker);
 
         boolean added = addFootnote(section, hyphenation, chunk, true);
 
@@ -108,8 +109,9 @@ public class FootnoteRenderer {
                 }
                 Paragraph paragraph = createParagraph();
                 if (firstChunk != null) {
-                    paragraph.setFirstLineIndent(noteStyle.getFirstFirstLineIndent());
+                    paragraph.setFirstLineIndent(0);
                     paragraph.add(firstChunk);
+                    paragraph.add(new Chunk(new VerticalPositionMark(), noteStyle.getFirstFirstLineIndent(), true));
                     firstChunk = null;
                 }
                 Chunk chunk = noteStyle.createChunk();

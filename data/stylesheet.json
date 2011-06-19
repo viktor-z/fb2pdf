@@ -525,14 +525,10 @@
             fontFamily:       "sansSerif",
             fontSize:         "7.5pt",
             alignment:        "justified",
-            firstLineIndent:  "0em",
+            firstFirstLineIndent:  "20pt",
+            firstLineIndent:  "1em",
             leading:          "1.1em",
-            firstFirstLineIndent:  "0em",
-            dropcapStyle:	  "",	
-            firstSpacingBefore:   "0em",
-            lastSpacingAfter:     "0em",
-            spacingBefore:   "0em",
-            spacingAfter:    "0em"
+            dropcapStyle:	  ""	
         },
        	{
        		name:			"bodyDropCap",
