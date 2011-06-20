@@ -39,7 +39,7 @@ public class CLIDriver {
             "\n\n\tfb2pdf test.fb2" +
             "\n\n\tfb2pdf \"c:\\My Books\"" +
             "\n\n\tfb2pdf test.fb2 mybook.pdf" +
-            "\n\n\tfb2pdf -s data\\myStylePart1.json:data\\myStylePart2.json test.fb2" +
+            "\n\n\tfb2pdf -s data\\myStylePart1.json -s data\\myStylePart2.json test.fb2" +
             "\n\n\tfb2pdf -l my_log.txt -e cp866 test.fb2";
     private static int succeeded = 0;
     private static int failed = 0;
@@ -105,7 +105,7 @@ public class CLIDriver {
         //    println(option.getOpt());
         //}
 
-        String stylesheetName = cl.hasOption('s') ? cl.getOptionValue('s') : new File(new File(getBaseDir()).getParent() + "/data/stylesheet.json").getCanonicalPath();
+        String[] stylesheetNames = cl.hasOption('s') ? cl.getOptionValues('s') : new String[]{new File(new File(getBaseDir()).getParent() + "/data/stylesheet.json").getCanonicalPath()};
 
         logEncoding = cl.hasOption('e') ? cl.getOptionValue('e') : "cp1251";
         try {
@@ -126,13 +126,13 @@ public class CLIDriver {
         println(String.format("Converting %s...\n", fb2name));
 
         if(fb2file.isDirectory()) {
-                processDirectory(fb2file, stylesheetName);
+                processDirectory(fb2file, stylesheetNames);
         } else {
                 String pdfname = cl.getArgs().length == 1 ? getPdfName(fb2name) : cl.getArgs()[1];
                 if ((new File(pdfname)).isDirectory()) {
                     pdfname = pdfname + "/" + getPdfName((new File(fb2name)).getName());
                 }
-                translate(fb2name, pdfname, stylesheetName);
+                translate(fb2name, pdfname, stylesheetNames);
 
         }
 
@@ -147,7 +147,7 @@ public class CLIDriver {
         return srcName + ".pdf";
     }
 
-    private static void processDirectory(File dir, String stylesheetName) throws FileNotFoundException, UnsupportedEncodingException {
+    private static void processDirectory(File dir, String[] stylesheetNames) throws FileNotFoundException, UnsupportedEncodingException {
                 File[] files = dir.listFiles(new FileFilter() {
                     @Override
                     public boolean accept(File pathname) {
@@ -156,7 +156,7 @@ public class CLIDriver {
                     }
                 });
                 for (File file: files){
-                    translate(file.getPath(), getPdfName(file.getPath()), stylesheetName);
+                    translate(file.getPath(), getPdfName(file.getPath()), stylesheetNames);
                 }
 
                 if(cl.hasOption('r')) {
@@ -167,16 +167,15 @@ public class CLIDriver {
                         }
                     });
                     for(File subdir: subdirs) {
-                        processDirectory(subdir, stylesheetName);
+                        processDirectory(subdir, stylesheetNames);
                     }
                 }
     }
 
-    private static void translate(String fb2name, String pdfname, String stylesheetName) throws FileNotFoundException, UnsupportedEncodingException {
+    private static void translate(String fb2name, String pdfname, String[] stylesheetNames) throws FileNotFoundException, UnsupportedEncodingException {
                 
-                String[] names = stylesheetName.split(":");
-                Vector<FileInputStream> streams = new Vector<FileInputStream>(names.length);
-                for (String name : names) {
+                Vector<FileInputStream> streams = new Vector<FileInputStream>(stylesheetNames.length);
+                for (String name : stylesheetNames) {
                     FileInputStream stream = new FileInputStream(name);
                     streams.add(stream);
                 }
