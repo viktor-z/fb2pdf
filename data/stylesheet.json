@@ -484,7 +484,8 @@
             alignment:        "left",
             spacingAfter:     "3pt",
             spacingBefore:    "0pt",
-            leftIndent:       "3pt"    
+            leftIndent:       "3pt",    
+            rightIndent:      "3pt"
         },
         {
             name:               "code",
