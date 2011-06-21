@@ -210,16 +210,20 @@ public class FB2toPDF {
     }
 
     private PdfPTable createHeaderTable() throws DocumentException, FB2toPDFException {
+        final ParagraphStyle headerStyle = stylesheet.getParagraphStyle("header");
         //PdfPTable table = new PdfPTable(2);
         //table.setWidths(new float[]{0.5f, 0.5f});
         PdfPTable table = new PdfPTable(1);
         table.setWidths(new float[]{1.0f});
         table.setTotalWidth(doc.getPageSize().getWidth() - doc.leftMargin() - doc.rightMargin());
         table.getDefaultCell().setBorder(Rectangle.BOTTOM);
-        table.getDefaultCell().setPaddingBottom(4);
+        table.getDefaultCell().setPaddingTop(headerStyle.getSpacingBefore());
+        table.getDefaultCell().setPaddingBottom(headerStyle.getSpacingAfter());
+        table.getDefaultCell().setPaddingLeft(headerStyle.getLeftIndent());
+        table.getDefaultCell().setPaddingRight(headerStyle.getRightIndent());
+        table.getDefaultCell().setHorizontalAlignment(headerStyle.getAlignment());
         table.getDefaultCell().setNoWrap(true);
         
-        final ParagraphStyle headerStyle = stylesheet.getParagraphStyle("header");
         table.getDefaultCell().setBorderColor(headerStyle.getColor());
         Chunk chunk = headerStyle.createChunk();
         String author = getTextContent(fb2.query("//fb:title-info//fb:author[1]//fb:first-name | //fb:title-info//fb:author[1]//fb:last-name", xCtx), "", "");
@@ -231,6 +235,30 @@ public class FB2toPDF {
         //chunk.append(title);
         //table.addCell(new Phrase(chunk));
         return table;
+    }
+
+    private Map<String, Integer> getCellHAlignmentMap() {
+        Map<String, Integer> hAlignMap = new HashMap<String, Integer>() {
+
+            {
+                put("center", PdfPCell.ALIGN_CENTER);
+                put("left", PdfPCell.ALIGN_LEFT);
+                put("right", PdfPCell.ALIGN_RIGHT);
+            }
+        };
+        return hAlignMap;
+    }
+
+    private Map<String, Integer> getCellVAlignmentMap() {
+        Map<String, Integer> vAlignMap = new HashMap<String, Integer>() {
+
+            {
+                put("middle", PdfPCell.ALIGN_MIDDLE);
+                put("top", PdfPCell.ALIGN_TOP);
+                put("bottom", PdfPCell.ALIGN_BOTTOM);
+            }
+        };
+        return vAlignMap;
     }
 
     private Element getNoteSection(String refname) {
@@ -648,22 +676,8 @@ public class FB2toPDF {
 
     private int setTableCellAttributes(Element cellElement, PdfPCell cell) throws NumberFormatException {
 
-        Map<String, Integer> hAlignMap = new HashMap<String, Integer>() {
-
-            {
-                put("center", PdfPCell.ALIGN_CENTER);
-                put("left", PdfPCell.ALIGN_LEFT);
-                put("right", PdfPCell.ALIGN_RIGHT);
-            }
-        };
-        Map<String, Integer> vAlignMap = new HashMap<String, Integer>() {
-
-            {
-                put("middle", PdfPCell.ALIGN_MIDDLE);
-                put("top", PdfPCell.ALIGN_TOP);
-                put("bottom", PdfPCell.ALIGN_BOTTOM);
-            }
-        };
+        Map<String, Integer> hAlignMap = getCellHAlignmentMap();
+        Map<String, Integer> vAlignMap = getCellVAlignmentMap();
 
         
         int colspan = getCellElementSpan(cellElement, "colspan");

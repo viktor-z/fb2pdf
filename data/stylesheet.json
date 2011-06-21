@@ -480,7 +480,11 @@
             baseStyle:        "default",
             fontFamily:       "serif",
             fontSize:         "8pt",
-            fontStyle:        "italic"
+            fontStyle:        "italic",
+            alignment:        "left",
+            spacingAfter:     "3pt",
+            spacingBefore:    "0pt",
+            leftIndent:       "3pt"    
         },
         {
             name:               "code",
