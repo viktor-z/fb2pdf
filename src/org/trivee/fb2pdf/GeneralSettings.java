@@ -14,6 +14,7 @@ import java.util.ArrayList;
 public class GeneralSettings {
     public boolean transliterateMetaInfo;
     public boolean forceTransliterateAuthor;
+    public String metaAuthorQuery = "(first-name,  middle-name,  last-name)";
     public float imageDpi;
     public boolean stretchCover = true;
     public boolean enableInlineImages;

@@ -44,6 +44,7 @@ import nu.xom.Nodes;
 import nu.xom.ParentNode;
 import nu.xom.Text;
 import nu.xom.XPathContext;
+import nux.xom.xquery.XQueryUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.tools.zip.ZipEntry;
@@ -1181,12 +1182,25 @@ public class FB2toPDF {
         }
 
     }
-
-    private String getAuthorFullName(Element author) throws FB2toPDFException {
-        String firstName = getTextContentByTagName(author, "first-name");
-        String middleName = getTextContentByTagName(author, "middle-name");
-        String lastName = getTextContentByTagName(author, "last-name");
-        return String.format("%s %s %s", firstName, middleName, lastName).trim();
+    
+    private String getMetaAuthorFullName(Element author) throws FB2toPDFException {
+        String query = stylesheet.getGeneralSettings().metaAuthorQuery;
+        return getAuthorFullName(author, query);
+    }
+    
+    private String getBookInfoPageAuthorFullName(Element author) throws FB2toPDFException {
+        String query = "(first-name,  middle-name,  last-name)";
+        return getAuthorFullName(author, query);
+    }
+    
+    private String getAuthorFullName(Element author, String query) throws FB2toPDFException {
+        String queryProlog = stylesheet.getTransformationSettings().queryProlog;
+        Nodes nodes = XQueryUtil.xquery(author, queryProlog + query);
+        List<String> strings = new ArrayList<String>(nodes.size());
+        for (int i=0; i<nodes.size(); i++) {
+            strings.add(nodes.get(i).getValue());
+        }
+        return StringUtils.join(strings, " ");
     }
 
     private void addMetaInfo(Element description)
@@ -1200,7 +1214,7 @@ public class FB2toPDF {
 
             for (int i = 0; i < authors.size(); ++i) {
                 Element author = authors.get(i);
-                String authorName = transliterate(getAuthorFullName(author), force);
+                String authorName = transliterate(getMetaAuthorFullName(author), force);
                 System.out.println("Adding author: " + authorName);
                 doc.addAuthor(authorName);
 
@@ -1252,8 +1266,7 @@ public class FB2toPDF {
             Elements authors = titleInfo.getChildElements("author", NS_FB2);
             for (int i = 0; i < authors.size(); ++i) {
                 Element author = authors.get(i);
-                String authorName = getAuthorFullName(author);
-                // doc.addAuthor(transliterate(authorName));
+                String authorName = getBookInfoPageAuthorFullName(author);
                 addLine(authorName, authorStyle);
             }
 
