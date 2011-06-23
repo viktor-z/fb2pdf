@@ -182,6 +182,10 @@ public class FB2toPDF {
     }
 
     private void applyTransformations() throws RuntimeException {
+        if (!stylesheet.getTransformationSettings().enabled) {
+            return;
+        }
+
         try {
             Transformation.transform(fb2, stylesheet.getTransformationSettings());
         } catch (Exception ex) {
@@ -1928,9 +1932,6 @@ public class FB2toPDF {
                     currentStyle.toggleHalfSize();
                     subscript = false;
                 } else {
-                    /*
-                    elif s.tagName == "code":
-                     */
                     System.out.println("Unhandled paragraph tag " + child.getLocalName());
                     processParagraphContent(child);
                 }
