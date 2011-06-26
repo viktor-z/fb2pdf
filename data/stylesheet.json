@@ -133,9 +133,9 @@
                 },
                 */
                 /* 
-                {   // delete dash when first character of first paragraph of the section
+                {   // delete dash (with following space) when dash is first character of first paragraph of the section
                     "query":   "//p[1]/text()", 
-                    "morpher": "replace(., '^(\u2012|\u2013|\u2014|\u2015)', '')" 
+                    "morpher": "replace(., '^(\u2012|\u2013|\u2014|\u2015)(\u00A0|\\s)*', '')" 
                 },
                 */ 
                 /*
