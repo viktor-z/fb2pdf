@@ -612,6 +612,7 @@ public class FB2toPDF {
 
         try {
             result = stylesheet.getParagraphStyle(elementStyleAttr);
+            result.containerStyle = currentStyle;
         } catch (FB2toPDFException ex) {
             System.out.println("Element style not found: " + elementStyleAttr);
         }
@@ -1858,6 +1859,7 @@ public class FB2toPDF {
     private void processParagraphContent(Element parent, boolean bFirst)
             throws DocumentException, FB2toPDFException {
         ParagraphStyle previousStyle = currentStyle;
+        ParagraphStyle previousContainerStyle = currentStyle.containerStyle;
         currentStyle = getStyleForElement(parent);
         boolean bFirstTextNode = true;
         Node parentNode = (Node)parent;
@@ -1882,12 +1884,9 @@ public class FB2toPDF {
                     currentStyle.toggleItalic();
                 } else if (child.getLocalName().equals("code")) {
                     flushCurrentChunk();
-                    ParagraphStyle prevStyle = currentStyle;
-                    currentStyle = stylesheet.getParagraphStyle("code");
                     processParagraphContent(child, bFirst && bFirstTextNode);
                     bFirstTextNode = false;
                     flushCurrentChunk();
-                    currentStyle = prevStyle;
                 } else if (child.getLocalName().equals("a")) {
                     flushCurrentChunk();
                     currentReference = child.getAttributeValue("href", NS_XLINK);
@@ -1966,6 +1965,7 @@ public class FB2toPDF {
             }
         }
         currentStyle = previousStyle;
+        currentStyle.containerStyle = previousContainerStyle;
     }
 
     private String transliterate(String text) {

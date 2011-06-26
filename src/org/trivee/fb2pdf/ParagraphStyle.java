@@ -10,6 +10,8 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.pdf.BaseFont;
 import java.awt.Color;
+import java.lang.reflect.Method;
+import org.apache.commons.lang.StringUtils;
 
 public class ParagraphStyle {
 
@@ -114,6 +116,7 @@ public class ParagraphStyle {
     private transient Stylesheet stylesheet;
     private String name;
     private String baseStyle;
+    public transient ParagraphStyle containerStyle;
     private String selector;
     private String fontFamily;
     private FontStyleInfo fontStyle;
@@ -158,7 +161,7 @@ public class ParagraphStyle {
     public String getSelector(){
         return selector;
     }
-
+    
     public BaseFont getBaseFont() throws FB2toPDFException {
         FontFamily ff = getFontFamily();
         FontStyleInfo fs = getFontStyle();
@@ -192,84 +195,71 @@ public class ParagraphStyle {
         if (stylesheet == null) {
             throw new FB2toPDFException("Stylesheet not set.");
         }
+        
+        FontFamily result = StringUtils.isNotBlank(fontFamily) ? stylesheet.getFontFamily(fontFamily) : null;
+        
+        result = getProperty(result, "getFontFamily", null);
 
-        if (fontFamily != null) {
-            return stylesheet.getFontFamily(fontFamily);
+        if(result == null) {         
+            throw new FB2toPDFException("Font family for style " + name + " not defined.");
         }
-
-        ParagraphStyle baseStyle = getBaseStyle();
-        if (baseStyle != null) {
-            return baseStyle.getFontFamily();
-        }
-
-        throw new FB2toPDFException("Font family for style " + name + " not defined.");
+        
+        return result;
     }
 
-    private FontStyleInfo getFontStyle()
+    public FontStyleInfo getFontStyle()
             throws FB2toPDFException {
-        if (fontStyle != null) {
-            return fontStyle;
-        }
-
-        ParagraphStyle baseStyle = getBaseStyle();
-        if (baseStyle != null) {
-            return baseStyle.getFontStyle();
-        }
-
-        // font style defaults to regular
-        return new FontStyleInfo("regular");
+        return getProperty(fontStyle, "getFontStyle", new FontStyleInfo("regular"));
     }
 
     public Dimension getFontSize()
             throws FB2toPDFException {
-        if (fontSize != null) {
-            return fontSize;
+        Dimension result = getProperty(fontSize, "getFontSize", null);
+        
+        if (result == null) {
+            throw new FB2toPDFException("Font size for style " + name + " not defined.");
+        }
+        
+        return result;
+    }
+
+    private <T> T getPropertyFromStyle(String getterName, ParagraphStyle style) throws FB2toPDFException {
+        try {
+            Class styleClass = this.getClass();
+            Method getter = styleClass.getMethod(getterName);
+            return (T)getter.invoke(style);
+        } catch (Exception ex) {
+            throw new FB2toPDFException(ex.toString());
+        }
+    }
+
+    private <T> T getProperty(T fieldValue, String getterName, T defaultValue) throws FB2toPDFException {
+        if (fieldValue != null) {
+            return fieldValue;
         }
 
         ParagraphStyle baseStyle = getBaseStyle();
         if (baseStyle != null) {
-            return baseStyle.getFontSize();
+            return (T)getPropertyFromStyle(getterName, baseStyle);
         }
 
-        throw new FB2toPDFException("Font size for style " + name + " not defined.");
+        if (containerStyle != null && containerStyle != this) {
+            return (T)getPropertyFromStyle(getterName, containerStyle);
+        }
+
+        return defaultValue;
     }
 
     public boolean getDisableHyphenation() throws FB2toPDFException {
-        if (disableHyphenation != null) {
-            return disableHyphenation;
-        }
-
-        ParagraphStyle baseStyle = getBaseStyle();
-        if (baseStyle != null) {
-            return baseStyle.getDisableHyphenation();
-        }
-
-        return false;
+        return getProperty(disableHyphenation, "getDisableHyphenation", false);
     }
 
     public boolean getPreserveWhitespaces() throws FB2toPDFException {
-        if (preserveWhitespaces != null) {
-            return preserveWhitespaces;
-        }
-        ParagraphStyle baseStyle = getBaseStyle();
-        if (baseStyle != null) {
-            return baseStyle.getPreserveWhitespaces();
-        }
-
-        return false;
+        return getProperty(preserveWhitespaces, "getPreserveWhitespaces", false);
     }
 
     public String getDropcapStyle() throws FB2toPDFException {
-        if (dropcapStyle != null) {
-            return dropcapStyle;
-        }
-
-        ParagraphStyle baseStyle = getBaseStyle();
-        if (baseStyle != null) {
-            return baseStyle.getDropcapStyle();
-        }
-
-        return "";
+        return getProperty(dropcapStyle, "getDropcapStyle", "");
     }
 
     private BaseColor getColor(String c) {
@@ -277,42 +267,17 @@ public class ParagraphStyle {
     }
 
     public BaseColor getColor() throws FB2toPDFException {
-        if (color != null) {
-            return getColor(color);
-        }
-
-        ParagraphStyle base = getBaseStyle();
-        if (base != null) {
-            return base.getColor();
-        }
-
-        return getColor("0x000000");
+        
+        BaseColor result = (StringUtils.isNotBlank(color)) ? getColor(color) : null;
+        return getProperty(result, "getColor", getColor("0x000000"));
     }
 
     public float getInlineImageOffsetY() throws FB2toPDFException {
-        if (inlineImageOffsetY != null) {
-            return inlineImageOffsetY.floatValue();
-        }
-
-        ParagraphStyle base = getBaseStyle();
-        if (base != null) {
-            return base.getInlineImageOffsetY();
-        }
-
-        return 0.0f;
+        return getProperty(inlineImageOffsetY, "getInlineImageOffsetY", 0.0f);
     }
 
     public float getInlineImageZoom() throws FB2toPDFException {
-        if (inlineImageZoom != null) {
-            return inlineImageZoom.floatValue();
-        }
-
-        ParagraphStyle base = getBaseStyle();
-        if (base != null) {
-            return base.getInlineImageZoom();
-        }
-
-        return 1.0f;
+        return getProperty(inlineImageZoom, "getInlineImageZoom", 1.0f);
     }
 
     public void toggleBold() {
@@ -355,19 +320,9 @@ public class ParagraphStyle {
         return new Font(bf, 0.01f);
     }
 
-    private Dimension getLeadingDimension()
+    public Dimension getLeadingDimension()
             throws FB2toPDFException {
-        if (leading != null) {
-            return leading;
-        }
-
-        ParagraphStyle baseStyle = getBaseStyle();
-        if (baseStyle != null) {
-            return baseStyle.getLeadingDimension();
-        }
-
-        // leading defaults to 1em
-        return new Dimension("1em");
+        return getProperty(leading, "getLeadingDimension", new Dimension("1em"));
     }
 
     public float getAbsoluteLeading()
@@ -382,32 +337,13 @@ public class ParagraphStyle {
 
     public int getAlignment()
             throws FB2toPDFException {
-        if (alignment != null) {
-            return alignment.getAlignmentValue();
-        }
-
-        ParagraphStyle baseStyle = getBaseStyle();
-        if (baseStyle != null) {
-            return baseStyle.getAlignment();
-        }
-
-        // alignment default
-        return Paragraph.ALIGN_LEFT;
+        Integer result = (alignment != null) ? alignment.getAlignmentValue() : null;
+        return getProperty(result, "getAlignment", Paragraph.ALIGN_LEFT);
     }
 
-    private Dimension getSpacingBeforeDimension()
+    public Dimension getSpacingBeforeDimension()
             throws FB2toPDFException {
-        if (spacingBefore != null) {
-            return spacingBefore;
-        }
-
-        ParagraphStyle baseStyle = getBaseStyle();
-        if (baseStyle != null) {
-            return baseStyle.getSpacingBeforeDimension();
-        }
-
-        // default value
-        return new Dimension("0pt");
+        return getProperty(spacingBefore, "getSpacingBeforeDimension", new Dimension("0pt"));
     }
 
     public float getSpacingBefore()
@@ -415,34 +351,14 @@ public class ParagraphStyle {
         return getSpacingBeforeDimension().getPoints(getFontSize().getPoints());
     }
 
-    private Dimension getSpacingAfterDimension()
+    public Dimension getSpacingAfterDimension()
             throws FB2toPDFException {
-        if (spacingAfter != null) {
-            return spacingAfter;
-        }
-
-        ParagraphStyle baseStyle = getBaseStyle();
-        if (baseStyle != null) {
-            return baseStyle.getSpacingAfterDimension();
-        }
-
-        // default value
-        return new Dimension("0pt");
+        return getProperty(spacingAfter, "getSpacingAfterDimension", new Dimension("0pt"));
     }
 
-    private Dimension getFirstSpacingBeforeDimension()
+    public Dimension getFirstSpacingBeforeDimension()
             throws FB2toPDFException {
-        if (firstSpacingBefore != null) {
-            return firstSpacingBefore;
-        }
-
-        ParagraphStyle baseStyle = getBaseStyle();
-        if (baseStyle != null) {
-            return baseStyle.getFirstSpacingBeforeDimension();
-        }
-
-        // default value
-        return getSpacingBeforeDimension();
+        return getProperty(firstSpacingBefore, "getFirstSpacingBeforeDimension", getSpacingBeforeDimension());
     }
 
     public float getFirstSpacingBefore()
@@ -455,19 +371,9 @@ public class ParagraphStyle {
         return getSpacingAfterDimension().getPoints(getFontSize().getPoints());
     }
 
-    private Dimension getLastSpacingAfterDimension()
+    public Dimension getLastSpacingAfterDimension()
             throws FB2toPDFException {
-        if (lastSpacingAfter != null) {
-            return lastSpacingAfter;
-        }
-
-        ParagraphStyle baseStyle = getBaseStyle();
-        if (baseStyle != null) {
-            return baseStyle.getLastSpacingAfterDimension();
-        }
-
-        // default value
-        return getSpacingAfterDimension();
+        return getProperty(lastSpacingAfter, "getLastSpacingAfterDimension", getSpacingAfterDimension());
     }
 
     public float getLastSpacingAfter()
@@ -475,34 +381,14 @@ public class ParagraphStyle {
         return getLastSpacingAfterDimension().getPoints(getFontSize().getPoints());
     }
 
-    private Dimension getLeftIndentDimension()
+    public Dimension getLeftIndentDimension()
             throws FB2toPDFException {
-        if (leftIndent != null) {
-            return leftIndent;
-        }
-
-        ParagraphStyle baseStyle = getBaseStyle();
-        if (baseStyle != null) {
-            return baseStyle.getLeftIndentDimension();
-        }
-
-        // default value
-        return new Dimension("0pt");
+        return getProperty(leftIndent, "getLeftIndentDimension", new Dimension("0pt"));
     }
 
-    private Dimension getRightIndentDimension()
+    public Dimension getRightIndentDimension()
             throws FB2toPDFException {
-        if (rightIndent != null) {
-            return rightIndent;
-        }
-
-        ParagraphStyle baseStyle = getBaseStyle();
-        if (baseStyle != null) {
-            return baseStyle.getRightIndentDimension();
-        }
-
-        // default value
-        return new Dimension("0pt");
+        return getProperty(rightIndent, "getRightIndentDimension", new Dimension("0pt"));
     }
 
     public float getLeftIndent()
@@ -515,34 +401,14 @@ public class ParagraphStyle {
         return getRightIndentDimension().getPoints(getFontSize().getPoints());
     }
 
-    private Dimension getFirstLineIndentDimension()
+    public Dimension getFirstLineIndentDimension()
             throws FB2toPDFException {
-        if (firstLineIndent != null) {
-            return firstLineIndent;
-        }
-
-        ParagraphStyle baseStyle = getBaseStyle();
-        if (baseStyle != null) {
-            return baseStyle.getFirstLineIndentDimension();
-        }
-
-        // default value
-        return new Dimension("0pt");
+        return getProperty(firstLineIndent, "getFirstLineIndentDimension", new Dimension("0pt"));
     }
 
-    private Dimension getFirstFirstLineIndentDimension()
+    public Dimension getFirstFirstLineIndentDimension()
             throws FB2toPDFException {
-        if (firstFirstLineIndent != null) {
-            return firstFirstLineIndent;
-        }
-
-        ParagraphStyle baseStyle = getBaseStyle();
-        if (baseStyle != null) {
-            return baseStyle.getFirstFirstLineIndentDimension();
-        }
-
-        // default value
-        return new Dimension("0pt");
+        return getProperty(firstFirstLineIndent, "getFirstFirstLineIndentDimension", new Dimension("0pt"));
     }
 
     public float getFirstLineIndent()
