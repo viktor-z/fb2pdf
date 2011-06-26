@@ -127,6 +127,18 @@
         morpherProlog:              "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\"; declare namespace l = \"http://www.w3.org/1999/xlink\";",
         transformationsMap: [
                 /*
+                {   // make digits superscript in notes (depends on font)
+                    "query":   "//a[@type='note']/text()", 
+                    "morpher": "translate(., '0123456789', '\u2070\u00B9\u00B2\u00B3\u2074\u2075\u2076\u2077\u2078\u2079')" 
+                },
+                */
+                /* 
+                {   // delete dash when first character of first paragraph of the section
+                    "query":   "//p[1]/text()", 
+                    "morpher": "replace(., '^(\u2012|\u2013|\u2014|\u2015)', '')" 
+                },
+                */ 
+                /*
                 {   // convert poem note to paragraphs, part 1
                     "query":   "//body[@name='notes']//section/poem",
                     "morpher": ".//stanza/*"
@@ -174,85 +186,85 @@
                 {   // remove table 
                     "query":   "//table", 
                     "morpher": "./*" 
-                }
+                },
                 */                
                 /*
                 {   //add empty title to the sections without title
                     "query":    "//section[empty(./title)]/*[position()=1]",
                     "morpher":  "(<title><p/></title>,.)"
-                }
+                },
                 */
                 /*
                 {   // remove square brackets from note link
                     "query":   "//a[@type='note']/text()",
                     "morpher": "replace(., '[\\[\\]]', '')"
-                }
+                },
                 */
                 /*
                 {   // remove word "note" from note link
                     "query":   "//a[@type='note']/text()",
                     "morpher": "replace(., 'note', '')"
-                }
+                },
                 */
                 /*
                 {   // remove extra spaces from note link
                     "query":   "//a[@type='note']/text()",
                     "morpher": "normalize-space(.)"
-                }
+                },
                 */
                 /*
                 {   // make note links superscript
                     "query":   "//a[@type='note']/text()",
                     "morpher": "<sup>{.}</sup>"
-                }
+                },
                 */
                 /*
                 {   // replace note link with note text 
                     "query":   "//a[@type='note']",
                     "morpher": "declare variable $hid := ./@l:href; <emphasis> [{//body[@name='notes']//section[@id=substring($hid,2)]/*[local-name()!='title']}]</emphasis>"
-                }
+                },
                 */
                 /*
                 {   // get rid of superscript inside note link
                     "query":   "//a[@type='note']//sup",
                     "morpher": "./* | text()"
-                }
+                },
                 */
                 /*
                 {   // get rid of superscript outside note link
                     "query":   "//sup[./a[@type='note']]",
                     "morpher": "./a"
-                }
+                },
                 */
                 /*
                 {   //replace emphasis inside cite with it's text
                     "query":   "//cite//emphasis",
                     "morpher": "./text()"
-                }
+                },
                 */
                 /*
                 {   //remove images
                     "query":   "//image",
                     "morpher": "()"
-                }
+                },
                 */
                 /*
                 {   // wrap notes body content in two sections, making notes third-level section
                     "query":   "//body[@name='notes']",
                     "morpher": "<body name='notes'><section><section>{./*}</section></section></body>"
-                }
+                },
                 */
                 /*
                 {   // add new line before and after "code" 
                     "query":   "//code",
                     "morpher": "<code>{('\n', ./* | text(), '\n')}</code>"
-                }
+                },
                 */
                 /*
                 {   // replace root section of nameless (main) body with it's content
                     "query":    "//body[not(./@name)]/section",
                     "morpher":  "./*"
-                }
+                },
                 */
         ]
     },
@@ -412,6 +424,7 @@
             baseStyle:        "default",
             fontSize:         "12.0pt",
             fontStyle:        "bold",
+            alignment:        "center",
             disableHyphenation: "true"
         },
         {
@@ -490,24 +503,27 @@
         },
         {
             name:               "code",
-            baseStyle:          "body",
-            dropcapStyle:	    "",	
+            selector:           "//code",
             fontFamily:         "monospaced"
         },
         {
             name:               "codeParagraph",
             selector:           "//p[code and count(*) = 1 and empty(text())]",
-            baseStyle:          "code",
+            baseStyle:          "body",
+            fontFamily:         "monospaced",
+            fontSize:           "6.0pt",
             alignment:          "left",
             disableHyphenation: "true",
             preserveWhitespaces: "true",
-            fontSize:           "6.0pt"
+            dropcapStyle:	  ""	
         },
+        /*
         {
-            name:               "codeParagraphCode",
-            selector:           "//p[code and count(*) = 1 and empty(text())]/code",
-            baseStyle:          "codeParagraph"
+            name:               "anchor",
+            selector:           "//a[@type='note']",
+            fontFamily:         "sansSerif"
         },
+        */
         {
             name:             "table",
             baseStyle:        "body",
