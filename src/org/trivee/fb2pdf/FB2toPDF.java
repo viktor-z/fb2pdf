@@ -196,17 +196,14 @@ public class FB2toPDF {
     private void applyXPathStyles() throws RuntimeException, IOException {
         String prolog = "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\"; "
         + "declare namespace l = \"http://www.w3.org/1999/xlink\"; ";
-        String morpher1 = prolog + "attribute {'fb2pdf-style'} {'%s'}";
-        String morpher2 = prolog + "(., attribute {'fb2pdf-style'} {'%s'})";
+        String morpher = prolog + "(., attribute {'fb2pdf-style'} {'%s'})";
         for (ParagraphStyle style : stylesheet.getParagraphStyles()) {
-                String xpath = style.getSelector();
-                String name = style.getName();
-                if (isBlank(xpath)) continue;
+            String xpath = style.getSelector();
+            String name = style.getName();
+            if (isBlank(xpath)) continue;
                 
             try {
-                Transformation.transform(fb2, prolog + xpath + "/@fb2pdf-style", String.format(morpher1, name));
-                Transformation.transform(fb2, prolog + xpath + "/*[last()]", String.format(morpher2, name));
-                Transformation.transform(fb2, prolog + xpath + "/text()[last()]", String.format(morpher2, name));
+                Transformation.transform(fb2, prolog + xpath + "/(* | text())[last()]", String.format(morpher, name));
             } catch (Exception ex) {
                 throw new RuntimeException("Error applying styles. " + ex.getMessage());
             }
