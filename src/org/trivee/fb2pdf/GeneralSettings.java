@@ -24,6 +24,7 @@ public class GeneralSettings {
     public boolean ignoreEmptyLineAfterImage;
     public boolean generateTOC;
     public boolean generateNoteBackLinks = true;
+    public boolean generateInternalLinks = true;
     public boolean generateFrontMatter = true;
     public float trackingSpaceCharRatio;
     public boolean strictImageSequence;

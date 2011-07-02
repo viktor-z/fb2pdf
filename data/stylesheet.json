@@ -4,6 +4,7 @@
         generateTOC:	"true",
         generateFrontMatter:	"true",
         generateNoteBackLinks:	"true",
+        generateInternalLinks:  "true",
         transliterateMetaInfo:	"true",
         forceTransliterateAuthor: "false",
         metaAuthorQuery: "(last-name, first-name,  middle-name)",
