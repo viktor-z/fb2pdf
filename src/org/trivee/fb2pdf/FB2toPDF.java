@@ -175,10 +175,41 @@ public class FB2toPDF {
         this.toName = toName;
     }
 
+    private void addAnchor(String anchorName) throws FB2toPDFException {
+        Anchor anchor = currentStyle.createAnchor();
+        anchor.add(currentChunk);
+        anchor.setName(anchorName);
+        currentParagraph.add(anchor);
+        System.out.println("Adding A Destination " + anchorName);
+        saveLinkPageNumber(anchorName);
+    }
+
     private void addFootnote(Element child) throws DocumentException, FB2toPDFException {
         if (stylesheet.getPageStyle().footnotes && "note".equals(child.getAttributeValue("type"))) {
             addFootnote(child.getValue(), currentReference);
         }
+    }
+
+    private void addInternalLink() throws FB2toPDFException {
+        Anchor anchor = currentStyle.createAnchor();
+        //Unlike Anchor, Action won't fail even when local destination does not exist
+        String refname = currentReference.substring(1); //getting rid of "#" at the begin of the reference
+        currentChunk.setGenericTag("FOOTNOTE:" + refname);
+        addGoToActionToChunk(refname, currentChunk);
+        String aName = refname + "_backlink";
+        anchor.setName(aName);
+        System.out.println("Adding A Destination " + aName);
+        saveLinkPageNumber(aName);
+        anchor.add(currentChunk);
+        currentParagraph.add(anchor);
+    }
+
+    private void addExternalLink() throws FB2toPDFException {
+        Anchor anchor = currentStyle.createAnchor();
+        anchor.setReference(currentReference);
+        System.out.println("Adding A Link " + currentReference);
+        anchor.add(currentChunk);
+        currentParagraph.add(anchor);
     }
 
     private void applyTransformations() throws RuntimeException {
@@ -1595,11 +1626,6 @@ public class FB2toPDF {
             Element element = children.get(i);
 
             if (element.getLocalName().equals("p")) {
-                /* XXX TODO
-                pid=x.getAttributeValue('id')
-                if pid:
-                res+='\\hypertarget{%s}{}\n' % pid
-                 */
                 processParagraph(element, i == 0, i == children.size() - 1);
             } else if (element.getLocalName().equals("empty-line")) {
                 if (!isIgnoreEmptyLine(element)) {
@@ -1788,34 +1814,16 @@ public class FB2toPDF {
     private void flushCurrentChunk()
             throws DocumentException, FB2toPDFException {
         if (currentChunk != null) {
-            String currentAnchorName = anchorStack.isEmpty() ? null : anchorStack.pop();
             if (!isBlank(currentReference)) {
-                Anchor anchor = currentStyle.createAnchor();
                 if (currentReference.charAt(0) == '#') {
-                    //Unlike Anchor, Action won't fail even when local destination does not exist
-                    String refname = currentReference.substring(1); //getting rid of "#" at the begin of the reference
-                    currentChunk.setGenericTag("FOOTNOTE:" + refname);
-                    addGoToActionToChunk(refname, currentChunk);
-                    currentAnchorName = refname + "_backlink";
+                    addInternalLink();
                 } else {
-                    anchor.setReference(currentReference);
-                    System.out.println("Adding A Link " + currentReference);
+                    addExternalLink();
                 }
-                if (currentAnchorName != null) {
-                    anchor.setName(currentAnchorName);
-                    System.out.println("Adding A Destination " + currentAnchorName);
-                    saveLinkPageNumber(currentAnchorName);
-                }
-                anchor.add(currentChunk);
-                currentParagraph.add(anchor);
             } else {
+                String currentAnchorName = anchorStack.isEmpty() ? null : anchorStack.pop();
                 if (currentAnchorName != null) {
-                    Anchor anchor = currentStyle.createAnchor();
-                    anchor.add(currentChunk);
-                    anchor.setName(currentAnchorName);
-                    currentParagraph.add(anchor);
-                    System.out.println("Adding A Destination " + currentAnchorName);
-                    saveLinkPageNumber(currentAnchorName);
+                    addAnchor(currentAnchorName);
                 } else {
                     currentParagraph.add(currentChunk);
                 }
