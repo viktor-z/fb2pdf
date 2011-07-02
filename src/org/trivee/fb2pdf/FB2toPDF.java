@@ -1438,10 +1438,10 @@ public class FB2toPDF {
             return;
         }
 
-        ParagraphStyle tocTitleStyle = stylesheet.getParagraphStyle("tocTitle");
-        ParagraphStyle tocItemStyle = stylesheet.getParagraphStyle("tocItem");
+        currentStyle = stylesheet.getParagraphStyle("tocTitle");
+        addLine(currentStyle.getText(), currentStyle);
 
-        addLine(tocTitleStyle.getText(), tocTitleStyle);
+        currentStyle = stylesheet.getParagraphStyle("tocItem");
 
         for (int i = 0; i < sections.size(); ++i) {
             Element section = sections.get(i);
@@ -1451,7 +1451,7 @@ public class FB2toPDF {
                 title = "#" + (i + 1);
             }
 
-            Chunk chunk = tocItemStyle.createChunk();
+            Chunk chunk = currentStyle.createChunk();
             chunk.append(TextPreprocessor.process(title, stylesheet.getTextPreprocessorSettings(), currentStyle));
 
             String ref = section.getAttributeValue("id");
@@ -1459,10 +1459,12 @@ public class FB2toPDF {
                 ref = "section" + i;
             }
             addGoToActionToChunk(ref, chunk);
-            Paragraph para = tocItemStyle.createParagraph();
-            para.add(chunk);
+            currentParagraph = currentStyle.createParagraph();
+            currentParagraph.add(chunk);
+            currentReference = "#" + ref;
+            addPageNumTemplate();
 
-            doc.add(para);
+            doc.add(currentParagraph);
         }
 
         doc.newPage();
