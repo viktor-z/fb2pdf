@@ -1619,10 +1619,7 @@ public class FB2toPDF {
 
         ParagraphStyle previousStyle = currentStyle;
 
-        ParagraphStyle mainStyle = stylesheet.getParagraphStyle("epigraph");
-        ParagraphStyle authorStyle = stylesheet.getParagraphStyle("epigraphAuthor");
-
-        currentStyle = mainStyle;
+        currentStyle = stylesheet.getParagraphStyle("epigraph");
 
         Elements children = epigraph.getChildElements();
         for (int i = 0; i < children.size(); ++i) {
@@ -1635,9 +1632,7 @@ public class FB2toPDF {
             } else if (element.getLocalName().equals("cite")) {
                 processCite(element);
             } else if (element.getLocalName().equals("text-author")) {
-                currentStyle = authorStyle;
                 processParagraph(element, true, true);
-                currentStyle = mainStyle;
             } else if (element.getLocalName().equals("empty-line")) {
                 if (!isIgnoreEmptyLine(element)) {
                     addEmptyLine();
@@ -1656,11 +1651,7 @@ public class FB2toPDF {
 
         ParagraphStyle previousStyle = currentStyle;
 
-        ParagraphStyle mainStyle = stylesheet.getParagraphStyle("cite");
-        ParagraphStyle authorStyle = stylesheet.getParagraphStyle("citeAuthor");
-        ParagraphStyle subtitleStyle = stylesheet.getParagraphStyle("citeSubtitle");
-
-        currentStyle = mainStyle;
+        currentStyle = stylesheet.getParagraphStyle("cite");
 
         Elements children = cite.getChildElements();
         for (int i = 0; i < children.size(); ++i) {
@@ -1669,15 +1660,11 @@ public class FB2toPDF {
             if (element.getLocalName().equals("p")) {
                 processParagraph(element, i == 0, i == children.size() - 1);
             } else if (element.getLocalName().equals("subtitle")) {
-                currentStyle = subtitleStyle;
                 processParagraph(element, true, true);
-                currentStyle = mainStyle;
             } else if (element.getLocalName().equals("poem")) {
                 processPoem(element);
             } else if (element.getLocalName().equals("text-author")) {
-                currentStyle = authorStyle;
                 processParagraph(element, true, true);
-                currentStyle = mainStyle;
             } else if (element.getLocalName().equals("empty-line")) {
                 if (!isIgnoreEmptyLine(element)) {
                     addEmptyLine();
@@ -1695,12 +1682,7 @@ public class FB2toPDF {
         addInvisibleAnchor(poem);
         ParagraphStyle previousStyle = currentStyle;
 
-        ParagraphStyle mainStyle = stylesheet.getParagraphStyle("poem");
-        ParagraphStyle authorStyle = stylesheet.getParagraphStyle("poemAuthor");
-        ParagraphStyle titleStyle = stylesheet.getParagraphStyle("poemTitle");
-        ParagraphStyle dateStyle = stylesheet.getParagraphStyle("poemDate");
-
-        currentStyle = mainStyle;
+        currentStyle = stylesheet.getParagraphStyle("poem");
 
         Elements children = poem.getChildElements();
         for (int i = 0; i < children.size(); ++i) {
@@ -1709,19 +1691,13 @@ public class FB2toPDF {
             if (element.getLocalName().equals("stanza")) {
                 processStanza(element);
             } else if (element.getLocalName().equals("title")) {
-                currentStyle = titleStyle;
                 processParagraph(element, true, true);
-                currentStyle = mainStyle;
             } else if (element.getLocalName().equals("date")) {
-                currentStyle = dateStyle;
                 processParagraph(element, true, true);
-                currentStyle = mainStyle;
             } else if (element.getLocalName().equals("epigraph")) {
                 processEpigraph(element);
             } else if (element.getLocalName().equals("text-author")) {
-                currentStyle = authorStyle;
                 processParagraph(element, true, true);
-                currentStyle = mainStyle;
             } else {
                 System.out.println("Unhandled poem tag " + element.getLocalName());
             }

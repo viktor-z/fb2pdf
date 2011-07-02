@@ -439,18 +439,24 @@
             firstSpacingBefore:   "0.5em",
             lastSpacingAfter:     "0.5em"
         },
+        /*
         {
             name:             "poemAuthor",
-            baseStyle:        "poem"
+            selector:         "//poem/text-author"
         },
+        */
+        /*
         {
             name:             "poemTitle",
-            baseStyle:        "poem"
+            selector:         "//poem/title"
         },
+        */
+        /*
         {
             name:             "poemDate",
-            baseStyle:        "poem"
+            selector:         "//poem/date"
         },
+        */
         {
             name:             "epigraph",
             baseStyle:        "default",
@@ -461,23 +467,27 @@
             firstSpacingBefore:   "0.5em",
             lastSpacingAfter:     "0.5em"
         },
+        /*
         {
             name:             "epigraphAuthor",
-            baseStyle:        "epigraph"
+            selector:         "//epigraph/text-author"
         },
+        */
         {
             name:             "cite",
             baseStyle:        "epigraph"
         },
         {
             name:             "citeSubtitle",
-            baseStyle:        "cite",
+            selector:         "//cite/subtitle",  
             fontStyle:        "boldItalic"
         },
+        /*
         {
             name:             "citeAuthor",
-            baseStyle:        "epigraphAuthor"
+            selector:         "//cite/text-author"
         },
+        */
         {
             name:             "body",
             baseStyle:        "default",
