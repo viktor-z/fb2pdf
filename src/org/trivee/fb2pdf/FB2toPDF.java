@@ -859,7 +859,7 @@ public class FB2toPDF {
     private void loadData(InputStream stylesheetInputStream)
             throws DocumentException, IOException, FB2toPDFException {
         if (stylesheetInputStream == null) {
-            stylesheet = Stylesheet.readStylesheet(getValidatedFileName("./data/stylesheet.json"));
+            stylesheet = Stylesheet.readStylesheet(Utilities.getValidatedFileName("./data/stylesheet.json"));
         } else {
             stylesheet = Stylesheet.readStylesheet(stylesheetInputStream);
         }
@@ -890,21 +890,6 @@ public class FB2toPDF {
         } catch (ParsingException e) {
             System.err.println("XML parsing error at line " + e.getLineNumber() + "#" + e.getColumnNumber() + ": " + e.getMessage());
         }
-    }
-
-    private String getValidatedFileName(String filename) throws IOException {
-        File file = new File(filename);
-        if (file.exists()) {
-            return filename;
-        }
-
-        String baseDir = CLIDriver.getBaseDir();
-        file = new File(new File(baseDir).getParent() + "/" + filename);
-        String fullFilename = file.getCanonicalPath();
-        if (!file.exists()) {
-            throw new IOException(String.format("File not found [%s or %s]", filename, fullFilename));
-        }
-        return fullFilename;
     }
 
     private void addFontChangeOutline() {
@@ -986,7 +971,7 @@ public class FB2toPDF {
         
         if (!isBlank(pageStyle.backgroundImage)){
             try {
-                Image image = Image.getInstance(getValidatedFileName(pageStyle.backgroundImage));
+                Image image = Image.getInstance(Utilities.getValidatedFileName(pageStyle.backgroundImage));
                 rescaleImage(image);
                 BackgroundImageHelper backgroundImageHelper = new BackgroundImageHelper(image);
                 writer.setPageEvent(backgroundImageHelper);
@@ -1164,7 +1149,7 @@ public class FB2toPDF {
 
         if (!isBlank(secondPassStylesheet)){
             passNamePrefix = "secondPass_";
-            stylesheet = Stylesheet.readStylesheet(getValidatedFileName(secondPassStylesheet));
+            stylesheet = Stylesheet.readStylesheet(Utilities.getValidatedFileName(secondPassStylesheet));
             doc.setPageSize(getPageSize());
             if (stylesheet.getPageStyle().footnotes) {
                 FootnoteRenderer.reinit(stylesheet);

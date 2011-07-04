@@ -1,6 +1,5 @@
 package org.trivee.fb2pdf;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 
@@ -33,21 +32,6 @@ public class FontFamily
         implements JsonDeserializer<FontInfo>,JsonSerializer<FontInfo>
     {
 
-        private String getValidatedFileName(String filename) throws IOException {
-            File file = new File(filename);
-            if (file.exists()) {
-                return filename;
-            }
-
-            String baseDir = CLIDriver.getBaseDir();
-            file = new File(new File(baseDir).getParent() + "/" + filename);
-            String fullFilename = file.getCanonicalPath();
-            if (!file.exists()) {
-                throw new IOException(String.format("Font file not found [%s or %s]", filename, fullFilename));
-            }
-            return fullFilename;
-        }
-
         public FontInfo deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
             throws JsonParseException
         {
@@ -55,7 +39,7 @@ public class FontFamily
             {
                 String[] parts = json.getAsString().split("#");
                 String[] parts2 = parts[0].split(",");
-                String filename =  getValidatedFileName(parts2[0]);
+                String filename =  Utilities.getValidatedFileName(parts2[0]);
                 String encoding = parts.length > 1 ? parts[1] : null;
                 filename += parts2.length > 1 ? "," + parts2[1] : "";
                 if (encoding == null)

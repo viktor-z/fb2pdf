@@ -16,7 +16,6 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.SequenceInputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.Vector;
 import java.util.regex.Pattern;
 import org.apache.commons.cli.CommandLine;
@@ -105,7 +104,7 @@ public class CLIDriver {
         //    println(option.getOpt());
         //}
 
-        String[] stylesheetNames = cl.hasOption('s') ? cl.getOptionValues('s') : new String[]{new File(new File(getBaseDir()).getParent() + "/data/stylesheet.json").getCanonicalPath()};
+        String[] stylesheetNames = cl.hasOption('s') ? cl.getOptionValues('s') : new String[]{new File(Utilities.getBaseDir() + "/data/stylesheet.json").getCanonicalPath()};
 
         logEncoding = cl.hasOption('e') ? cl.getOptionValue('e') : "cp1251";
         try {
@@ -238,10 +237,6 @@ public class CLIDriver {
                         System.setOut(saveOut);
                     }
                 }
-    }
-
-    public static String getBaseDir()  throws IOException {
-        return URLDecoder.decode(new File(CLIDriver.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent(), "UTF-8");
     }
 
     private CLIDriver() {
