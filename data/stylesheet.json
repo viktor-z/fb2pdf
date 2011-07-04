@@ -1,6 +1,6 @@
 {
     generalSettings: {
-        //secondPassStylesheet:   "/data/stylesheet2.json",
+        //secondPassStylesheet:   "./data/stylesheet2.json",
         bodiesToSkip:   [],
         generateTOC:	"true",
         generateFrontMatter:	"true",

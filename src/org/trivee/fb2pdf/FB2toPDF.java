@@ -54,14 +54,6 @@ import org.apache.tools.zip.ZipFile;
 
 public class FB2toPDF {
 
-    public static String FB2PDF_HOME = ".";
-
-    static {
-        String fb2pdf_home = System.getenv("FB2PDF_HOME");
-        if (fb2pdf_home != null) {
-            FB2PDF_HOME = fb2pdf_home;
-        }
-    }
     private static final String NS_XLINK = "http://www.w3.org/1999/xlink";
     private static final String NS_FB2 = "http://www.gribuser.ru/xml/fictionbook/2.0";
     private static final XPathContext xCtx = new XPathContext("fb", NS_FB2);
@@ -867,7 +859,7 @@ public class FB2toPDF {
     private void loadData(InputStream stylesheetInputStream)
             throws DocumentException, IOException, FB2toPDFException {
         if (stylesheetInputStream == null) {
-            stylesheet = Stylesheet.readStylesheet(FB2PDF_HOME + "/data/stylesheet.json");
+            stylesheet = Stylesheet.readStylesheet(getValidatedFileName("./data/stylesheet.json"));
         } else {
             stylesheet = Stylesheet.readStylesheet(stylesheetInputStream);
         }
@@ -936,21 +928,22 @@ public class FB2toPDF {
         int length = srcpageLabel.length();
         String part1 = srcpageLabel.substring(0, length - maxPageNumLength+1);
         String part2 = srcpageLabel.substring(length - maxPageNumLength +1);
+        @SuppressWarnings("ReplaceAllDot")
         String currentTitle = part1 + part2.replaceAll(".", "?");
-        PdfOutline currentOutline = null;
+        PdfOutline curOutline = null;
         for (PdfOutline outline : root.getKids()) {
             if (currentTitle.equals(outline.getTitle())) {
-                currentOutline = outline;
+                curOutline = outline;
                 break;
             }
         }
-        if (currentOutline == null) {
+        if (curOutline == null) {
             PdfDestination destination = new PdfDestination(PdfDestination.FITH);
             PdfAction action = PdfAction.gotoLocalPage(destpage, destination, writer);
-            currentOutline = new PdfOutline(root, action, currentTitle);
+            curOutline = new PdfOutline(root, action, currentTitle);
         }
         
-        addFontChangeOutlineItem(currentOutline, maxPageNumLength-1, srcpageLabel, destpage);
+        addFontChangeOutlineItem(curOutline, maxPageNumLength-1, srcpageLabel, destpage);
     }
     
     private class PageElementMapHelper extends PdfPageEventHelper {
@@ -1171,7 +1164,7 @@ public class FB2toPDF {
 
         if (!isBlank(secondPassStylesheet)){
             passNamePrefix = "secondPass_";
-            stylesheet = Stylesheet.readStylesheet(FB2PDF_HOME + secondPassStylesheet);
+            stylesheet = Stylesheet.readStylesheet(getValidatedFileName(secondPassStylesheet));
             doc.setPageSize(getPageSize());
             if (stylesheet.getPageStyle().footnotes) {
                 FootnoteRenderer.reinit(stylesheet);
