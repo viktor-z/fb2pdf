@@ -1736,14 +1736,17 @@ public class FB2toPDF {
         for (int i = 0; i < children.size(); ++i) {
             Element element = children.get(i);
 
+            boolean first = (i == 0);
+            boolean last = (i == children.size() - 1);
+
             if (element.getLocalName().equals("p")) {
-                processParagraph(element, i == 0, i == children.size() - 1);
+                processParagraph(element, first, last);
             } else if (element.getLocalName().equals("poem")) {
                 processPoem(element);
             } else if (element.getLocalName().equals("cite")) {
                 processCite(element);
             } else if (element.getLocalName().equals("text-author")) {
-                processParagraph(element, true, true);
+                processParagraph(element, first, last);
             } else if (element.getLocalName().equals("empty-line")) {
                 if (!isIgnoreEmptyLine(element)) {
                     addEmptyLine();
@@ -1767,15 +1770,18 @@ public class FB2toPDF {
         Elements children = cite.getChildElements();
         for (int i = 0; i < children.size(); ++i) {
             Element element = children.get(i);
+            
+            boolean first = (i == 0);
+            boolean last = (i == children.size() - 1);
 
             if (element.getLocalName().equals("p")) {
-                processParagraph(element, i == 0, i == children.size() - 1);
+                processParagraph(element, first, last);
             } else if (element.getLocalName().equals("subtitle")) {
-                processParagraph(element, true, true);
+                processParagraph(element, first, last);
             } else if (element.getLocalName().equals("poem")) {
                 processPoem(element);
             } else if (element.getLocalName().equals("text-author")) {
-                processParagraph(element, true, true);
+                processParagraph(element, first, last);
             } else if (element.getLocalName().equals("empty-line")) {
                 if (!isIgnoreEmptyLine(element)) {
                     addEmptyLine();
@@ -1799,16 +1805,19 @@ public class FB2toPDF {
         for (int i = 0; i < children.size(); ++i) {
             Element element = children.get(i);
 
+            boolean first = (i == 0);
+            boolean last = (i == children.size() - 1);
+
             if (element.getLocalName().equals("stanza")) {
                 processStanza(element);
             } else if (element.getLocalName().equals("title")) {
-                processParagraph(element, true, true);
+                processParagraph(element, first, last);
             } else if (element.getLocalName().equals("date")) {
-                processParagraph(element, true, true);
+                processParagraph(element, first, last);
             } else if (element.getLocalName().equals("epigraph")) {
                 processEpigraph(element);
             } else if (element.getLocalName().equals("text-author")) {
-                processParagraph(element, true, true);
+                processParagraph(element, first, last);
             } else {
                 System.out.println("Unhandled poem tag " + element.getLocalName());
             }
