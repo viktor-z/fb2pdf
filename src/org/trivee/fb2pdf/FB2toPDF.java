@@ -437,6 +437,15 @@ public class FB2toPDF {
         return lengths;
     }
 
+    private Rectangle getPageSize() throws NumberFormatException {
+        final PageStyle pageStyle = stylesheet.getPageStyle();
+        Rectangle pageSize = new Rectangle(pageStyle.getPageWidth(), pageStyle.getPageHeight(), pageStyle.getPageRotation());
+        if(!isBlank(pageStyle.backgroundColor)) {
+            pageSize.setBackgroundColor(new BaseColor(Color.decode(pageStyle.backgroundColor)));
+        }
+        return pageSize;
+    }
+
     private void renderBook(Element description) throws FB2toPDFException, IOException, DocumentException {
 
         if (description != null) {
@@ -963,13 +972,10 @@ public class FB2toPDF {
     
     private void createPDFDoc()
             throws DocumentException, FileNotFoundException {
-        final PageStyle pageStyle = stylesheet.getPageStyle();
         final GeneralSettings generalSettings = stylesheet.getGeneralSettings();
 
-        Rectangle pageSize = new Rectangle(pageStyle.getPageWidth(), pageStyle.getPageHeight(), pageStyle.getPageRotation());
-        if(!isBlank(pageStyle.backgroundColor)) {
-            pageSize.setBackgroundColor(new BaseColor(Color.decode(pageStyle.backgroundColor)));
-        }
+        final PageStyle pageStyle = stylesheet.getPageStyle();
+        Rectangle pageSize = getPageSize();
 
         System.out.println("Page size is " + pageSize);
         
@@ -1166,6 +1172,7 @@ public class FB2toPDF {
         if (!isBlank(secondPassStylesheet)){
             passNamePrefix = "secondPass_";
             stylesheet = Stylesheet.readStylesheet(FB2PDF_HOME + secondPassStylesheet);
+            doc.setPageSize(getPageSize());
             if (stylesheet.getPageStyle().footnotes) {
                 FootnoteRenderer.reinit(stylesheet);
             }
