@@ -1,7 +1,6 @@
 package org.trivee.fb2pdf;
 
 import java.io.IOException;
-import java.io.FileReader;
 import java.util.LinkedList;
 
 import com.itextpdf.text.DocumentException;

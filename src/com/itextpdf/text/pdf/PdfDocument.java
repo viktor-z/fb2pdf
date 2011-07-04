@@ -2430,12 +2430,12 @@ public class PdfDocument extends Document {
     }
 
     private float getFootnoteLineH() {
-        FootnoteLineImage footNoteLine = footnoteImages.getFirst();
+        FootnoteLineImage footNoteLine = footnoteImages.getLast();
         return footNoteLine.getHeight();
     }
 
     private BaseColor getFootnoteSeparatorColor() {
-        FootnoteLineImage footNoteLine = footnoteImages.getFirst();
+        FootnoteLineImage footNoteLine = footnoteImages.getLast();
         return footNoteLine.getBorderColor();
     }
 

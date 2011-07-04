@@ -13,7 +13,6 @@ import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfDocument;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.text.pdf.draw.VerticalPositionMark;
 import java.io.ByteArrayOutputStream;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -179,6 +178,28 @@ public class FootnoteRenderer {
     }
     
     public static void init(Stylesheet stylesheet) throws FB2toPDFException, DocumentException {
+        initParams(stylesheet);
+        //pageSize.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        doc = new Document(pageSize, 0, 0, 0, 0);
+        PdfDocument.preventWidows = false;
+        output = new ByteArrayOutputStream();
+        writer = PdfWriter.getInstance(doc, output);
+        writer.setPageEvent(new PageEvents());
+        doc.open();
+    }
+
+    public static void reinit(Stylesheet stylesheet) throws FB2toPDFException, DocumentException {
+        if (doc == null) {
+            init(stylesheet);
+            return;
+        }
+        
+        initParams(stylesheet);
+        //pageSize.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        doc.setPageSize(pageSize);
+    }
+
+    private static void initParams(Stylesheet stylesheet) throws FB2toPDFException {
         pageStyle = stylesheet.getPageStyle();
         noteStyle = stylesheet.getParagraphStyle("footnote");
         float pageWidth = pageStyle.getPageWidth() - pageStyle.getMarginLeft() - pageStyle.getMarginRight();
@@ -189,13 +210,6 @@ public class FootnoteRenderer {
         float descent = basefont.getFontDescriptor(BaseFont.DESCENT, fontSize);
         float pageHeight = Math.max(ascent - descent, noteStyle.getAbsoluteLeading());
         pageSize = new Rectangle(pageWidth, pageHeight);
-        //pageSize.setBackgroundColor(BaseColor.LIGHT_GRAY);
-        doc = new Document(pageSize, 0, 0, 0, 0);
-        PdfDocument.preventWidows = false;
-        output = new ByteArrayOutputStream();
-        writer = PdfWriter.getInstance(doc, output);
-        writer.setPageEvent(new PageEvents());
-        doc.open();
     }
 
     private static class PageEvents extends PdfPageEventHelper {

@@ -12,6 +12,7 @@ import java.util.ArrayList;
  * @author vzeltser
  */
 public class GeneralSettings {
+    public String secondPassStylesheet;
     public boolean transliterateMetaInfo;
     public boolean forceTransliterateAuthor;
     public String metaAuthorQuery = "(first-name,  middle-name,  last-name)";
