@@ -106,7 +106,24 @@
 
         backgroundColor: "",
         backgroundImage: "",
-        header:          "false",
+        header: {          
+            enabled: "false",
+            left:   {
+                enabled:        "true",
+                style:          "headerLeft",
+                border:         2, // TOP = 1; BOTTOM = 2; LEFT = 4; RIGHT = 8; NO_BORDER = 0; BOX = TOP + BOTTOM + LEFT + RIGHT;
+                borderColor:    "0x000000",
+                query:          "string-join(($authorFirstLastName, $bookTitle), ', ')" // There are predefined variables $bookTitle, $authorFirstName, $authorLastName, $authorMiddleName, $authorFirstLastName
+            },
+            center: {
+                //border:         0, 
+                enabled:        "false"
+            },
+            right:  {
+                //border:         0, 
+                enabled:        "false"
+            }
+        },
 
         enforcePageSize: "false",
         pageSizeEnforcerColor: "0x7F7F7F",
@@ -506,11 +523,20 @@
             fontFamily:       "serif",
             fontSize:         "8pt",
             fontStyle:        "italic",
-            alignment:        "left",
             spacingAfter:     "3pt",
             spacingBefore:    "0pt",
             leftIndent:       "3pt",    
             rightIndent:      "3pt"
+        },
+        {
+            name:             "headerLeft",
+            baseStyle:        "header",
+            alignment:        "left"
+        },
+        {
+            name:             "headerRight",
+            baseStyle:        "header",
+            alignment:        "right"
         },
         {
             name:               "code",

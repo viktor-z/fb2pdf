@@ -262,14 +262,9 @@ public class ParagraphStyle {
         return getProperty(dropcapStyle, "getDropcapStyle", "");
     }
 
-    private BaseColor getColor(String c) {
-        return new BaseColor(Color.decode(c));
-    }
-
     public BaseColor getColor() throws FB2toPDFException {
-        
-        BaseColor result = (StringUtils.isNotBlank(color)) ? getColor(color) : null;
-        return getProperty(result, "getColor", getColor("0x000000"));
+        BaseColor result = (StringUtils.isNotBlank(color)) ? Utilities.getColor(color) : null;
+        return getProperty(result, "getColor", Utilities.getColor("0x000000"));
     }
 
     public float getInlineImageOffsetY() throws FB2toPDFException {

@@ -7,7 +7,10 @@ package org.trivee.fb2pdf;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import nu.xom.Document;
+import nu.xom.Element;
 import nu.xom.Nodes;
 import nu.xom.ParsingException;
 import nu.xom.Serializer;
@@ -15,13 +18,14 @@ import nux.xom.pool.XQueryPool;
 import nux.xom.xquery.XQuery;
 import nux.xom.xquery.XQueryException;
 import nux.xom.xquery.XQueryUtil;
+import org.apache.commons.lang.StringUtils;
 import org.trivee.fb2pdf.TransformationSettings.Entry;
 
 /**
  *
  * @author vzeltser
  */
-public class Transformation {
+public class XQueryUtilities {
 
     public static void outputDebugInfo(Document xdoc, TransformationSettings settings, final String fileName) throws IOException {
         if (settings.outputDebugFile) {
@@ -71,5 +75,15 @@ public class Transformation {
         Nodes nodes = xselect.execute(xdoc).toNodes();
         System.out.println(String.format("Transformation query '%s' returned %d nodes", query, nodes.size()));
         XQueryUtil.update(nodes, xmorpher, null);
+    }
+    
+    public static String getString(Element element, TransformationSettings settings, String query, String separator) {
+        String queryProlog = settings.queryProlog;
+        Nodes nodes = XQueryUtil.xquery(element, queryProlog + query);
+        List<String> strings = new ArrayList<String>(nodes.size());
+        for (int i=0; i<nodes.size(); i++) {
+            strings.add(nodes.get(i).getValue());
+        }
+        return StringUtils.join(strings, separator == null ? " " : separator);
     }
 }

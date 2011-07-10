@@ -228,7 +228,7 @@ public class FB2toPDF {
         }
 
         try {
-            Transformation.transform(fb2, stylesheet.getTransformationSettings());
+            XQueryUtilities.transform(fb2, stylesheet.getTransformationSettings());
         } catch (Exception ex) {
             throw new RuntimeException("Error processing transformation. " + ex.getMessage());
         }
@@ -244,12 +244,12 @@ public class FB2toPDF {
             if (isBlank(xpath)) continue;
                 
             try {
-                Transformation.transform(fb2, prolog + xpath + "/(* | text())[last()]", String.format(morpher, name));
+                XQueryUtilities.transform(fb2, prolog + xpath + "/(* | text())[last()]", String.format(morpher, name));
             } catch (Exception ex) {
                 throw new RuntimeException("Error applying styles. " + ex.getMessage());
             }
         }
-        Transformation.outputDebugInfo(fb2, stylesheet.getTransformationSettings(), "styling-result.xml");
+        XQueryUtilities.outputDebugInfo(fb2, stylesheet.getTransformationSettings(), "styling-result.xml");
     }
 
     private void addFontChangeOutline(Map<Integer, Integer> pageElementMap, Map<Integer, Integer> elementPageMap, int maxPageNumLength) {
@@ -262,32 +262,54 @@ public class FB2toPDF {
             addFontChangeOutlineItem(fontChangeOutline, maxPageNumLength, srcpageLabel, destpage);
         }
     }
+    
+    private void createHeaderSlot(PdfPTable table, HeaderSlotSettings slotSettings) throws FB2toPDFException {
+        final ParagraphStyle slotStyle = stylesheet.getParagraphStyle(slotSettings.style);
+
+        table.getDefaultCell().setBorder(slotSettings.border);
+        BaseColor color = slotSettings.getBorderColor();
+        if (color == null) color = slotStyle.getColor();
+        table.getDefaultCell().setBorderColor(color);
+        
+        table.getDefaultCell().setPaddingTop(slotStyle.getSpacingBefore());
+        table.getDefaultCell().setPaddingBottom(slotStyle.getSpacingAfter());
+        table.getDefaultCell().setPaddingLeft(slotStyle.getLeftIndent());
+        table.getDefaultCell().setPaddingRight(slotStyle.getRightIndent());
+        table.getDefaultCell().setHorizontalAlignment(slotStyle.getAlignment());
+        
+        if (slotSettings.enabled) {
+            Chunk chunk = slotStyle.createChunk();
+           
+            String query = "";
+            query  = "declare variable $bookTitle := //title-info//book-title; ";
+            query += "declare variable $author := //title-info//author[1]; ";
+            query += "declare variable $authorFirstName := $author//first-name; ";
+            query += "declare variable $authorLastName := $author//last-name; ";
+            query += "declare variable $authorMiddleName := $author//middle-name; ";
+            query += "declare variable $authorFirstLastName := string-join(($authorFirstName, $authorLastName), ' '); ";
+            //query += "string-join(($authorFirstLastName, $bookTitle), ', ')";
+            query += slotSettings.query;
+            String txt = XQueryUtilities.getString(fb2.getRootElement(), stylesheet.getTransformationSettings(), query, " ");
+            chunk.append(txt);
+            table.addCell(new Phrase(chunk));
+        } else {
+            table.addCell("");
+        }
+    }
 
     private PdfPTable createHeaderTable() throws DocumentException, FB2toPDFException {
-        final ParagraphStyle headerStyle = stylesheet.getParagraphStyle("header");
-        //PdfPTable table = new PdfPTable(2);
-        //table.setWidths(new float[]{0.5f, 0.5f});
-        PdfPTable table = new PdfPTable(1);
-        table.setWidths(new float[]{1.0f});
-        table.setTotalWidth(doc.getPageSize().getWidth() - doc.leftMargin() - doc.rightMargin());
-        table.getDefaultCell().setBorder(Rectangle.BOTTOM);
-        table.getDefaultCell().setPaddingTop(headerStyle.getSpacingBefore());
-        table.getDefaultCell().setPaddingBottom(headerStyle.getSpacingAfter());
-        table.getDefaultCell().setPaddingLeft(headerStyle.getLeftIndent());
-        table.getDefaultCell().setPaddingRight(headerStyle.getRightIndent());
-        table.getDefaultCell().setHorizontalAlignment(headerStyle.getAlignment());
-        table.getDefaultCell().setNoWrap(true);
         
-        table.getDefaultCell().setBorderColor(headerStyle.getColor());
-        Chunk chunk = headerStyle.createChunk();
-        String author = getTextContent(fb2.query("//fb:title-info//fb:author[1]//fb:first-name | //fb:title-info//fb:author[1]//fb:last-name", xCtx), "", "");
-        String title = getTextContent(fb2.query("//fb:title-info//fb:book-title", xCtx), "", "");
-        chunk.append(author + ", " + title);
-        table.addCell(new Phrase(chunk));
-        //table.getDefaultCell().setHorizontalAlignment(com.itextpdf.text.Element.ALIGN_RIGHT);
-        //chunk = stylesheet.getParagraphStyle("header").createChunk();
-        //chunk.append(title);
-        //table.addCell(new Phrase(chunk));
+        HeaderSettings headerSettings = stylesheet.getPageStyle().getHeader();
+        
+        PdfPTable table = new PdfPTable(3);
+        table.setWidths(new float[]{0.3333f, 0.3333f, 0.3333f});
+        table.setTotalWidth(doc.getPageSize().getWidth() - doc.leftMargin() - doc.rightMargin());
+        table.getDefaultCell().setNoWrap(true);
+
+        createHeaderSlot(table, headerSettings.left);
+        createHeaderSlot(table, headerSettings.center);
+        createHeaderSlot(table, headerSettings.right);
+
         return table;
     }
 
@@ -444,7 +466,11 @@ public class FB2toPDF {
             setupHyphenation(description);
             processDescription(description);
         }
-
+        
+        if (stylesheet.getPageStyle().getHeader().enabled) {
+            setupHeader();
+        }
+        
         Element body = bodies.get(0);
         if (stylesheet.getGeneralSettings().generateTOC) {
             makeTOCPage(body);
@@ -1128,11 +1154,6 @@ public class FB2toPDF {
         doc.open();
         currentOutline.put(0, writer.getDirectContent().getRootOutline());
 
-        if (stylesheet.getPageStyle().header) {
-            setupHeader();
-        }
-        
-        
         if (stylesheet.getPageStyle().footnotes) {
             FootnoteRenderer.init(stylesheet);
         }
@@ -1285,22 +1306,12 @@ public class FB2toPDF {
     
     private String getMetaAuthorFullName(Element author) throws FB2toPDFException {
         String query = stylesheet.getGeneralSettings().metaAuthorQuery;
-        return getAuthorFullName(author, query);
+        return XQueryUtilities.getString(author, stylesheet.getTransformationSettings(), query, " ");
     }
     
     private String getBookInfoPageAuthorFullName(Element author) throws FB2toPDFException {
         String query = "(first-name,  middle-name,  last-name)";
-        return getAuthorFullName(author, query);
-    }
-    
-    private String getAuthorFullName(Element author, String query) throws FB2toPDFException {
-        String queryProlog = stylesheet.getTransformationSettings().queryProlog;
-        Nodes nodes = XQueryUtil.xquery(author, queryProlog + query);
-        List<String> strings = new ArrayList<String>(nodes.size());
-        for (int i=0; i<nodes.size(); i++) {
-            strings.add(nodes.get(i).getValue());
-        }
-        return StringUtils.join(strings, " ");
+        return XQueryUtilities.getString(author, stylesheet.getTransformationSettings(), query, " ");
     }
 
     private void addMetaInfo(Element description)

@@ -1,5 +1,7 @@
 package org.trivee.fb2pdf;
 
+import com.itextpdf.text.BaseColor;
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -27,6 +29,10 @@ public class Utilities {
     public static String getBaseDir()  throws IOException {
         String libPath = URLDecoder.decode(new File(Utilities.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent(), "UTF-8");
         return (new File(libPath)).getParent();
+    }
+
+    public static BaseColor getColor(String c) {
+        return new BaseColor(Color.decode(c));
     }
 
 }
