@@ -108,20 +108,30 @@
         backgroundImage: "",
         header: {          
             enabled: "false",
-            left:   {
+            leftOdd:   {
                 enabled:        "true",
                 style:          "headerLeft",
                 border:         2, // TOP = 1; BOTTOM = 2; LEFT = 4; RIGHT = 8; NO_BORDER = 0; BOX = TOP + BOTTOM + LEFT + RIGHT;
                 borderColor:    "0x000000",
-                query:          "string-join(($authorFirstLastName, $bookTitle), ', ')" // There are predefined variables $bookTitle, $authorFirstName, $authorLastName, $authorMiddleName, $authorFirstLastName
+                //query:          "string-join(($authorFirstLastName, $bookTitle), ', ')" // There are predefined variables $bookTitle, $authorFirstName, $authorLastName, $authorMiddleName, $authorFirstLastName
+                query:          "$authorFirstLastName" // There are predefined variables $bookTitle, $authorFirstName, $authorLastName, $authorMiddleName, $authorFirstLastName
             },
-            center: {
-                //border:         0, 
+            centerOdd: {
                 enabled:        "false"
             },
-            right:  {
-                //border:         0, 
+            rightOdd:  {
                 enabled:        "false"
+            },
+            leftEven:   {
+                enabled:        "false"
+            },
+            centerEven: {
+                enabled:        "false"
+            },
+            rightEven:  {
+                enabled:        "true",
+                style:          "headerRight",
+                query:          "$bookTitle"
             }
         },
 

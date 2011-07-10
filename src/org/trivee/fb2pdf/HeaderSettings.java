@@ -11,9 +11,12 @@ package org.trivee.fb2pdf;
 public class HeaderSettings {
 
     public boolean enabled;
-    public HeaderSlotSettings left = new HeaderSlotSettings();
-    public HeaderSlotSettings center = new HeaderSlotSettings();
-    public HeaderSlotSettings right = new HeaderSlotSettings();
+    public HeaderSlotSettings leftOdd = new HeaderSlotSettings();
+    public HeaderSlotSettings centerOdd = new HeaderSlotSettings();
+    public HeaderSlotSettings rightOdd = new HeaderSlotSettings();
+    public HeaderSlotSettings leftEven = new HeaderSlotSettings();
+    public HeaderSlotSettings centerEven = new HeaderSlotSettings();
+    public HeaderSlotSettings rightEven = new HeaderSlotSettings();
 
     public HeaderSettings() {
     }

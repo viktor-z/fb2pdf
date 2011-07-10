@@ -46,7 +46,6 @@ import nu.xom.Nodes;
 import nu.xom.ParentNode;
 import nu.xom.Text;
 import nu.xom.XPathContext;
-import nux.xom.xquery.XQueryUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.tools.zip.ZipEntry;
@@ -297,7 +296,7 @@ public class FB2toPDF {
         }
     }
 
-    private PdfPTable createHeaderTable() throws DocumentException, FB2toPDFException {
+    private PdfPTable createHeaderTable(boolean odd) throws DocumentException, FB2toPDFException {
         
         HeaderSettings headerSettings = stylesheet.getPageStyle().getHeader();
         
@@ -306,9 +305,15 @@ public class FB2toPDF {
         table.setTotalWidth(doc.getPageSize().getWidth() - doc.leftMargin() - doc.rightMargin());
         table.getDefaultCell().setNoWrap(true);
 
-        createHeaderSlot(table, headerSettings.left);
-        createHeaderSlot(table, headerSettings.center);
-        createHeaderSlot(table, headerSettings.right);
+        if (odd) {
+            createHeaderSlot(table, headerSettings.leftOdd);
+            createHeaderSlot(table, headerSettings.centerOdd);
+            createHeaderSlot(table, headerSettings.rightOdd);
+        } else {
+            createHeaderSlot(table, headerSettings.leftEven);
+            createHeaderSlot(table, headerSettings.centerEven);
+            createHeaderSlot(table, headerSettings.rightEven);
+        } 
 
         return table;
     }
@@ -1185,12 +1190,15 @@ public class FB2toPDF {
     }
 
     private void setupHeader() throws FB2toPDFException, DocumentException, BadElementException {
-        PdfPTable table = createHeaderTable();
-        float adjustedMargin =  doc.topMargin() + table.getTotalHeight();
+        PdfPTable tableOdd = createHeaderTable(true);
+        PdfPTable tableEven = createHeaderTable(false);
+        float adjustedMargin =  doc.topMargin() + Math.max(tableOdd.getTotalHeight(), tableEven.getTotalHeight());
         stylesheet.getPageStyle().setMarginTop(adjustedMargin);
         doc.setMargins(doc.leftMargin(), doc.rightMargin(), adjustedMargin , doc.bottomMargin());
-        HeaderHelper footerHelper = new HeaderHelper(doc, writer, table);
-        writer.setPageEvent(footerHelper);
+        HeaderHelper footerHelperOdd = new HeaderHelper(doc, writer, tableOdd, HeaderHelper.ODD);
+        writer.setPageEvent(footerHelperOdd);
+        HeaderHelper footerHelperEven = new HeaderHelper(doc, writer, tableEven, HeaderHelper.EVEN);
+        writer.setPageEvent(footerHelperEven);
     }
 
     private void fillFootnoteTemplates() throws IOException {

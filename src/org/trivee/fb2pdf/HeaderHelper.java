@@ -18,25 +18,21 @@ import com.itextpdf.text.pdf.PdfWriter;
  */
 public class HeaderHelper extends PdfPageEventHelper {
 
+    public static int ODD = 1;
+    public static int EVEN = 0;
+
     private Image image;
     private boolean firstPass = true;
     private Document doc;
+    private int oddOrEven;
 
-    public HeaderHelper(Document doc, PdfWriter writer, PdfPTable table) throws BadElementException {
+    public HeaderHelper(Document doc, PdfWriter writer, PdfPTable table, int oddOrEven) throws BadElementException {
         this.doc = doc;
+        this.oddOrEven = oddOrEven;
         float templateWidth = doc.getPageSize().getWidth();
         float templateHight = doc.getPageSize().getHeight();
         PdfTemplate tp = PdfTemplate.createTemplate(writer, templateWidth, templateHight);
         table.writeSelectedRows(0, -1, doc.leftMargin(), templateHight, tp);
-        //tp.saveState();
-        //tp.setColorStroke(BaseColor.YELLOW);
-        //tp.setColorFill(BaseColor.YELLOW);
-        //tp.rectangle(-100, -100, 200, 200);
-        //tp.fillStroke();
-        //tp.setColorFill(BaseColor.RED);
-        //tp.rectangle(0, 0, templateWidth, templateHight);
-        //tp.fillStroke();
-        //stp.restoreState();
         Image footer = Image.getInstance(tp);
         footer.setAbsolutePosition(0, 0);
         this.image = footer;
@@ -50,7 +46,9 @@ public class HeaderHelper extends PdfPageEventHelper {
         }
     
         try {
-            writer.getDirectContent().addImage(image);
+            if (oddOrEven == document.getPageNumber() % 2) {
+                writer.getDirectContent().addImage(image);
+            }
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
