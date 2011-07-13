@@ -114,8 +114,11 @@
                 style:          "headerLeft",
                 border:         2, // TOP = 1; BOTTOM = 2; LEFT = 4; RIGHT = 8; NO_BORDER = 0; BOX = TOP + BOTTOM + LEFT + RIGHT;
                 borderColor:    "0x000000",
-                //query:          "string-join(($authorFirstLastName, $bookTitle), ', ')" // There are predefined variables $bookTitle, $authorFirstName, $authorLastName, $authorMiddleName, $authorFirstLastName
-                query:          "$authorFirstLastName" // There are predefined variables $bookTitle, $authorFullName, $authorLastName, $authorFirstLastName, $authorFirstInitialLastName, $authorAllInitialsLastName
+                // There are predefined variables $bookTitle, $authorFirstName, $authorLastName, $authorMiddleName, $authorFirstLastName
+                // There are predefined custom functions fb:cut-right(string, length) fb:cut-left(string, length)
+                // There are standard xquery functions http://www.w3schools.com/xpath/xpath_functions.asp
+                //query:          "string-join(($authorFirstLastName, $bookTitle), ', ')" 
+                query:          "fb:cut-right($authorFirstLastName, 45)" 
             },
             centerOdd: {
                 enabled:        "false"
@@ -132,7 +135,7 @@
             rightEven:  {
                 enabled:        "true",
                 style:          "headerRight",
-                query:          "$bookTitle"
+                query:          "fb:cut-right($bookTitle, 45)"
             }
         },
 
