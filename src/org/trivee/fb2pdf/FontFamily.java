@@ -84,24 +84,34 @@ public class FontFamily
     {
         return name;
     }
+    
+    private void validateFontInfo(FontInfo fi, String fiName) {
+        if (fi == null) {
+            throw new RuntimeException(String.format("Invalid \"%s\" font settings in \"%s\" family", fiName, name));
+        }
+    }
 
     public BaseFont getRegularFont()
     {
+        validateFontInfo(regular, "regular");
         return regular.font;
     }
 
     public BaseFont getBoldFont()
     {
+        validateFontInfo(bold, "bold");
         return bold.font;
     }
 
     public BaseFont getItalicFont()
     {
+        validateFontInfo(italic, "italic");
         return italic.font;
     }
 
     public BaseFont getBoldItalicFont()
     {
+        validateFontInfo(boldItalic, "boldItalic");
         return boldItalic.font;
     }
 }
