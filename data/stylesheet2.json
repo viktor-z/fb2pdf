@@ -167,6 +167,16 @@
                 },
                 */ 
                 /*
+                { //delete bracket at the end of the text node 
+                  "query": "//text()[ends-with(., '[')]", 
+                  "morpher": "replace(., '(.*)\\[$', '$1')" 
+                }, 
+                { //delete bracket at the beginning of the text node 
+                  "query": "//text()[starts-with(., ']')]", 
+                  "morpher": "replace(., '^\\](.*)', '$1')" 
+                },
+                */              
+                /*
                 {   // convert poem note to paragraphs, part 1
                     "query":   "//body[@name='notes']//section/poem",
                     "morpher": ".//stanza/*"
