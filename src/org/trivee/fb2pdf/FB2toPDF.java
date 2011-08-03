@@ -195,11 +195,11 @@ public class FB2toPDF {
     }
 
     private void addInternalLink() throws FB2toPDFException {
+        String refname = currentReference.substring(1); //getting rid of "#" at the begin of the reference
+        currentChunk.setGenericTag("FOOTNOTE:" + refname);
         if (stylesheet.getGeneralSettings().generateInternalLinks) {
             Anchor anchor = currentStyle.createAnchor();
             //Unlike Anchor, Action won't fail even when local destination does not exist
-            String refname = currentReference.substring(1); //getting rid of "#" at the begin of the reference
-            currentChunk.setGenericTag("FOOTNOTE:" + refname);
             refname = passNamePrefix + refname;
             addGoToActionToChunk(refname, currentChunk);
             String aName = refname + "_backlink";
