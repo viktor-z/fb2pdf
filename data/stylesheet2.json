@@ -301,6 +301,7 @@
         makeEndUnbreakable:			"false",
         makeReplacements:			"true",
         replacementsMap: {
+                //"\"(.*?)\"": "«$1»", //replacing quotes
                 " \u2012 ": "\u00A0\u2012 ",
                 " \u2013 ": "\u00A0\u2013 ",
                 " \u2014 ": "\u00A0\u2014 ",
