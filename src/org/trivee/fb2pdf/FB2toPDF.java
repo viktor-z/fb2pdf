@@ -494,6 +494,20 @@ public class FB2toPDF {
         }
     }
 
+    private void rescaleImage(Image image, float zoomFactor, float wSpace, float hSpace) {
+        Rectangle pageSize = doc.getPageSize();
+        float dpi = stylesheet.getGeneralSettings().imageDpi;
+        float scaleWidth = pageSize.getWidth() - wSpace;
+        float scaleHeight = pageSize.getHeight() - hSpace;
+        float imgWidth = image.getWidth() / dpi * 72 * zoomFactor;
+        float imgHeight = image.getHeight() / dpi * 72 * zoomFactor;
+        if ((imgWidth <= scaleWidth) && (imgHeight <= scaleHeight)) {
+            scaleWidth = imgWidth;
+            scaleHeight = imgHeight;
+        }
+        image.scaleToFit(scaleWidth, scaleHeight);
+    }
+
     private void saveLinkPageNumber(String currentAnchorName) {
         if (!stylesheet.getGeneralSettings().enableLinkPageNum) {
             return;
@@ -521,28 +535,17 @@ public class FB2toPDF {
         linkPageNumTemplates.put(currentReference, new LinkPageNumTemplate(template, currentStyle));
     }
 
-    private float rescaleImage(Image image) throws FB2toPDFException {
-        return rescaleImage(image, 1.0f);
+    private void rescaleImage(Image image) throws FB2toPDFException {
+        rescaleImage(image, 1.0f);
     }
 
-    private float rescaleImage(Image image, float zoomFactor) throws FB2toPDFException {
-        Rectangle pageSize = doc.getPageSize();
-        float dpi = stylesheet.getGeneralSettings().imageDpi;
+    private void rescaleImage(Image image, float zoomFactor) throws FB2toPDFException {
         float hSpace = doc.topMargin() + doc.bottomMargin() + image.getSpacingAfter() + image.getSpacingBefore();
         float wSpace = doc.leftMargin() + doc.rightMargin() + stylesheet.getPageStyle().getImageExtraMargins();
         if (currentStyle != null) {
             hSpace += currentStyle.getAbsoluteLeading() + currentStyle.getFontSize().getPoints();
         }
-        float scaleWidth = pageSize.getWidth() - wSpace;
-        float scaleHeight = pageSize.getHeight() - hSpace;
-        float imgWidth = image.getWidth() / dpi * 72 * zoomFactor;
-        float imgHeight = image.getHeight() / dpi * 72 * zoomFactor;
-        if ((imgWidth <= scaleWidth) && (imgHeight <= scaleHeight)) {
-            scaleWidth = imgWidth;
-            scaleHeight = imgHeight;
-        }
-        image.scaleToFit(scaleWidth, scaleHeight);
-        return scaleHeight;
+        rescaleImage(image, zoomFactor, wSpace, hSpace);
     }
 
     protected void addInlineImage(Image image) throws DocumentException, FB2toPDFException {
@@ -1006,7 +1009,7 @@ public class FB2toPDF {
         if (!isBlank(pageStyle.backgroundImage)){
             try {
                 Image image = Image.getInstance(Utilities.getValidatedFileName(pageStyle.backgroundImage));
-                rescaleImage(image);
+                rescaleImage(image, 1.0f, 0, 0);
                 BackgroundImageHelper backgroundImageHelper = new BackgroundImageHelper(image);
                 writer.setPageEvent(backgroundImageHelper);
             } catch (Exception ex) {
