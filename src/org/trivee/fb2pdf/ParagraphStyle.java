@@ -9,7 +9,7 @@ import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.pdf.BaseFont;
-import java.awt.Color;
+import com.itextpdf.text.pdf.PdfContentByte;
 import java.lang.reflect.Method;
 import org.apache.commons.lang.StringUtils;
 
@@ -142,6 +142,7 @@ public class ParagraphStyle {
     private String text;
     private Float inlineImageOffsetY;
     private Float inlineImageZoom;
+    private Float strokeWidth;
 
     public ParagraphStyle() {
     }
@@ -273,6 +274,10 @@ public class ParagraphStyle {
 
     public float getInlineImageZoom() throws FB2toPDFException {
         return getProperty(inlineImageZoom, "getInlineImageZoom", 1.0f);
+    }
+    
+    public float getStrokeWidth() throws FB2toPDFException {
+        return getProperty(strokeWidth, "getStrokeWidth", 0.0f);
     }
 
     public void toggleBold() {
@@ -424,6 +429,10 @@ public class ParagraphStyle {
             throws FB2toPDFException {
         Chunk chunk = new Chunk();
         chunk.setFont(getFont());
+        float strokeW = getStrokeWidth();
+        if (strokeW > 0) {
+            chunk.setTextRenderMode(PdfContentByte.TEXT_RENDER_MODE_FILL_STROKE, strokeW, getColor());
+        }
         return chunk;
     }
 
