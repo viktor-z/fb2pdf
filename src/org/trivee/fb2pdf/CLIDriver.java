@@ -24,6 +24,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.io.FilenameUtils;
 import org.trivee.utils.Rotate;
 import org.trivee.utils.TwoUp;
 
@@ -45,6 +46,16 @@ public class CLIDriver {
     private static CommandLine cl;
     private static PrintWriter outWriter = new PrintWriter(System.out, true);
     private static String logEncoding;
+
+    private static String getNonExistingFileName(String pdfname) {
+        File f = new File(pdfname);
+        for (int i=1; f.exists(); i++) {
+            String path = FilenameUtils.getFullPath(pdfname);
+            String newName = String.format("%s (%s).%s", FilenameUtils.getBaseName(pdfname), i, FilenameUtils.getExtension(pdfname));
+            f = new File(FilenameUtils.concat(path, newName));
+        }
+        return f.getAbsolutePath();
+    }
 
     private static void printNameVersion() {
         String id = CLIDriver.class.getPackage().getImplementationVersion();
@@ -68,6 +79,7 @@ public class CLIDriver {
         Options options = new Options();
         options.addOption("h", "help", false, "Show usage information and quit");
         options.addOption("r", "recursive", false, "Process subdirectories");
+        options.addOption("o", "overwrite", false, "Overwrite existing pdf files");
         options.addOption(OptionBuilder
                 .withLongOpt("stylesheet")
                 .hasArg()
@@ -215,15 +227,18 @@ public class CLIDriver {
 
                 try
                 {
-                        FB2toPDF.translate(fb2name, pdfname, stylesheet);
-                        println(String.format("Success: %s\n", fb2name));
-                        succeeded++;
-                        if (cl.hasOption("t")){
-                            TwoUp.execute(pdfname, pdfname+".booklet.pdf");
-                        }
-                        if (cl.hasOption("rt")){
-                            Rotate.execute(pdfname, pdfname+".rotated.pdf", cl.getOptionValue("rt"));
-                        }
+                    if (!cl.hasOption("o")) {
+                        pdfname = getNonExistingFileName(pdfname);
+                    }
+                    FB2toPDF.translate(fb2name, pdfname, stylesheet);
+                    println(String.format("Success: %s\n", pdfname));
+                    succeeded++;
+                    if (cl.hasOption("t")){
+                        TwoUp.execute(pdfname, pdfname+".booklet.pdf");
+                    }
+                    if (cl.hasOption("rt")){
+                        Rotate.execute(pdfname, pdfname+".rotated.pdf", cl.getOptionValue("rt"));
+                    }
                 }
                 catch (Exception ex)
                 {
