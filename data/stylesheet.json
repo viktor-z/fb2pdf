@@ -15,7 +15,7 @@
         stretchCover: "true",
         enableInlineImages: "false",
         fullCompression: "false",
-        trackingSpaceCharRatio: 5.0,
+        trackingSpaceCharRatio: 500,
         overrideImageTransparency: "",
         cacheImages:    "false",
         ignoreEmptyLineBeforeImage: "true",
