@@ -147,7 +147,7 @@ public class FB2toPDF {
     private com.itextpdf.text.Document doc;
     private PdfWriter writer;
     int bodyIndex;
-    private Elements bodies;
+    private Nodes bodies;
     private Paragraph currentParagraph;
     private String secondPassStylesheet;
     private int currentElementHash;
@@ -234,8 +234,7 @@ public class FB2toPDF {
     }
 
     private void applyXPathStyles() throws RuntimeException, IOException {
-        String prolog = "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\"; "
-        + "declare namespace l = \"http://www.w3.org/1999/xlink\"; ";
+        String prolog = XQueryUtilities.defaultProlog;
         String morpher = prolog + "(., attribute {'fb2pdf-style'} {'%s'})";
         for (ParagraphStyle style : stylesheet.getParagraphStyles()) {
             String xpath = style.getSelector();
@@ -479,7 +478,7 @@ public class FB2toPDF {
             setupHeader();
         }
         
-        Element body = bodies.get(0);
+        Element body = (Element)bodies.get(0);
         if (stylesheet.getGeneralSettings().generateTOC) {
             makeTOCPage(body);
         }
@@ -487,10 +486,8 @@ public class FB2toPDF {
         for (int i = 0; i < bodies.size(); ++i) {
             body = (Element) bodies.get(i);
             bodyIndex = i;
-            if (!stylesheet.getGeneralSettings().bodiesToSkip.contains(i)) {
-                processBody(body);
-                doc.newPage();
-            }
+            processBody(body);
+            doc.newPage();
         }
     }
 
@@ -1149,7 +1146,13 @@ public class FB2toPDF {
 
         extractBinaries(root);
 
-        bodies = root.getChildElements("body", NS_FB2);
+        //bodies = root.getChildElements("body", NS_FB2);
+        try {
+            String query = stylesheet.getGeneralSettings().bodiesToRender;
+            bodies = XQueryUtilities.query(XQueryUtilities.defaultProlog + query, fb2);
+        } catch (Exception ex) {
+            throw new FB2toPDFException(ex.toString());
+        }
         if (bodies.size() == 0) {
             throw new FB2toPDFException("Element not found: FictionBook/body");
         }

@@ -1,7 +1,8 @@
 {
     generalSettings: {
         //secondPassStylesheet:   "./data/stylesheet2.json",
-        bodiesToSkip:   [],
+        bodiesToRender:   "//body",
+        //bodiesToRender:   "//body[empty(@name) or @name != 'notes']",
         generateTOC:	"true",
         generateFrontMatter:	"true",
         generateNoteBackLinks:	"true",

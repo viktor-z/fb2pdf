@@ -26,6 +26,10 @@ import org.trivee.fb2pdf.TransformationSettings.Entry;
  * @author vzeltser
  */
 public class XQueryUtilities {
+    
+    public static String defaultProlog = "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\"; "
+        + "declare namespace l = \"http://www.w3.org/1999/xlink\"; ";
+    
 
     public static void outputDebugInfo(Document xdoc, TransformationSettings settings, final String fileName) throws IOException {
         if (settings.outputDebugFile) {
@@ -70,10 +74,8 @@ public class XQueryUtilities {
     }
 
     public static void transform(Document xdoc, String query, String morpher) throws IOException, XQueryException, ParsingException {
-        XQuery xselect = XQueryPool.GLOBAL_POOL.getXQuery(query, null);
         XQuery xmorpher = XQueryPool.GLOBAL_POOL.getXQuery(morpher, null);
-        Nodes nodes = xselect.execute(xdoc).toNodes();
-        System.out.println(String.format("Transformation query '%s' returned %d nodes", query, nodes.size()));
+        Nodes nodes = query(query, xdoc);
         XQueryUtil.update(nodes, xmorpher, null);
     }
     
@@ -86,4 +88,12 @@ public class XQueryUtilities {
         }
         return StringUtils.join(strings, separator == null ? " " : separator);
     }
+    
+    public static Nodes query(String query, Document xdoc) throws XQueryException {
+        XQuery xselect = XQueryPool.GLOBAL_POOL.getXQuery(query, null);
+        Nodes nodes = xselect.execute(xdoc).toNodes();
+        System.out.println(String.format("Query '%s' returned %d nodes", query, nodes.size()));
+        return nodes;
+    }
+
 }

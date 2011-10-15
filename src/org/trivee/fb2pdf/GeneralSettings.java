@@ -5,8 +5,6 @@
 
 package org.trivee.fb2pdf;
 
-import java.util.ArrayList;
-
 /**
  *
  * @author vzeltser
@@ -33,7 +31,7 @@ public class GeneralSettings {
     public boolean enableLinkPageNum;
     public String linkPageNumFormat = "[%04d]";
     public int linkPageNumMax = 9999;
-    public ArrayList<Integer> bodiesToSkip = new ArrayList<Integer>();
+    public String bodiesToRender = "//body";
     public boolean fullCompression = false;
 
     public GeneralSettings()
