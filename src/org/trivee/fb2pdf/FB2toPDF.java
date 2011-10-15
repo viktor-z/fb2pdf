@@ -1147,14 +1147,14 @@ public class FB2toPDF {
         extractBinaries(root);
 
         //bodies = root.getChildElements("body", NS_FB2);
+        String query = stylesheet.getGeneralSettings().bodiesToRender;
         try {
-            String query = stylesheet.getGeneralSettings().bodiesToRender;
             bodies = XQueryUtilities.query(XQueryUtilities.defaultProlog + query, fb2);
         } catch (Exception ex) {
             throw new FB2toPDFException(ex.toString());
         }
         if (bodies.size() == 0) {
-            throw new FB2toPDFException("Element not found: FictionBook/body");
+            throw new FB2toPDFException(String.format("Body elements not found for query '%s'", query));
         }
 
 
