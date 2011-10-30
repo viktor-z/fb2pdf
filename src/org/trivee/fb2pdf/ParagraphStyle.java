@@ -143,6 +143,8 @@ public class ParagraphStyle {
     private Float inlineImageOffsetY;
     private Float inlineImageZoom;
     private Float strokeWidth;
+    private Float characterSpacing;
+    private Float horizontalScaling;
 
     public ParagraphStyle() {
     }
@@ -278,6 +280,14 @@ public class ParagraphStyle {
     
     public float getStrokeWidth() throws FB2toPDFException {
         return getProperty(strokeWidth, "getStrokeWidth", 0.0f);
+    }
+
+    public float getCharacterSpacing() throws FB2toPDFException {
+        return getProperty(characterSpacing, "getCharacterSpacing", 0.0f);
+    }
+
+    public float getHorizontalScaling() throws FB2toPDFException {
+        return getProperty(horizontalScaling, "getHorizontalScaling", 1.0f);
     }
 
     public void toggleBold() {
@@ -433,6 +443,8 @@ public class ParagraphStyle {
         if (strokeW > 0) {
             chunk.setTextRenderMode(PdfContentByte.TEXT_RENDER_MODE_FILL_STROKE, strokeW, getColor());
         }
+        chunk.setCharacterSpacing(getCharacterSpacing());
+        chunk.setHorizontalScaling(getHorizontalScaling());
         return chunk;
     }
 

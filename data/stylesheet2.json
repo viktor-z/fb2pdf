@@ -371,6 +371,8 @@
             fontFamily:       "sansSerif",
             color:            "0x000000",  
             strokeWidth:      "0.0",  
+            characterSpacing: "0.0",  
+            horizontalScaling:"1.0",  
             inlineImageZoom:    "1.0",
             inlineImageOffsetY: "0.0",
             fontSize:         "13.0pt"
