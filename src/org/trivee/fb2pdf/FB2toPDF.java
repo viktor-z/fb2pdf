@@ -1556,6 +1556,8 @@ public class FB2toPDF {
             addPageNumTemplate();
 
             doc.add(currentParagraph);
+            
+            currentReference = null;
         }
 
         doc.newPage();
