@@ -83,9 +83,13 @@
         //pageWidth:    "75.802mm",
         //pageHeight:   "83.654mm",
 
-        // Kindle 3 Portrait  (another variant is 85.09mm x 111.76mm, yet another variant is 85.5mm х 112.3mm)
+        // Kindle 3/4 Portrait  (calculated from 560x735 pixels of 0.151mm; another variant is 85.09mm x 111.76mm, yet another variant is 85.5mm x 112.3mm)
         //pageWidth:    "84.560mm",
         //pageHeight:   "110.985mm",
+
+        // Kindle 3/4 Landscape  (calculated from 722x535 pixels of 0.151mm)
+        //pageWidth:    "109.022mm",
+        //pageHeight:   "80.785mm",
 
         // Kindle DX Portrait
         //pageWidth:    "132.757mm",
