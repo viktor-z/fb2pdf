@@ -16,7 +16,7 @@
         stretchCover: "true",
         enableInlineImages: "false",
         fullCompression: "false",
-        trackingSpaceCharRatio: 500,
+        trackingSpaceCharRatio: 10000000, //Inter-character spacing disabled with 10000000
         overrideImageTransparency: "",
         cacheImages:    "false",
         ignoreEmptyLineBeforeImage: "true",
