@@ -1124,7 +1124,12 @@ public class PdfDocument extends Document {
             	// After the new page we add the current line back in
             	PdfLine overflowLine = line;
             	line = null;
-            	newPage();
+            	//newPage();                                                                   //VIKTORZ --
+                float t = currentHeight + overflowLine.height() - overflowLine.getDescender(); //VIKTORZ ++
+                while(t > indentTop() - indentBottom()) {                                      //VIKTORZ ++
+                    newPage();                                                                 //VIKTORZ ++
+                    t = currentHeight + overflowLine.height() - overflowLine.getDescender();   //VIKTORZ ++
+                }                                                                              //VIKTORZ ++
             	line = overflowLine;
             }
             currentHeight += line.height();

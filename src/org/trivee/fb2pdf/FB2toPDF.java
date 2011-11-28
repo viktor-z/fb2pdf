@@ -540,7 +540,7 @@ public class FB2toPDF {
         float hSpace = doc.topMargin() + doc.bottomMargin() + image.getSpacingAfter() + image.getSpacingBefore();
         float wSpace = doc.leftMargin() + doc.rightMargin() + stylesheet.getPageStyle().getImageExtraMargins();
         if (currentStyle != null) {
-            hSpace += currentStyle.getAbsoluteLeading() + currentStyle.getFontSize().getPoints();
+            hSpace += currentStyle.getAbsoluteLeading();// + currentStyle.getFontSize().getPoints();
         }
         rescaleImage(image, zoomFactor, wSpace, hSpace);
     }
@@ -562,7 +562,7 @@ public class FB2toPDF {
 
     protected void addStretchedImage(Image image) throws DocumentException {
         Rectangle pageSize = doc.getPageSize();
-        image.scaleToFit(pageSize.getWidth() - doc.leftMargin() - doc.rightMargin(), pageSize.getHeight() - doc.topMargin() - doc.bottomMargin());
+        image.scaleToFit(pageSize.getWidth()/* - doc.leftMargin() - doc.rightMargin()*/, pageSize.getHeight()/* - doc.topMargin() - doc.bottomMargin()*/);
         image.setAlignment(Image.MIDDLE);
         doc.add(image);
     }
