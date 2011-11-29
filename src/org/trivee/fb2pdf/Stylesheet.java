@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import org.apache.commons.io.input.BOMInputStream;
 
 public class Stylesheet
 {
@@ -89,13 +90,14 @@ public class Stylesheet
         throws DocumentException, IOException, FB2toPDFException
     {
         FileInputStream fis = new FileInputStream(filename);
-        return readStylesheet(new InputStreamReader(fis, "UTF-8"));
+        return readStylesheet(fis);
     }
 
     public static Stylesheet readStylesheet(InputStream stream)
         throws DocumentException, IOException, FB2toPDFException
     {
-        return readStylesheet(new InputStreamReader(stream, "UTF-8"));
+        BOMInputStream bomStream = new BOMInputStream(stream);
+        return readStylesheet(new InputStreamReader(bomStream, "UTF-8"));
     }
 
     public static Stylesheet readStylesheet(Reader reader)
