@@ -37,6 +37,7 @@ public class FootnoteRenderer {
     static float cutMarkerWidth = 0;
     private static boolean superscript;
     private static boolean subscript;
+    static float topMargin = 0;
 
     private static void addCutMarker(Chunk chunk) throws FB2toPDFException, DocumentException {
         doc.setPageSize(new Rectangle(cutMarkerWidth, pageSize.getHeight()));
@@ -179,8 +180,7 @@ public class FootnoteRenderer {
     
     public static void init(Stylesheet stylesheet) throws FB2toPDFException, DocumentException {
         initParams(stylesheet);
-        //pageSize.setBackgroundColor(BaseColor.LIGHT_GRAY);
-        doc = new Document(pageSize, 0, 0, 0, 0);
+        doc = new Document(pageSize, 0, 0, topMargin, 0);
         PdfDocument.preventWidows = false;
         output = new ByteArrayOutputStream();
         writer = PdfWriter.getInstance(doc, output);
@@ -195,7 +195,6 @@ public class FootnoteRenderer {
         }
         
         initParams(stylesheet);
-        //pageSize.setBackgroundColor(BaseColor.LIGHT_GRAY);
         doc.setPageSize(pageSize);
     }
 
@@ -210,6 +209,13 @@ public class FootnoteRenderer {
         float descent = basefont.getFontDescriptor(BaseFont.DESCENT, fontSize);
         float pageHeight = Math.max(ascent - descent, noteStyle.getAbsoluteLeading());
         pageSize = new Rectangle(pageWidth, pageHeight);
+        
+        float delta = noteStyle.getAbsoluteLeading() - (ascent - descent);
+        topMargin = (delta > 0) ? delta : 0;
+
+        //pageSize.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        //pageSize.setBorder(Rectangle.BOX);
+        //pageSize.setBorderColor(BaseColor.DARK_GRAY);
     }
 
     private static class PageEvents extends PdfPageEventHelper {
