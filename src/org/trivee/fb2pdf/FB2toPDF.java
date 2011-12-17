@@ -1547,7 +1547,7 @@ public class FB2toPDF {
 
             String ref = section.getAttributeValue("id");
             if (isBlank(ref)) {
-                ref = "section" + i;
+                ref = String.format("section%d", section.hashCode());
             }
             addGoToActionToChunk(ref, chunk);
             currentParagraph = currentStyle.createParagraph();
@@ -1574,6 +1574,17 @@ public class FB2toPDF {
         return bookmark;
     }
 
+    private PdfOutline addBookmark(String title, String refname, int level) {
+        if (!currentOutline.containsKey(level)) {
+            return null;
+        }
+        System.out.println("Adding bookmark: " + transliterate(title));
+        PdfAction action = PdfAction.gotoLocalPage(refname, false);
+        PdfOutline bookmark = new PdfOutline(currentOutline.get(level), action, transliterate(title));
+        currentOutline.put(level + 1, bookmark);
+        return bookmark;
+    }
+
     private void processSection(Element section, int level, int index)
             throws DocumentException, FB2toPDFException {
 
@@ -1584,21 +1595,21 @@ public class FB2toPDF {
             writer.setPageEmpty(false);
         }
 
-        if (bodyIndex == 0) {
-            Nodes nodes = section.query("./fb:title//*[not(@type) or @type != 'note']/text()", xCtx);
-            String bmk = getTextContent(nodes, " ", null);
-            if (StringUtils.isNotBlank(bmk)) {
-                addBookmark(bmk, level);
-            }
-        }
-
         String id = section.getAttributeValue("id");
-        if (isBlank(id) && bodyIndex == 0 && level == 0) {
-            id = "section" + index;
+        if (isBlank(id)) {
+            id = String.format("section%d", section.hashCode());
         }
 
         if (!isBlank(id)) {
             addInvisibleAnchor(id);
+        }
+
+        if (bodyIndex == 0) {
+            Nodes nodes = section.query("./fb:title//*[not(@type) or @type != 'note']/text()", xCtx);
+            String bmk = getTextContent(nodes, " ", null);
+            if (StringUtils.isNotBlank(bmk)) {
+                addBookmark(bmk, id, level);
+            }
         }
 
         processSectionContent(section, level);
