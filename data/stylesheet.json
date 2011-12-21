@@ -1,4 +1,4 @@
-{
+﻿{
     generalSettings: {
         //secondPassStylesheet:   "./data/stylesheet2.json",
         bodiesToRender:   "//body",
@@ -49,6 +49,29 @@
             italic:       "./data/LiberationMono-Italic.ttf",
             boldItalic:   "./data/LiberationMono-BoldItalic.ttf"
         }
+        /*
+        {
+            name:         "sansSerif",
+            regular:      "c:/windows/fonts/calibri.ttf",
+            bold:         "c:/windows/fonts/calibrib.ttf",
+            italic:       "c:/windows/fonts/calibrii.ttf",
+            boldItalic:   "c:/windows/fonts/calibriz.ttf"
+        },
+        {
+            name:         "serif",
+            regular:      "c:/windows/fonts/CAMBRIA.TTC,0",
+            bold:         "c:/windows/fonts/CAMBRIAB.TTF",
+            italic:       "c:/windows/fonts/CAMBRIAI.TTF",
+            boldItalic:   "c:/windows/fonts/CAMBRIAZ.TTF"
+        },
+        {
+            name:         "monospaced",
+            regular:      "c:/windows/fonts/consola.ttf",
+            bold:         "c:/windows/fonts/consolab.ttf",
+            italic:       "c:/windows/fonts/consolai.ttf",
+            boldItalic:   "c:/windows/fonts/consolaz.ttf"
+        }
+        */
     ],
     pageStyle: {
         //values: 0, 90, 180, 270
