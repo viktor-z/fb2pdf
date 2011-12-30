@@ -940,7 +940,7 @@ public class FB2toPDF {
         if (maxPageNumLength == 1) {
             PdfDestination destination = new PdfDestination(PdfDestination.FITH);
             PdfAction action = PdfAction.gotoLocalPage(destpage, destination, writer);
-            PdfOutline bookmark = new PdfOutline(root, action, String.format("%s", srcpageLabel));
+            PdfOutline bookmark = new PdfOutline(root, action, String.format("%s", srcpageLabel), false);
             return;
         }
         
@@ -959,7 +959,7 @@ public class FB2toPDF {
         if (curOutline == null) {
             PdfDestination destination = new PdfDestination(PdfDestination.FITH);
             PdfAction action = PdfAction.gotoLocalPage(destpage, destination, writer);
-            curOutline = new PdfOutline(root, action, currentTitle);
+            curOutline = new PdfOutline(root, action, currentTitle, false);
         }
         
         addFontChangeOutlineItem(curOutline, maxPageNumLength-1, srcpageLabel, destpage);
@@ -1569,7 +1569,7 @@ public class FB2toPDF {
         }
         System.out.println("Adding bookmark: " + transliterate(title));
         PdfDestination destination = new PdfDestination(PdfDestination.FITH);
-        PdfOutline bookmark = new PdfOutline(currentOutline.get(level), destination, transliterate(title));
+        PdfOutline bookmark = new PdfOutline(currentOutline.get(level), destination, transliterate(title), false);
         currentOutline.put(level + 1, bookmark);
         return bookmark;
     }
@@ -1580,7 +1580,7 @@ public class FB2toPDF {
         }
         System.out.println("Adding bookmark: " + transliterate(title));
         PdfAction action = PdfAction.gotoLocalPage(refname, false);
-        PdfOutline bookmark = new PdfOutline(currentOutline.get(level), action, transliterate(title));
+        PdfOutline bookmark = new PdfOutline(currentOutline.get(level), action, transliterate(title), false);
         currentOutline.put(level + 1, bookmark);
         return bookmark;
     }
