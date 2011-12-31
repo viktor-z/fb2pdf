@@ -307,7 +307,7 @@ public class FB2toPDF {
     }
 
     private String replaceDynamicVariables(String txt) {
-        txt = txt.replaceAll("#pageNum", new Integer(writer.getPageNumber()+1).toString());
+        txt = txt.replaceAll("#pageNum", new Integer(writer.getPageNumber()).toString());
         txt = txt.replaceAll("#chapterTitle", chapterTitle);
 
         return txt;
@@ -489,15 +489,15 @@ public class FB2toPDF {
             processDescription(description);
         }
         
-        if (stylesheet.getPageStyle().getHeader().enabled && isBlank(passNamePrefix) ) {
-            setupHeader();
-        }
-        
         Element body = (Element)bodies.get(0);
         if (stylesheet.getGeneralSettings().generateTOC) {
             makeTOCPage(body);
         }
 
+        if (stylesheet.getPageStyle().getHeader().enabled && isBlank(passNamePrefix) ) {
+            setupHeader();
+        }
+        
         for (int i = 0; i < bodies.size(); ++i) {
             body = (Element) bodies.get(i);
             bodyIndex = i;
@@ -1216,7 +1216,7 @@ public class FB2toPDF {
     
     private class HeaderRefresher extends PdfPageEventHelper {
         @Override
-        public void onEndPage(PdfWriter writer, Document document) {
+        public void onStartPage(PdfWriter writer, Document document) {
             try {
                 refreshHeader();
             } catch (Exception ex) {
