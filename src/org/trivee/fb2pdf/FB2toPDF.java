@@ -12,6 +12,7 @@ import com.itextpdf.text.Anchor;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.FootnoteLineImage;
@@ -173,7 +174,10 @@ public class FB2toPDF {
     private Map<Integer, PdfOutline> currentOutline = new HashMap<Integer, PdfOutline>();
     private ArrayList<BinaryAttachment> attachments = new ArrayList<BinaryAttachment>();
     private List<PdfTemplate> footnoteTemplates = new ArrayList<PdfTemplate>();
-
+    private HeaderHelper footerHelperOdd = null;
+    private HeaderHelper footerHelperEven = null;
+    private String chapterTitle = "";
+        
     private FB2toPDF(String fromName, String toName) {
         this.fromName = fromName;
         this.toName = toName;
@@ -291,12 +295,22 @@ public class FB2toPDF {
             query += "declare function fb:cut-right($string as xs:string?, $length as xs:integer) { replace(replace($string,concat('^(.{', $length, '}).+$'),'$1…'), '^(.*)\\W.*…', '$1…') }; ";
             query += "declare function fb:cut-left($string as xs:string?, $length as xs:integer) { replace(replace($string,concat('^.+(.{', $length, '})$'),'…$1'), '…\\w*\\W(.*)$', '…$1') }; ";
             query += slotSettings.query;
+            if (stylesheet.getPageStyle().getHeader().dynamic) {
+                query = replaceDynamicVariables(query);
+            }
             String txt = XQueryUtilities.getString(fb2.getRootElement(), stylesheet.getTransformationSettings(), query, " ");
             chunk.append(txt);
             table.addCell(new Phrase(chunk));
         } else {
             table.addCell("");
         }
+    }
+
+    private String replaceDynamicVariables(String txt) {
+        txt = txt.replaceAll("#pageNum", new Integer(writer.getPageNumber()+1).toString());
+        txt = txt.replaceAll("#chapterTitle", chapterTitle);
+
+        return txt;
     }
 
     private PdfPTable createHeaderTable(boolean odd) throws DocumentException, FB2toPDFException {
@@ -475,7 +489,7 @@ public class FB2toPDF {
             processDescription(description);
         }
         
-        if (stylesheet.getPageStyle().getHeader().enabled) {
+        if (stylesheet.getPageStyle().getHeader().enabled && isBlank(passNamePrefix) ) {
             setupHeader();
         }
         
@@ -1199,6 +1213,17 @@ public class FB2toPDF {
 
         closePDF();
     }
+    
+    private class HeaderRefresher extends PdfPageEventHelper {
+        @Override
+        public void onEndPage(PdfWriter writer, Document document) {
+            try {
+                refreshHeader();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
 
     private void setupHeader() throws FB2toPDFException, DocumentException, BadElementException {
         PdfPTable tableOdd = createHeaderTable(true);
@@ -1206,10 +1231,21 @@ public class FB2toPDF {
         float adjustedMargin =  doc.topMargin() + Math.max(tableOdd.getTotalHeight(), tableEven.getTotalHeight());
         stylesheet.getPageStyle().setMarginTop(adjustedMargin);
         doc.setMargins(doc.leftMargin(), doc.rightMargin(), adjustedMargin , doc.bottomMargin());
-        HeaderHelper footerHelperOdd = new HeaderHelper(doc, writer, tableOdd, HeaderHelper.ODD);
+        footerHelperOdd = new HeaderHelper(doc, writer, tableOdd, HeaderHelper.ODD);
         writer.setPageEvent(footerHelperOdd);
-        HeaderHelper footerHelperEven = new HeaderHelper(doc, writer, tableEven, HeaderHelper.EVEN);
+        footerHelperEven = new HeaderHelper(doc, writer, tableEven, HeaderHelper.EVEN);
         writer.setPageEvent(footerHelperEven);
+        
+        if (stylesheet.getPageStyle().getHeader().dynamic) {
+            writer.setPageEvent(new HeaderRefresher());
+        }
+    }
+    
+    private void refreshHeader() throws DocumentException, FB2toPDFException {
+        PdfPTable tableOdd = createHeaderTable(true);
+        PdfPTable tableEven = createHeaderTable(false);
+        footerHelperOdd.refresh(tableOdd);
+        footerHelperEven.refresh(tableEven);
     }
 
     private void fillFootnoteTemplates() throws IOException {
@@ -1500,6 +1536,12 @@ public class FB2toPDF {
 
     private void processBody(Element body)
             throws DocumentException, FB2toPDFException {
+        HeaderSettings header = stylesheet.getPageStyle().getHeader();
+        if (header.enabled && header.dynamic) {
+            chapterTitle = "";
+            refreshHeader();
+        }
+        
         currentStyle = stylesheet.getParagraphStyle("body");
 
         Elements children = body.getChildElements();
@@ -1612,6 +1654,14 @@ public class FB2toPDF {
             if (StringUtils.isNotBlank(bmk)) {
                 addBookmark(bmk, passNamePrefix + id, level);
             }
+        }
+        
+        HeaderSettings header = stylesheet.getPageStyle().getHeader();
+        if (header.enabled && header.dynamic && header.chapterLevel == level+1) {
+            String query = header.chapterTitle;
+            chapterTitle = XQueryUtilities.getString(section, stylesheet.getTransformationSettings(), query, " ");
+            System.out.println(String.format("Header chapter %s", chapterTitle));
+            refreshHeader();
         }
 
         processSectionContent(section, level);

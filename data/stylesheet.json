@@ -138,25 +138,32 @@
         backgroundImage: "",
         header: {          
             enabled: "false",
+            dynamic: "true",
+            chapterLevel: "1",
+            chapterTitle: "./title//*[not(@type) or @type != 'note']/text()",
             leftOdd:   {
                 enabled:        "true",
                 style:          "headerLeft",
                 border:         2, // TOP = 1; BOTTOM = 2; LEFT = 4; RIGHT = 8; NO_BORDER = 0; BOX = TOP + BOTTOM + LEFT + RIGHT;
                 borderColor:    "0x000000",
                 // There are predefined variables $bookTitle, $authorFullName, $authorLastName, $authorFirstLastName, $authorFirstInitialLastName, $authorAllInitialsLastName
+                // There are predefined dynamic variables #pageNum, #chapterTitle
                 // There are predefined custom functions fb:cut-right(string, length) fb:cut-left(string, length)
                 // There are standard xquery functions http://www.w3schools.com/xpath/xpath_functions.asp
                 //query:          "string-join(($authorFirstLastName, $bookTitle), ', ')" 
-                query:          "fb:cut-right($authorFirstLastName, 45)" 
+                query:          "fb:cut-right($authorFirstLastName, 30)" 
             },
             centerOdd: {
                 enabled:        "false"
             },
             rightOdd:  {
-                enabled:        "false"
+                enabled:        "true",
+                style:          "headerRight",
+                query:          "fb:cut-right($bookTitle, 30)"
             },
             leftEven:   {
-                enabled:        "false"
+                enabled:        "true",
+                query:          "fb:cut-right('#chapterTitle', 45)"
             },
             centerEven: {
                 enabled:        "false"
@@ -164,7 +171,7 @@
             rightEven:  {
                 enabled:        "true",
                 style:          "headerRight",
-                query:          "fb:cut-right($bookTitle, 45)"
+                query:          "'#pageNum'"
             }
         },
 

@@ -24,11 +24,19 @@ public class HeaderHelper extends PdfPageEventHelper {
     private Image image;
     private boolean firstPass = true;
     private Document doc;
+    private PdfWriter writer;
+    private PdfPTable table;
     private int oddOrEven;
 
     public HeaderHelper(Document doc, PdfWriter writer, PdfPTable table, int oddOrEven) throws BadElementException {
         this.doc = doc;
         this.oddOrEven = oddOrEven;
+        this.writer = writer;
+        this.table = table;
+        refresh(table);
+    }
+
+    public final void refresh(PdfPTable table) throws BadElementException {
         float templateWidth = doc.getPageSize().getWidth();
         float templateHight = doc.getPageSize().getHeight();
         PdfTemplate tp = PdfTemplate.createTemplate(writer, templateWidth, templateHight);

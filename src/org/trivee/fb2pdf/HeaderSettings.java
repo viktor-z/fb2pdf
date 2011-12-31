@@ -11,6 +11,9 @@ package org.trivee.fb2pdf;
 public class HeaderSettings {
 
     public boolean enabled;
+    public boolean dynamic = true;
+    public int chapterLevel = 1;
+    public String chapterTitle = "";
     public HeaderSlotSettings leftOdd = new HeaderSlotSettings();
     public HeaderSlotSettings centerOdd = new HeaderSlotSettings();
     public HeaderSlotSettings rightOdd = new HeaderSlotSettings();
