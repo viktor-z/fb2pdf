@@ -1578,7 +1578,7 @@ public class FB2toPDF {
         if (!currentOutline.containsKey(level)) {
             return null;
         }
-        System.out.println("Adding bookmark: " + transliterate(title));
+        System.out.println(String.format("Adding bookmark: %s to %s", transliterate(title), refname));
         PdfAction action = PdfAction.gotoLocalPage(refname, false);
         PdfOutline bookmark = new PdfOutline(currentOutline.get(level), action, transliterate(title), false);
         currentOutline.put(level + 1, bookmark);
@@ -1599,7 +1599,7 @@ public class FB2toPDF {
         if (isBlank(id)) {
             id = String.format("section%d", section.hashCode());
         }
-
+        
         if (!isBlank(id)) {
             addInvisibleAnchor(id);
         }
@@ -1608,7 +1608,7 @@ public class FB2toPDF {
             Nodes nodes = section.query("./fb:title//*[not(@type) or @type != 'note']/text()", xCtx);
             String bmk = getTextContent(nodes, " ", null);
             if (StringUtils.isNotBlank(bmk)) {
-                addBookmark(bmk, id, level);
+                addBookmark(bmk, passNamePrefix + id, level);
             }
         }
 
