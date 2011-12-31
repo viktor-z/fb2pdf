@@ -1,6 +1,7 @@
 ﻿{
     generalSettings: {
         //secondPassStylesheet:   "./data/stylesheet2.json",
+        enableDoubleRenderingOutline:   "true",
         bodiesToRender:   "//body",
         //bodiesToRender:   "//body[empty(@name) or @name != 'notes']",
         generateTOC:	"true",

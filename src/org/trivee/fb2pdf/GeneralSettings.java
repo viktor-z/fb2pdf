@@ -33,6 +33,7 @@ public class GeneralSettings {
     public int linkPageNumMax = 9999;
     public String bodiesToRender = "//body";
     public boolean fullCompression = false;
+    boolean enableDoubleRenderingOutline = true;
 
     public GeneralSettings()
     {

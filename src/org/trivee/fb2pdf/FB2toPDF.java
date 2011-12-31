@@ -150,6 +150,7 @@ public class FB2toPDF {
     private Nodes bodies;
     private Paragraph currentParagraph;
     private String secondPassStylesheet;
+    private boolean enableDoubleRenderingOutline;
     private int currentElementHash;
     private PdfOutline fontChangeOutline;
     private String passNamePrefix = "";
@@ -1014,7 +1015,7 @@ public class FB2toPDF {
             }
         }
         
-        if (!isBlank(generalSettings.secondPassStylesheet)){
+        if (!isBlank(generalSettings.secondPassStylesheet) && generalSettings.enableDoubleRenderingOutline){
             writer.setPageEvent(new PageElementMapHelper());
         }
         
@@ -1040,7 +1041,7 @@ public class FB2toPDF {
         
         fillFootnoteTemplates();
     
-        if (!isBlank(secondPassStylesheet)){
+        if (!isBlank(secondPassStylesheet) && enableDoubleRenderingOutline){
             addFontChangeOutline();
         }
 
@@ -1173,8 +1174,9 @@ public class FB2toPDF {
         }
         
         secondPassStylesheet = stylesheet.getGeneralSettings().secondPassStylesheet;
+        enableDoubleRenderingOutline = stylesheet.getGeneralSettings().enableDoubleRenderingOutline;
 
-        if (!isBlank(secondPassStylesheet)){
+        if (!isBlank(secondPassStylesheet) && enableDoubleRenderingOutline){
             fontChangeOutline = addBookmark("Switch style from page...", 0);
             pageElementMap = pageElementMap1;
             elementPageMap = elementPageMap1;
