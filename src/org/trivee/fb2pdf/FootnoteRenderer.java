@@ -205,17 +205,37 @@ public class FootnoteRenderer {
         fontSize = noteStyle.getFontSize().getPoints();
         basefont = noteStyle.getBaseFont();
         cutMarkerWidth = basefont.getWidthPointKerned("  <…> ", fontSize);
-        float ascent = basefont.getFontDescriptor(BaseFont.ASCENT, fontSize);
-        float descent = basefont.getFontDescriptor(BaseFont.DESCENT, fontSize);
-        float pageHeight = Math.max(ascent - descent, noteStyle.getAbsoluteLeading());
+        float ascdesc = getAscDesc();
+        float pageHeight = Math.max(ascdesc, noteStyle.getAbsoluteLeading());
         pageSize = new Rectangle(pageWidth, pageHeight);
         
-        float delta = noteStyle.getAbsoluteLeading() - (ascent - descent);
+        float delta = noteStyle.getAbsoluteLeading() - ascdesc;
         topMargin = (delta > 0) ? delta : 0;
 
         //pageSize.setBackgroundColor(BaseColor.LIGHT_GRAY);
         //pageSize.setBorder(Rectangle.BOX);
         //pageSize.setBorderColor(BaseColor.DARK_GRAY);
+    }
+
+    private static float getAscDesc() throws FB2toPDFException {
+        
+        FontFamily family = noteStyle.getFontFamily();
+        BaseFont[] fonts = {
+            family.getRegularFont(), 
+            family.getBoldFont(),
+            family.getItalicFont(),
+            family.getBoldItalicFont()
+        };
+        
+        float ascdesc = -999;
+        
+        for (BaseFont font: fonts) {
+            float ascent = font.getFontDescriptor(BaseFont.ASCENT, fontSize);
+            float descent = font.getFontDescriptor(BaseFont.DESCENT, fontSize);
+            ascdesc = Math.max(ascdesc, ascent - descent);
+        }
+        
+        return ascdesc;
     }
 
     private static class PageEvents extends PdfPageEventHelper {
