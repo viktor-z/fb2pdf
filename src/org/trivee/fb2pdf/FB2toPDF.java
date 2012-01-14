@@ -1657,7 +1657,7 @@ public class FB2toPDF {
         }
         
         HeaderSettings header = stylesheet.getPageStyle().getHeader();
-        if (header.enabled && header.dynamic && header.chapterLevel == level+1) {
+        if (header.enabled && header.dynamic) {
             String query = header.chapterTitle;
             chapterTitle = XQueryUtilities.getString(section, stylesheet.getTransformationSettings(), query, " ");
             System.out.println(String.format("Header chapter %s", chapterTitle));

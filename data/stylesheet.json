@@ -139,8 +139,8 @@
         header: {          
             enabled: "false",
             dynamic: "true",
-            chapterLevel: "1",
-            chapterTitle: "./title//*[not(@type) or @type != 'note']/text()",
+            //chapterTitle: "string-join(ancestor-or-self::section/title[.//text()[matches(., '[^\\d\\s]')]]//*[name()!='a']/text(), '. ')",
+            chapterTitle: "string-join(ancestor-or-self::section/title//*[name()!='a']/text(), '. ')",
             leftOdd:   {
                 enabled:        "true",
                 style:          "headerLeft",
