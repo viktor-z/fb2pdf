@@ -1146,16 +1146,20 @@ public class FB2toPDF {
         secondPassStylesheet = stylesheet.getGeneralSettings().secondPassStylesheet;
         enableDoubleRenderingOutline = stylesheet.getGeneralSettings().enableDoubleRenderingOutline;
 
-        if (!isBlank(secondPassStylesheet) && enableDoubleRenderingOutline){
-            fontChangeOutline = addBookmark("Switch style from page...", 0);
-            pageElementMap = pageElementMap1;
-            elementPageMap = elementPageMap1;
+        if (!isBlank(secondPassStylesheet)) {
+            if (enableDoubleRenderingOutline) {
+                fontChangeOutline = addBookmark("Switch style from page...", 0);
+                pageElementMap = pageElementMap1;
+                elementPageMap = elementPageMap1;
+            }
+            addBookmark("Pass 1", 0);
         }
 
         renderBook(description);
 
         if (!isBlank(secondPassStylesheet)){
             passNamePrefix = "secondPass_";
+            addBookmark("Pass 2", 0);
             stylesheet = Stylesheet.readStylesheet(Utilities.getValidatedFileName(secondPassStylesheet));
             doc.setPageSize(getPageSize());
             if (stylesheet.getPageStyle().footnotes) {
@@ -1586,6 +1590,9 @@ public class FB2toPDF {
     }
 
     private PdfOutline addBookmark(String title, String refname, int level) {
+        if (!isBlank(secondPassStylesheet)) {
+            level += 1;
+        }
         if (!currentOutline.containsKey(level)) {
             return null;
         }
