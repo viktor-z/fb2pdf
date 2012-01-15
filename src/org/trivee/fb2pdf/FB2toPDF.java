@@ -138,8 +138,8 @@ public class FB2toPDF {
     private Map<Integer, PdfOutline> currentOutline = new HashMap<Integer, PdfOutline>();
     private ArrayList<BinaryAttachment> attachments = new ArrayList<BinaryAttachment>();
     private List<PdfTemplate> footnoteTemplates = new ArrayList<PdfTemplate>();
-    private HeaderHelper footerHelperOdd = null;
-    private HeaderHelper footerHelperEven = null;
+    private HeaderHelper headerHelperOdd = null;
+    private HeaderHelper headerHelperEven = null;
     private String chapterTitle = "";
     private BackgroundImageHelper backgroundImageHelper;
         
@@ -450,7 +450,7 @@ public class FB2toPDF {
     }
 
     private void renderBook(Element description) throws FB2toPDFException, IOException, DocumentException {
-
+        
         if (description != null) {
             setupHyphenation(description);
             processDescription(description);
@@ -942,7 +942,7 @@ public class FB2toPDF {
         
         addFontChangeOutlineItem(curOutline, maxPageNumLength-1, srcpageLabel, destpage);
     }
-    
+
     private class PageElementMapHelper extends PdfPageEventHelper {
         
         @Override
@@ -1202,10 +1202,10 @@ public class FB2toPDF {
         float adjustedMargin =  doc.topMargin() + Math.max(tableOdd.getTotalHeight(), tableEven.getTotalHeight());
         stylesheet.getPageStyle().setMarginTop(adjustedMargin);
         doc.setMargins(doc.leftMargin(), doc.rightMargin(), adjustedMargin , doc.bottomMargin());
-        footerHelperOdd = new HeaderHelper(doc, writer, tableOdd, HeaderHelper.ODD);
-        writer.setPageEvent(footerHelperOdd);
-        footerHelperEven = new HeaderHelper(doc, writer, tableEven, HeaderHelper.EVEN);
-        writer.setPageEvent(footerHelperEven);
+        headerHelperOdd = new HeaderHelper(doc, writer, tableOdd, HeaderHelper.ODD);
+        writer.setPageEvent(headerHelperOdd);
+        headerHelperEven = new HeaderHelper(doc, writer, tableEven, HeaderHelper.EVEN);
+        writer.setPageEvent(headerHelperEven);
         
         if (stylesheet.getPageStyle().getHeader().dynamic) {
             writer.setPageEvent(new HeaderRefresher());
@@ -1215,10 +1215,10 @@ public class FB2toPDF {
     private void refreshHeader() throws DocumentException, FB2toPDFException {
         PdfPTable tableOdd = createHeaderTable(true);
         PdfPTable tableEven = createHeaderTable(false);
-        footerHelperOdd.refresh(tableOdd);
-        footerHelperEven.refresh(tableEven);
+        headerHelperOdd.refresh(tableOdd);
+        headerHelperEven.refresh(tableEven);
     }
-
+    
     private void fillFootnoteTemplates() throws IOException {
         
         if (!stylesheet.getPageStyle().footnotes) return;
