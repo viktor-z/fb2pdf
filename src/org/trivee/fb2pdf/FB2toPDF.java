@@ -1167,6 +1167,9 @@ public class FB2toPDF {
             }
             pageElementMap = pageElementMap2;
             elementPageMap = elementPageMap2;
+            doc.newPage();
+            writer.setPageEmpty(false);
+            doc.newPage();
 
             renderBook(description);
         }
