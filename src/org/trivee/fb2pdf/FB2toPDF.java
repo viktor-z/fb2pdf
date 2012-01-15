@@ -450,8 +450,12 @@ public class FB2toPDF {
             makeTOCPage(body);
         }
 
-        if (stylesheet.getPageStyle().getHeader().enabled && isBlank(passNamePrefix) ) {
-            setupHeader();
+        if (stylesheet.getPageStyle().getHeader().enabled) {
+            if (isBlank(passNamePrefix)) {
+                setupHeader();
+            } else {
+                refreshHeader();
+            }
         }
         
         for (int i = 0; i < bodies.size(); ++i) {
