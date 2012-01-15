@@ -4,10 +4,13 @@
  */
 package org.trivee.fb2pdf;
 
+import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Image;
+import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
+import java.io.IOException;
 
 /**
  *
@@ -17,8 +20,12 @@ public class BackgroundImageHelper extends PdfPageEventHelper {
 
     private Image image;
 
-    public BackgroundImageHelper(Image image) {
-        this.image = image;
+    protected final void init(Stylesheet stylesheet, Rectangle pageSize) throws IOException, BadElementException {
+        String imagePath = stylesheet.getPageStyle().backgroundImage;
+        float dpi = stylesheet.getGeneralSettings().imageDpi;
+        Image img = Image.getInstance(Utilities.getValidatedFileName(imagePath));
+        Utilities.rescaleImage(img, 1.0f, 0, 0, pageSize, dpi);
+        this.image = img;
     }
 
     @Override

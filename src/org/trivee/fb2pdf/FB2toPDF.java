@@ -141,10 +141,21 @@ public class FB2toPDF {
     private HeaderHelper footerHelperOdd = null;
     private HeaderHelper footerHelperEven = null;
     private String chapterTitle = "";
+    private BackgroundImageHelper backgroundImageHelper;
         
     private FB2toPDF(String fromName, String toName) {
         this.fromName = fromName;
         this.toName = toName;
+    }
+
+    protected void setupBackgroundImage() throws FB2toPDFException {
+        try {
+            backgroundImageHelper = new BackgroundImageHelper();
+            backgroundImageHelper.init(stylesheet, doc.getPageSize());
+            writer.setPageEvent(backgroundImageHelper);
+        } catch (Exception ex) {
+            throw new FB2toPDFException(ex.getMessage());
+        }
     }
 
     private void addAnchor(String anchorName) throws FB2toPDFException {
@@ -469,15 +480,7 @@ public class FB2toPDF {
     private void rescaleImage(Image image, float zoomFactor, float wSpace, float hSpace) {
         Rectangle pageSize = doc.getPageSize();
         float dpi = stylesheet.getGeneralSettings().imageDpi;
-        float scaleWidth = pageSize.getWidth() - wSpace;
-        float scaleHeight = pageSize.getHeight() - hSpace;
-        float imgWidth = image.getWidth() / dpi * 72 * zoomFactor;
-        float imgHeight = image.getHeight() / dpi * 72 * zoomFactor;
-        if ((imgWidth <= scaleWidth) && (imgHeight <= scaleHeight)) {
-            scaleWidth = imgWidth;
-            scaleHeight = imgHeight;
-        }
-        image.scaleToFit(scaleWidth, scaleHeight);
+        Utilities.rescaleImage(image, zoomFactor, wSpace, hSpace, pageSize, dpi);
     }
 
     private void saveLinkPageNumber(String currentAnchorName) {
@@ -958,7 +961,7 @@ public class FB2toPDF {
     }
     
     private void createPDFDoc()
-            throws DocumentException, FileNotFoundException {
+            throws DocumentException, FileNotFoundException, FB2toPDFException {
         final GeneralSettings generalSettings = stylesheet.getGeneralSettings();
 
         final PageStyle pageStyle = stylesheet.getPageStyle();
@@ -977,16 +980,9 @@ public class FB2toPDF {
             pageSizeEnforceHelper.pageSizeEnforcerColor = Color.decode(pageStyle.pageSizeEnforcerColor);
             writer.setPageEvent(pageSizeEnforceHelper);
         }
-        
+
         if (!isBlank(pageStyle.backgroundImage)){
-            try {
-                Image image = Image.getInstance(Utilities.getValidatedFileName(pageStyle.backgroundImage));
-                rescaleImage(image, 1.0f, 0, 0);
-                BackgroundImageHelper backgroundImageHelper = new BackgroundImageHelper(image);
-                writer.setPageEvent(backgroundImageHelper);
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
+            setupBackgroundImage();
         }
         
         if (!isBlank(generalSettings.secondPassStylesheet) && generalSettings.enableDoubleRenderingOutline){
@@ -1165,8 +1161,16 @@ public class FB2toPDF {
             if (stylesheet.getPageStyle().footnotes) {
                 FootnoteRenderer.reinit(stylesheet);
             }
+            if (!isBlank(stylesheet.getPageStyle().backgroundImage)){
+                if (backgroundImageHelper == null) {
+                    setupBackgroundImage();
+                } else {
+                    backgroundImageHelper.init(stylesheet, doc.getPageSize());
+                }
+            }
             pageElementMap = pageElementMap2;
             elementPageMap = elementPageMap2;
+            
             doc.newPage();
             writer.setPageEmpty(false);
             doc.newPage();

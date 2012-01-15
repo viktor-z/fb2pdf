@@ -1,6 +1,8 @@
 package org.trivee.fb2pdf;
 
 import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Rectangle;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
@@ -35,4 +37,15 @@ public class Utilities {
         return new BaseColor(Color.decode(c));
     }
 
+    public static void rescaleImage(Image image, float zoomFactor, float wSpace, float hSpace, Rectangle pageSize, float dpi) {
+        float scaleWidth = pageSize.getWidth() - wSpace;
+        float scaleHeight = pageSize.getHeight() - hSpace;
+        float imgWidth = image.getWidth() / dpi * 72 * zoomFactor;
+        float imgHeight = image.getHeight() / dpi * 72 * zoomFactor;
+        if ((imgWidth <= scaleWidth) && (imgHeight <= scaleHeight)) {
+            scaleWidth = imgWidth;
+            scaleHeight = imgHeight;
+        }
+        image.scaleToFit(scaleWidth, scaleHeight);
+    }
 }
