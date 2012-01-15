@@ -1,52 +1,16 @@
 package org.trivee.fb2pdf;
 
-import java.io.*;
-import java.net.MalformedURLException;
-import java.util.StringTokenizer;
-import nu.xom.ParsingException;
-import nu.xom.Element;
-
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.BadElementException;
-import com.itextpdf.text.Anchor;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.FootnoteLineImage;
-import com.itextpdf.text.Phrase;
-
-import com.itextpdf.text.pdf.BaseFont;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.text.pdf.PdfAction;
-
-import com.itextpdf.text.pdf.PdfDestination;
-import com.itextpdf.text.pdf.PdfDocument;
-import com.itextpdf.text.pdf.PdfImportedPage;
-import com.itextpdf.text.pdf.PdfOutline;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfPageEventHelper;
-import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.PdfTemplate;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
 import java.awt.Color;
 import java.awt.Toolkit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.io.*;
+import java.net.MalformedURLException;
 import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-import nu.xom.Builder;
-import nu.xom.Elements;
-import nu.xom.Node;
-import nu.xom.Nodes;
-import nu.xom.ParentNode;
-import nu.xom.Text;
-import nu.xom.XPathContext;
+import java.util.*;
+import nu.xom.Element;
+import nu.xom.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.tools.zip.ZipEntry;
@@ -336,26 +300,18 @@ public class FB2toPDF {
     }
 
     private Map<String, Integer> getCellHAlignmentMap() {
-        Map<String, Integer> hAlignMap = new HashMap<String, Integer>() {
-
-            {
-                put("center", PdfPCell.ALIGN_CENTER);
-                put("left", PdfPCell.ALIGN_LEFT);
-                put("right", PdfPCell.ALIGN_RIGHT);
-            }
-        };
+        Map<String, Integer> hAlignMap = new HashMap<String, Integer>();
+        hAlignMap.put("center", PdfPCell.ALIGN_CENTER);
+        hAlignMap.put("left", PdfPCell.ALIGN_LEFT);
+        hAlignMap.put("right", PdfPCell.ALIGN_RIGHT);
         return hAlignMap;
     }
 
     private Map<String, Integer> getCellVAlignmentMap() {
-        Map<String, Integer> vAlignMap = new HashMap<String, Integer>() {
-
-            {
-                put("middle", PdfPCell.ALIGN_MIDDLE);
-                put("top", PdfPCell.ALIGN_TOP);
-                put("bottom", PdfPCell.ALIGN_BOTTOM);
-            }
-        };
+        Map<String, Integer> vAlignMap = new HashMap<String, Integer>();
+        vAlignMap.put("middle", PdfPCell.ALIGN_MIDDLE);
+        vAlignMap.put("top", PdfPCell.ALIGN_TOP);
+        vAlignMap.put("bottom", PdfPCell.ALIGN_BOTTOM);
         return vAlignMap;
     }
 
@@ -445,7 +401,7 @@ public class FB2toPDF {
                     continue;
                 }
 
-                Element cellElement = (Element) cols.get(j);
+                Element cellElement = cols.get(j);
                 int length = cellElement.getValue().length();
                 
                 int colspan = getCellElementSpan(cellElement, "colspan");
@@ -660,7 +616,7 @@ public class FB2toPDF {
 
             PdfTemplate cutImg = PdfTemplate.createTemplate(writer, 100, pageHeight);
             for (int i = 1; i <= numPages; i++) {
-                Image image = null;
+                Image image;
                 
                 PdfTemplate tmp = PdfTemplate.createTemplate(writer, pageWidth, pageHeight);
                 if (numLines < numPages && i == numLines) {
@@ -733,7 +689,7 @@ public class FB2toPDF {
                 if (nodeName.equalsIgnoreCase("th")) {
                     currentStyle = stylesheet.getParagraphStyle("tableTH");
                 }
-                Element cellElement = (Element) cols.get(j);
+                Element cellElement = cols.get(j);
                 currentParagraph = currentStyle.createParagraph();
                 if (i == 0 && j == 0) {
                     addInvisibleAnchor(table);
