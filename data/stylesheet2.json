@@ -138,6 +138,7 @@
         header: {          
             enabled: "false",
             dynamic: "true",
+            //chapterTitle: "(ancestor-or-self::section)[2]/title//*[name()!='a']/text()", 
             //chapterTitle: "string-join(ancestor-or-self::section/title[.//text()[matches(., '[^\\d\\s]')]]//*[name()!='a']/text(), '. ')",
             chapterTitle: "replace(string-join(ancestor-or-self::section/title//*[name()!='a']/text(), '. '), '([^\\s\\w])\\. ', '$1 ')",
             leftOdd:   {
