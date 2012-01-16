@@ -258,18 +258,19 @@ public class FB2toPDF {
         if (slotSettings.enabled) {
             Chunk chunk = slotStyle.createChunk();
            
-            String query = "";
-            query += "declare namespace fb = 'http://www.fb2pdf.com'; "; 
-            query += "declare variable $bookTitle := //title-info/book-title; ";
-            query += "declare variable $author := //title-info/author; ";
-            query += "declare variable $authorFullName := string-join($author/string-join((first-name, middle-name, last-name), ' '), ', '); ";
-            query += "declare variable $authorLastName := string-join($author/last-name, ', '); ";
-            query += "declare variable $authorFirstLastName := string-join($author/string-join((first-name, last-name), ' '), ', '); ";
-            query += "declare variable $authorFirstInitialLastName := string-join($author/string-join((substring(first-name, 1, 1), last-name), '. '), ', '); ";
-            query += "declare variable $authorAllInitialsLastName := string-join($author/string-join((substring(first-name, 1, 1), substring(middle-name, 1, 1), last-name), '. '), ', '); ";
-            query += "declare function fb:cut-right($string as xs:string?, $length as xs:integer) { replace(replace($string,concat('^(.{', $length, '}).+$'),'$1…'), '^(.*)\\W.*…', '$1…') }; ";
-            query += "declare function fb:cut-left($string as xs:string?, $length as xs:integer) { replace(replace($string,concat('^.+(.{', $length, '})$'),'…$1'), '…\\w*\\W(.*)$', '…$1') }; ";
-            query += slotSettings.query;
+            StringBuilder queryBuilder = new StringBuilder();
+            queryBuilder.append("declare namespace fb = 'http://www.fb2pdf.com'; "); 
+            queryBuilder.append("declare variable $bookTitle := //title-info/book-title; "); 
+            queryBuilder.append("declare variable $author := //title-info/author; "); 
+            queryBuilder.append("declare variable $authorFullName := string-join($author/string-join((first-name, middle-name, last-name), ' '), ', '); "); 
+            queryBuilder.append("declare variable $authorLastName := string-join($author/last-name, ', '); "); 
+            queryBuilder.append("declare variable $authorFirstLastName := string-join($author/string-join((first-name, last-name), ' '), ', '); "); 
+            queryBuilder.append("declare variable $authorFirstInitialLastName := string-join($author/string-join((substring(first-name, 1, 1), last-name), '. '), ', '); "); 
+            queryBuilder.append("declare variable $authorAllInitialsLastName := string-join($author/string-join((substring(first-name, 1, 1), substring(middle-name, 1, 1), last-name), '. '), ', '); "); 
+            queryBuilder.append("declare function fb:cut-right($string as xs:string?, $length as xs:integer) { replace(replace($string,concat('^(.{', $length, '}).+$'),'$1…'), '^(.*)\\W.*…', '$1…') }; "); 
+            queryBuilder.append("declare function fb:cut-left($string as xs:string?, $length as xs:integer) { replace(replace($string,concat('^.+(.{', $length, '})$'),'…$1'), '…\\w*\\W(.*)$', '…$1') }; "); 
+            queryBuilder.append(slotSettings.query); 
+            String query = queryBuilder.toString();
             if (stylesheet.getPageStyle().getHeader().dynamic) {
                 query = replaceDynamicVariables(query);
             }
@@ -283,7 +284,7 @@ public class FB2toPDF {
 
     private String replaceDynamicVariables(String txt) {
         txt = txt.replaceAll("#pageNum", new Integer(writer.getPageNumber()).toString());
-        txt = txt.replaceAll("#chapterTitle", chapterTitle);
+        txt = txt.replaceAll("#chapterTitle", chapterTitle.replace("'", "''"));
 
         return txt;
     }
