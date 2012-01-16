@@ -147,7 +147,7 @@
                 border:         2, // TOP = 1; BOTTOM = 2; LEFT = 4; RIGHT = 8; NO_BORDER = 0; BOX = TOP + BOTTOM + LEFT + RIGHT;
                 borderColor:    "0x000000",
                 // There are predefined variables $bookTitle, $authorFullName, $authorLastName, $authorFirstLastName, $authorFirstInitialLastName, $authorAllInitialsLastName
-                // There are predefined dynamic variables #pageNum, #chapterTitle
+                // There are predefined dynamic variables $pageNum, $chapterTitle
                 // There are predefined custom functions fb:cut-right(string, length) fb:cut-left(string, length)
                 // There are standard xquery functions http://www.w3schools.com/xpath/xpath_functions.asp
                 //query:          "string-join(($authorFirstLastName, $bookTitle), ', ')" 
@@ -163,7 +163,7 @@
             },
             leftEven:   {
                 enabled:        "true",
-                query:          "fb:cut-right('#chapterTitle', 45)"
+                query:          "fb:cut-right($chapterTitle, 45)"
             },
             centerEven: {
                 enabled:        "false"
@@ -171,7 +171,7 @@
             rightEven:  {
                 enabled:        "true",
                 style:          "headerRight",
-                query:          "'#pageNum'"
+                query:          "$pageNum"
             }
         },
 

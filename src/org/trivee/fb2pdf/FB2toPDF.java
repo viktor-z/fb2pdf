@@ -269,11 +269,9 @@ public class FB2toPDF {
             queryBuilder.append("declare variable $authorAllInitialsLastName := string-join($author/string-join((substring(first-name, 1, 1), substring(middle-name, 1, 1), last-name), '. '), ', '); "); 
             queryBuilder.append("declare function fb:cut-right($string as xs:string?, $length as xs:integer) { replace(replace($string,concat('^(.{', $length, '}).+$'),'$1…'), '^(.*)\\W.*…', '$1…') }; "); 
             queryBuilder.append("declare function fb:cut-left($string as xs:string?, $length as xs:integer) { replace(replace($string,concat('^.+(.{', $length, '})$'),'…$1'), '…\\w*\\W(.*)$', '…$1') }; "); 
+            declareDynamicVariables(queryBuilder);
             queryBuilder.append(slotSettings.query); 
             String query = queryBuilder.toString();
-            if (stylesheet.getPageStyle().getHeader().dynamic) {
-                query = replaceDynamicVariables(query);
-            }
             String txt = XQueryUtilities.getString(fb2.getRootElement(), stylesheet.getTransformationSettings(), query, " ");
             chunk.append(txt);
             table.addCell(new Phrase(chunk));
@@ -282,11 +280,14 @@ public class FB2toPDF {
         }
     }
 
-    private String replaceDynamicVariables(String txt) {
-        txt = txt.replaceAll("#pageNum", new Integer(writer.getPageNumber()).toString());
-        txt = txt.replaceAll("#chapterTitle", chapterTitle.replace("'", "''"));
-
-        return txt;
+    private void declareDynamicVariables(StringBuilder queryBuilder) {
+        if (stylesheet.getPageStyle().getHeader().dynamic) {
+            queryBuilder.append(String.format("declare variable $pageNum := '%s'; ", new Integer(writer.getPageNumber())));
+            queryBuilder.append(String.format("declare variable $chapterTitle := '%s'; ", chapterTitle.replace("'", "''")));
+        } else {
+            queryBuilder.append("declare variable $pageNum := '$pageNum'; ");
+            queryBuilder.append("declare variable $chapterTitle := '$chapterTitle'; ");
+        }
     }
 
     private PdfPTable createHeaderTable(boolean odd) throws DocumentException, FB2toPDFException {
