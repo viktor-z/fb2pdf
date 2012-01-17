@@ -1263,10 +1263,14 @@ public class FB2toPDF {
             return Base64.decodeBase64(this.binary.getValue().getBytes());
         }
         
-        public Image getImage(String overrideTransparency, boolean cacheImage) throws BadElementException, MalformedURLException, IOException {
+        public Image getImage(boolean makeGrayImageTransparent, String overrideTransparency, boolean cacheImage) throws BadElementException, MalformedURLException, IOException {
             Image tmp = image;
             if (tmp == null) {
-                if (overrideTransparency == null || overrideTransparency.isEmpty()) {
+
+                if (makeGrayImageTransparent) {
+                    java.awt.Image img = Utilities.makeGrayTransparent(getData());
+                    tmp = Image.getInstance(img, null);
+                } else if (overrideTransparency == null || overrideTransparency.isEmpty()) {
                     tmp = Image.getInstance(getData());
                 } else {
                     Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -1496,8 +1500,9 @@ public class FB2toPDF {
             }
             try {
                 String overrideTransparency = stylesheet.getGeneralSettings().overrideImageTransparency;
+                boolean makeGrayImageTransparent = stylesheet.getGeneralSettings().makeGrayImageTransparent;
                 boolean cacheImage = stylesheet.getGeneralSettings().cacheImages;
-                return attachment.getImage(overrideTransparency, cacheImage);
+                return attachment.getImage(makeGrayImageTransparent, overrideTransparency, cacheImage);
             } catch (Exception ex) {
                 System.out.println(ex);
                 return null;

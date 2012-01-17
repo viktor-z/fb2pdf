@@ -4,6 +4,11 @@ import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Rectangle;
 import java.awt.Color;
+import java.awt.Toolkit;
+import java.awt.image.FilteredImageSource;
+import java.awt.image.ImageFilter;
+import java.awt.image.ImageProducer;
+import java.awt.image.RGBImageFilter;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -48,4 +53,26 @@ public class Utilities {
         }
         image.scaleToFit(scaleWidth, scaleHeight);
     }
+
+    public static java.awt.Image makeGrayTransparent(byte[] imageData) {
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        java.awt.Image img = toolkit.createImage(imageData);
+        ImageFilter filter = new RGBImageFilter() {
+
+                public final int filterRGB(int x, int y, int rgb)
+                {
+                    int r = (rgb & 0xFF0000) >> 16;
+                    int g = (rgb & 0xFF00) >> 8;
+                    int b = rgb & 0xFF;
+                    if (r == g && g == b) {
+                        return ((0xFF - r) << 24) & 0xFF000000;
+                    }
+                    return rgb;
+                }        
+        };
+
+        ImageProducer ip = new FilteredImageSource(img.getSource(), filter);
+        return toolkit.createImage(ip);
+    }
+
 }

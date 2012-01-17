@@ -19,6 +19,7 @@
         fullCompression: "false",
         trackingSpaceCharRatio: 10000000, //Inter-character spacing disabled with 10000000
         overrideImageTransparency: "",
+        makeGrayImageTransparent: "false",
         cacheImages:    "false",
         ignoreEmptyLineBeforeImage: "true",
         ignoreEmptyLineAfterImage: "true",
