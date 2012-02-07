@@ -1,0 +1,8 @@
+<Window title="fb2pdf-j" maximized="true" bxml:id="main"
+    xmlns:bxml="http://pivot.apache.org/bxml"
+    xmlns="org.apache.pivot.wtk" WindowStateListener.windowOpened="mainWindowOpened(arguments[0])">
+    <bxml:script src="main.js"/>
+    <Label text="Drop files here" 
+           styles="{font: 'Arial BOLD 24', horizontalAlignment: 'CENTER', verticalAlignment: 'CENTER'}" 
+           dropTarget="$dropTarget"/>
+</Window>
