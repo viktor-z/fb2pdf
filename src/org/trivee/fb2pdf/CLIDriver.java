@@ -56,9 +56,13 @@ public class CLIDriver {
         }
         return f.getAbsolutePath();
     }
+    
+    public static String getImplementationVersion() {
+        return CLIDriver.class.getPackage().getImplementationVersion();
+    }
 
     private static void printNameVersion() {
-        String id = CLIDriver.class.getPackage().getImplementationVersion();
+        String id = getImplementationVersion();
         id = id == null ? "" : "fb2pdf-j." + id;
         System.out.println(id);
     }
