@@ -5,39 +5,52 @@ importClass(org.trivee.fb2pdf.gui.Task);
 importClass(org.apache.pivot.util.concurrent.TaskListener);
 importClass(org.apache.pivot.wtk.TaskAdapter);
 
-function mainWindowOpened(window) {
-    println("fb2pdf-j UI started")
-    main.title = "fb2pdf-j " + CLIDriver.getImplementationVersion();
-}
-
-function processFile(file) {
+function processFile(file, fileList) {
     var path = file.getPath(); 
     if (path.endsWith(".fb2") || path.endsWith(".fb2.zip")) {
-        runFb2Pdf([path]);
+        runFb2Pdf([path], fileList);
     } else {
-        //println("Skipping " + path);
+        println("Skipping " + path);
+        processFileList(fileList);
     }
 }
 
-function processDirectory(dir) {
+function processDirectory(dir, fileList) {
     var path = dir.getPath(); 
-    runFb2Pdf(["-r", path]);
+    runFb2Pdf(["-r", path], fileList);
 }
 
-function processFileOrDirectory(file) {
+function processFileList(fileList) {
+    if (!fileList || fileList.length < 1) {
+        hideActivityIndicator();
+        println("End time: " + new Date() + '\n');
+        return; 
+    }
+    var file = fileList.pop();
     if (file.isDirectory()) {
-        processDirectory(file);
+        processDirectory(file, fileList);
     } else {
-        processFile(file);
+        processFile(file, fileList);
     }
 }
 
-function runFb2Pdf(params) {
+function runFb2Pdf(params, fileList) {
+
+
+    var taskListener = new TaskListener() {
+
+        taskExecuted: function(task) {
+            processFileList(fileList);
+        },
+     
+        executeFailed: function(task) {
+            println(task.getFault());
+            processFileList(fileList);
+        }
+    };
     var task = new Task(function(){
         CLIDriver.main(params);
     });
-    hideActivityIndicator();
-    println("Start time: " + new Date());
     task.execute(new TaskAdapter(taskListener));
 }
 
@@ -62,12 +75,15 @@ var dropTarget = new DropTarget() {
         var dropAction = null;
  
         if (dragContent.containsFileList()) {
+            var fileList = [];
             var it = dragContent.getFileList().iterator();
             while (it.hasNext()) {
-                var file = it.next();
-                processFileOrDirectory(file);
+                fileList.push(it.next());
             }
-            dropAction = DropAction.COPY;
+           showActivityIndicator();
+           println("Start time: " + new Date());
+           processFileList(fileList);
+           dropAction = DropAction.COPY;
         }
  
         return dropAction;
@@ -75,27 +91,19 @@ var dropTarget = new DropTarget() {
 };
 
 function showActivityIndicator() {
-    activityIndicator.setActive(false);
-    cardPane.setSelectedIndex(0);
-    main.setEnabled(true);
+    activityIndicator.setActive(true);
+    cardPane.setSelectedIndex(1);
+    main.setEnabled(false);
 }
 
 function hideActivityIndicator() {
-    main.setEnabled(false);    
-    activityIndicator.setActive(true);
-    cardPane.setSelectedIndex(1);
+    main.setEnabled(true);    
+    activityIndicator.setActive(false);
+    cardPane.setSelectedIndex(0);
 }
 
-var taskListener = new TaskListener() {
+function mainWindowOpened(window) {
+    println("fb2pdf-j UI started")
+    main.title = "fb2pdf-j " + CLIDriver.getImplementationVersion();
+}
 
-    taskExecuted: function(task) {
-        showActivityIndicator()
-        println("End time: " + new Date());
-    },
- 
-    executeFailed: function(task) {
-        showActivityIndicator()
-        println(task.getFault());
-        println("End time: " + new Date());
-    }
-};
