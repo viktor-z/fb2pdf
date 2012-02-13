@@ -1,16 +1,19 @@
 importPackage(org.apache.pivot.wtk);
 importClass(java.io.FileFilter);
+importClass(java.io.PrintStream);
 importClass(org.trivee.fb2pdf.CLIDriver);
 importClass(org.trivee.fb2pdf.gui.Task);
+importClass(org.trivee.fb2pdf.gui.TextAreaOutputStream);
 importClass(org.apache.pivot.util.concurrent.TaskListener);
 importClass(org.apache.pivot.wtk.TaskAdapter);
+importClass(java.lang.System);
 
 function processFile(file, fileList) {
     var path = file.getPath(); 
     if (path.endsWith(".fb2") || path.endsWith(".fb2.zip")) {
         runFb2Pdf([path], fileList);
     } else {
-        println("Skipping " + path);
+        System.out.println("Skipping " + path);
         processFileList(fileList);
     }
 }
@@ -23,7 +26,7 @@ function processDirectory(dir, fileList) {
 function processFileList(fileList) {
     if (!fileList || fileList.length < 1) {
         hideActivityIndicator();
-        println("End time: " + new Date() + '\n');
+        System.out.println("End time: " + new Date() + '\n');
         return; 
     }
     var file = fileList.pop();
@@ -44,7 +47,7 @@ function runFb2Pdf(params, fileList) {
         },
      
         executeFailed: function(task) {
-            println(task.getFault());
+            System.out.println(task.getFault());
             processFileList(fileList);
         }
     };
@@ -81,7 +84,7 @@ var dropTarget = new DropTarget() {
                 fileList.push(it.next());
             }
            showActivityIndicator();
-           println("Start time: " + new Date());
+           System.out.println("Start time: " + new Date());
            processFileList(fileList);
            dropAction = DropAction.COPY;
         }
@@ -93,17 +96,19 @@ var dropTarget = new DropTarget() {
 function showActivityIndicator() {
     activityIndicator.setActive(true);
     cardPane.setSelectedIndex(1);
-    main.setEnabled(false);
+    dropLabel.setEnabled(false);
 }
 
 function hideActivityIndicator() {
-    main.setEnabled(true);    
+    dropLabel.setEnabled(true);    
     activityIndicator.setActive(false);
     cardPane.setSelectedIndex(0);
 }
 
 function mainWindowOpened(window) {
-    println("fb2pdf-j UI started")
+    var consoleStream = new TextAreaOutputStream(console);
+    System.setOut(new PrintStream(consoleStream, true));
+    System.out.println("fb2pdf-j UI started")
     main.title = "fb2pdf-j " + CLIDriver.getImplementationVersion();
 }
 

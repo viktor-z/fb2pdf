@@ -1,11 +1,23 @@
 <Window title="fb2pdf-j" maximized="true" bxml:id="main"
     xmlns:bxml="http://pivot.apache.org/bxml"
-    xmlns="org.apache.pivot.wtk" WindowStateListener.windowOpened="mainWindowOpened(arguments[0])">
+    xmlns="org.apache.pivot.wtk" 
+    xmlns:fb2pdf="org.trivee.fb2pdf.gui" 
+    WindowStateListener.windowOpened="mainWindowOpened(arguments[0])">
     <bxml:script src="main.js"/>
-    <CardPane bxml:id="cardPane" styles="{selectionChangeEffect: 'VERTICAL_FLIP'}">
-        <Label text="Drop files here" styles="{font: 'Arial BOLD 24', horizontalAlignment: 'CENTER', verticalAlignment: 'CENTER'}" dropTarget="$dropTarget"/>
-        <BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center'}">
-            <ActivityIndicator bxml:id="activityIndicator" preferredWidth="96" preferredHeight="96"/>
-        </BoxPane>
-    </CardPane>
+    <SplitPane orientation="vertical"> 
+        <top>
+            <CardPane bxml:id="cardPane" styles="{selectionChangeEffect: 'VERTICAL_FLIP'}">
+                <Label bxml:id="dropLabel" text="Drop files here" styles="{font: 'Arial BOLD 24', backgroundColor: '0xAAAAAAFF', horizontalAlignment: 'CENTER', verticalAlignment: 'CENTER'}" dropTarget="$dropTarget"/>
+                <BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center'}">
+                    <ActivityIndicator bxml:id="activityIndicator" preferredWidth="96" preferredHeight="96"/>
+                </BoxPane>
+            </CardPane>
+        </top>
+        <bottom>
+            <ScrollPane horizontalScrollBarPolicy="fill" verticalScrollBarPolicy="fill_to_capacity">
+                <TextArea bxml:id="console" editable="false" styles="{color: '0xAAAAAAFF', backgroundColor: '0x000000FF'}" />
+            </ScrollPane>
+        </bottom>
+    </SplitPane>
 </Window>
+
