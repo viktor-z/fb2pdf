@@ -6,10 +6,10 @@
     <bxml:script src="main.js"/>
     <SplitPane orientation="vertical"> 
         <top>
-            <CardPane bxml:id="cardPane" styles="{selectionChangeEffect: 'VERTICAL_FLIP'}">
+            <CardPane bxml:id="cardPane">
                 <Label bxml:id="dropLabel" text="Drop files here" styles="{font: 'Arial BOLD 24', backgroundColor: '0xAAAAAAFF', horizontalAlignment: 'CENTER', verticalAlignment: 'CENTER'}" dropTarget="$dropTarget"/>
-                <BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center'}">
-                    <ActivityIndicator bxml:id="activityIndicator" preferredWidth="96" preferredHeight="96"/>
+                <BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center', backgroundColor: '0xAAAAAAFF'}">
+                    <ActivityIndicator bxml:id="activityIndicator" preferredWidth="96" preferredHeight="96" styles="{backgroundColor: '0xAAAAAAFF'}" />
                 </BoxPane>
             </CardPane>
         </top>
