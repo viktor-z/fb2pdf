@@ -10,16 +10,16 @@
             <TabPane>
                 <CardPane bxml:id="cardPane">
                     <TabPane.tabData>
-                        <content:ButtonData text="Drag&amp;Drop"/>
+                        <content:ButtonData text="%dragDropTab"/>
                     </TabPane.tabData>
-                    <Label bxml:id="dropLabel" text="Drop files here" styles="{font: 'Arial BOLD 24', backgroundColor: '0xAAAAAAFF', horizontalAlignment: 'CENTER', verticalAlignment: 'CENTER'}" dropTarget="$dropTarget"/>
+                    <Label bxml:id="dropLabel" text="%dragDropLabel" styles="{font: 'Arial BOLD 24', backgroundColor: '0xAAAAAAFF', horizontalAlignment: 'CENTER', verticalAlignment: 'CENTER'}" dropTarget="$dropTarget"/>
                     <BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center', backgroundColor: '0xAAAAAAFF'}">
                         <ActivityIndicator bxml:id="activityIndicator" preferredWidth="96" preferredHeight="96" styles="{backgroundColor: '0xAAAAAAFF'}" />
                     </BoxPane>
                 </CardPane>
                 <TablePane>
                     <TabPane.tabData>
-                        <content:ButtonData text="File Browser"/>
+                        <content:ButtonData text="%fileBrowserTab"/>
                     </TabPane.tabData>
                     <columns>
                         <TablePane.Column width="1*"/>
