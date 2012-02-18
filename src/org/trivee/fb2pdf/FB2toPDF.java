@@ -12,7 +12,7 @@ import java.util.*;
 import nu.xom.Element;
 import nu.xom.*;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 

@@ -6,7 +6,7 @@ package org.trivee.fb2pdf;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Rectangle;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *

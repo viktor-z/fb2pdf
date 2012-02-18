@@ -18,7 +18,7 @@ import nux.xom.pool.XQueryPool;
 import nux.xom.xquery.XQuery;
 import nux.xom.xquery.XQueryException;
 import nux.xom.xquery.XQueryUtil;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.trivee.fb2pdf.TransformationSettings.Entry;
 
 /**

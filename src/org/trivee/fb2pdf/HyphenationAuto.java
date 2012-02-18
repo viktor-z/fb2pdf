@@ -9,7 +9,7 @@ import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.hyphenation.Hyphenation;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
