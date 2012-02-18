@@ -63,14 +63,14 @@
 
 	<target name="jar" depends="compile">
 		<mkdir dir="${dist}" />
-        <tstamp/>
+                <tstamp/>
 		<jar destfile="${dist}/fb2pdf.jar" compress="true" level="9">
 			<fileset dir="${build}" excludes="**/Test.class, lib/**" />
-    		<fileset dir="${src}" includes="**/l10n/**" />
+                        <fileset dir="${src}" includes="**/l10n/**" />
 			<manifest>
 				<attribute name="Main-Class" value="org.trivee.fb2pdf.CLIDriver" />
-				<attribute name="Class-Path" value="iText.jar itext-hyph-xml.jar commons-lang-2.6.jar commons-codec-1.5.jar commons-io-2.0.1.jar commons-cli-1.2.jar gson-1.7.1.jar nux.jar xom.jar saxon8.jar" />
-                <attribute name="Implementation-Version" value="${DSTAMP}"/>   
+				<attribute name="Class-Path" value="iText.jar itext-hyph-xml.jar commons-lang3-3.1.jar commons-codec-1.6.jar commons-io-2.1.jar commons-cli-1.2.jar gson-2.1.jar nux.jar xom.jar saxon8.jar" />
+                                <attribute name="Implementation-Version" value="${DSTAMP}"/>   
   			</manifest>
 		</jar>
 		<copy todir="${build}/lib">
