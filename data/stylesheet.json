@@ -293,9 +293,9 @@
                 },
                 */
                 /*
-                {   // make note links superscript
-                    "query":   "//a[@type='note']/text()",
-                    "morpher": "<sup>{.}</sup>"
+                {   // make note links superscript 
+                    "query":   "//a[(@type='note' or @type='comment') and not(parent::sup or child::sup)]/text()", 
+                    "morpher":   "<sup>{.}</sup>" 
                 },
                 */
                 /*
