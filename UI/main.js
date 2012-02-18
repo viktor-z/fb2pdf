@@ -5,7 +5,9 @@ importClass(org.trivee.fb2pdf.CLIDriver);
 importClass(org.trivee.fb2pdf.gui.Task);
 importClass(org.trivee.fb2pdf.gui.TextAreaOutputStream);
 importClass(org.apache.pivot.util.concurrent.TaskListener);
+importClass(org.apache.pivot.util.Filter);
 importClass(org.apache.pivot.wtk.TaskAdapter);
+
 importClass(java.lang.System);
 
 function processFile(file, fileList) {
@@ -78,18 +80,23 @@ var dropTarget = new DropTarget() {
         var dropAction = null;
  
         if (dragContent.containsFileList()) {
-            var fileList = [];
-            var it = dragContent.getFileList().iterator();
-            while (it.hasNext()) {
-                fileList.push(it.next());
-            }
-           showActivityIndicator();
-           System.out.println("Start time: " + new Date());
-           processFileList(fileList);
-           dropAction = DropAction.COPY;
+            processFileIterator(dragContent.getFileList().iterator());
+            dropAction = DropAction.COPY;
         }
  
         return dropAction;
+    }
+};
+
+var destBrowserDisabledFilter = new Filter() {
+    include: function(itm) {
+        return !(itm.isDirectory());
+    }
+};
+
+var srcBrowserDisabledFilter = new Filter() {
+    include: function(itm) {
+        return !(itm.isDirectory() || itm.getName().endsWith(".fb2") || itm.getName().endsWith(".fb2.zip"));
     }
 };
 
@@ -97,9 +104,14 @@ function showActivityIndicator() {
     activityIndicator.setActive(true);
     cardPane.setSelectedIndex(1);
     dropLabel.setEnabled(false);
+    fileBrowser.setEnabled(false);
+    convertButton.setEnabled(false);
 }
 
 function hideActivityIndicator() {
+    fileBrowser.clearSelection();
+    convertButton.setEnabled(true);
+    fileBrowser.setEnabled(true);
     dropLabel.setEnabled(true);    
     activityIndicator.setActive(false);
     cardPane.setSelectedIndex(0);
@@ -110,5 +122,19 @@ function mainWindowOpened(window) {
     System.setOut(new PrintStream(consoleStream, true));
     System.out.println("fb2pdf-j UI started")
     main.title = "fb2pdf-j " + CLIDriver.getImplementationVersion();
+}
+
+function processFileIterator(iterator) {
+    var fileList = [];
+    while (iterator.hasNext()) {
+        fileList.push(iterator.next());
+    }
+    showActivityIndicator();
+    System.out.println("Start time: " + new Date());
+    processFileList(fileList);
+}
+
+function convertButtonPressed(button) {
+    processFileIterator(fileBrowser.getSelectedFiles().iterator());
 }
 

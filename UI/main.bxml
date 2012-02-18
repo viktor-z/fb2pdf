@@ -1,22 +1,47 @@
 <Window title="fb2pdf-j" maximized="true" bxml:id="main"
     xmlns:bxml="http://pivot.apache.org/bxml"
     xmlns="org.apache.pivot.wtk" 
+    xmlns:content="org.apache.pivot.wtk.content"
     xmlns:fb2pdf="org.trivee.fb2pdf.gui" 
     WindowStateListener.windowOpened="mainWindowOpened(arguments[0])">
     <bxml:script src="main.js"/>
     <SplitPane orientation="vertical"> 
         <top>
-            <CardPane bxml:id="cardPane">
-                <Label bxml:id="dropLabel" text="Drop files here" styles="{font: 'Arial BOLD 24', backgroundColor: '0xAAAAAAFF', horizontalAlignment: 'CENTER', verticalAlignment: 'CENTER'}" dropTarget="$dropTarget"/>
-                <BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center', backgroundColor: '0xAAAAAAFF'}">
-                    <ActivityIndicator bxml:id="activityIndicator" preferredWidth="96" preferredHeight="96" styles="{backgroundColor: '0xAAAAAAFF'}" />
-                </BoxPane>
-            </CardPane>
+            <TabPane>
+                <CardPane bxml:id="cardPane">
+                    <TabPane.tabData>
+                        <content:ButtonData text="Drag&amp;Drop"/>
+                    </TabPane.tabData>
+                    <Label bxml:id="dropLabel" text="Drop files here" styles="{font: 'Arial BOLD 24', backgroundColor: '0xAAAAAAFF', horizontalAlignment: 'CENTER', verticalAlignment: 'CENTER'}" dropTarget="$dropTarget"/>
+                    <BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center', backgroundColor: '0xAAAAAAFF'}">
+                        <ActivityIndicator bxml:id="activityIndicator" preferredWidth="96" preferredHeight="96" styles="{backgroundColor: '0xAAAAAAFF'}" />
+                    </BoxPane>
+                </CardPane>
+                <TablePane>
+                    <TabPane.tabData>
+                        <content:ButtonData text="File Browser"/>
+                    </TabPane.tabData>
+                    <columns>
+                        <TablePane.Column width="1*"/>
+                    </columns>
+                    <TablePane.Row height="1*">
+                        <FileBrowser bxml:id="fileBrowser" multiSelect="true" disabledFileFilter="$srcBrowserDisabledFilter" styles="{hideDisabledFiles: true}" />
+                    </TablePane.Row>
+                    <TablePane.Row height="34">
+                        <BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center'}">
+                            <PushButton bxml:id="convertButton" buttonData="Convert" width="120" height="24" 
+                                    ButtonPressListener.buttonPressed="convertButtonPressed(arguments[0])"/>
+                        </BoxPane>
+                    </TablePane.Row>
+                </TablePane>
+            </TabPane>
         </top>
         <bottom>
-            <ScrollPane horizontalScrollBarPolicy="fill" verticalScrollBarPolicy="fill_to_capacity">
-                <TextArea bxml:id="console" editable="false" styles="{color: '0xAAAAAAFF', backgroundColor: '0x000000FF'}" />
-            </ScrollPane>
+            <Border styles="{thickness: 1, padding: 5}"><Border styles="{thickness: 1}">
+                <ScrollPane horizontalScrollBarPolicy="fill" verticalScrollBarPolicy="fill_to_capacity">
+                    <TextArea bxml:id="console" editable="false" styles="{color: '0xAAAAAAFF', backgroundColor: '0x000000FF'}" />
+                </ScrollPane>
+            </Border></Border>
         </bottom>
     </SplitPane>
 </Window>
