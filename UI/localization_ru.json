@@ -1,5 +1,5 @@
 {
-    dragDropTab: "Перетащить и бросить",
+    dragDropTab: "Перетащить файлы",
     fileBrowserTab: "Выбрать файлы",
     dragDropLabel: "Бросить файлы сюда.",
 }
