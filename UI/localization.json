@@ -2,4 +2,5 @@
     dragDropTab: "Drag&Drop",
     fileBrowserTab: "File Browser",
     dragDropLabel: "Drop files here",
+    convertButton: "Convert",
 }

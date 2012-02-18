@@ -29,7 +29,7 @@
                     </TablePane.Row>
                     <TablePane.Row height="34">
                         <BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center'}">
-                            <PushButton bxml:id="convertButton" buttonData="Convert" width="120" height="24" 
+                            <PushButton bxml:id="convertButton" buttonData="%convertButton" width="120" height="24" 
                                     ButtonPressListener.buttonPressed="convertButtonPressed(arguments[0])"/>
                         </BoxPane>
                     </TablePane.Row>

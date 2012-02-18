@@ -2,4 +2,5 @@
     dragDropTab: "Перетащить файлы",
     fileBrowserTab: "Выбрать файлы",
     dragDropLabel: "Бросить файлы сюда.",
+    convertButton: "Конвертировать",
 }
