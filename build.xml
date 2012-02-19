@@ -124,7 +124,7 @@
 	<target name="jar-nodebug" depends="compile-nodebug,jar" />
 
     <target name="zip">
-    	<zip destfile="${dist}/fb2pdf.zip" compress="true" level="9">
+    	<zip destfile="${dist}/fb2pdf-j.${DSTAMP}.zip" compress="true" level="9">
 			<zipfileset prefix="lib" file="${lib}/iText.jar" />
     		<zipfileset prefix="lib" file="${lib}/itext-hyph-xml.jar" />
     		<zipfileset prefix="lib" file="${lib}/commons-lang3-3.1.jar" />
