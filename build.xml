@@ -76,6 +76,9 @@
 		<copy todir="${build}/lib">
 			<path refid="lib" />
 		</copy>
+	</target>
+
+    <target name="job" depends="jar">
 		<jar destfile="${dist}/fb2pdf.job" compress="true" level="9">
 			<fileset dir="${build}" excludes="**/Test.class" />
 		</jar>
@@ -119,4 +122,53 @@
 	</target>
 
 	<target name="jar-nodebug" depends="compile-nodebug,jar" />
+
+    <target name="zip">
+    	<zip destfile="${dist}/fb2pdf.zip" compress="true" level="9">
+			<zipfileset prefix="lib" file="${lib}/iText.jar" />
+    		<zipfileset prefix="lib" file="${lib}/itext-hyph-xml.jar" />
+    		<zipfileset prefix="lib" file="${lib}/commons-lang3-3.1.jar" />
+    		<zipfileset prefix="lib" file="${lib}/commons-codec-1.6.jar" />
+    		<zipfileset prefix="lib" file="${lib}/commons-io-2.1.jar" />
+    		<zipfileset prefix="lib" file="${lib}/commons-cli-1.2.jar" />
+    		<zipfileset prefix="lib" file="${lib}/gson-2.1.jar" />
+    		<zipfileset prefix="lib" file="${lib}/gnu-getopt.jar" />
+    		<zipfileset prefix="lib" file="${lib}/nux.jar" />
+    		<zipfileset prefix="lib" file="${lib}/xom.jar" />
+    		<zipfileset prefix="lib" file="${lib}/saxon8.jar" />
+    		<zipfileset prefix="lib" file="${dist}/fb2pdf.jar" />
+
+    		<zipfileset prefix="data" file="data/fb2pdf.jar" />
+            <zipfileset prefix="data" file="data/stylesheet.json" />
+            <zipfileset prefix="data" file="data/stylesheet2.json" />
+            <zipfileset prefix="data" file="data/library.xq" />
+            <zipfileset prefix="data" file="data/LiberationMono-Bold.ttf" />
+            <zipfileset prefix="data" file="data/LiberationMono-BoldItalic.ttf" />
+            <zipfileset prefix="data" file="data/LiberationMono-Italic.ttf" />
+            <zipfileset prefix="data" file="data/LiberationMono-Regular.ttf" />
+            <zipfileset prefix="data" file="data/FreeSansOblique.ttf" />
+            <zipfileset prefix="data" file="data/FreeSansBold.ttf" />
+            <zipfileset prefix="data" file="data/FreeSans.ttf" />
+            <zipfileset prefix="data" file="data/FreeSansBoldOblique.ttf" />
+            <zipfileset prefix="data" file="data/DroidSerif-Regular.ttf" />
+            <zipfileset prefix="data" file="data/DroidSerif-Bold.ttf" />
+            <zipfileset prefix="data" file="data/DroidSerif-BoldItalic.ttf" />
+            <zipfileset prefix="data" file="data/DroidSerif-Italic.ttf" />
+
+    		<zipfileset file="fb2pdf-GUI.cmd" />
+    		<zipfileset file="twoup.cmd" />
+    		<zipfileset file="transform.cmd" />
+    		<zipfileset file="testTransformation.cmd" />
+    		<zipfileset file="rotate.cmd" />
+    		<zipfileset file="readme.txt" />
+    		<zipfileset file="fb2pdf.sh" />
+    		<zipfileset file="fb2pdf.desktop" />
+    		<zipfileset file="fb2pdf.cmd" />    		
+
+            <zipfileset prefix="UI" dir="UI" />
+		</zip>
+    </target>
+
+    <target name="dist" depends="clean,compile-nodebug,jar,zip"/>
+
   </project>
