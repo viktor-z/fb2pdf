@@ -5,6 +5,7 @@
 package org.trivee.fb2pdf;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -61,10 +62,25 @@ public class XQueryUtilities {
         out.close();
         return out.toByteArray();
     }
+    
+    private static String getLibPath(String filename) {
+        try {
+            String path = Utilities.getValidatedFileName("data/" + filename);
+            return new File(path).toURI().toString();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private static String getLibImport() {
+        String libpath = getLibPath("library.xq");
+        return String.format("import module namespace fb = 'https://sites.google.com/site/fb2pdfj' at '%s'; ", libpath);
+    }
 
     public static void transform(Document xdoc, TransformationSettings settings) throws ParsingException, XQueryException, IOException {
-        String queryProlog = settings.queryProlog;
-        String morpherProlog = settings.morpherProlog;
+        String libImport = getLibImport();
+        String queryProlog = settings.queryProlog + libImport;
+        String morpherProlog = settings.morpherProlog + libImport;
         for (Entry entry : settings.transformationsMap)
         {
             if (entry == null) continue;
@@ -80,8 +96,10 @@ public class XQueryUtilities {
     }
     
     public static String getString(Element element, TransformationSettings settings, String query, String separator) {
-        String queryProlog = settings.queryProlog;
-        Nodes nodes = XQueryUtil.xquery(element, queryProlog + query);
+        StringBuilder sb = new StringBuilder(settings.queryProlog);
+        sb.append(getLibImport());
+        sb.append(query);
+        Nodes nodes = XQueryUtil.xquery(element, sb.toString());
         List<String> strings = new ArrayList<String>(nodes.size());
         for (int i=0; i<nodes.size(); i++) {
             strings.add(nodes.get(i).getValue());

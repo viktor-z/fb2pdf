@@ -193,8 +193,8 @@
     transformationSettings: {
         enabled:					"false",
         outputDebugFile:            "false",
-        queryProlog:                "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\"; declare namespace l = \"http://www.w3.org/1999/xlink\"; import module namespace fb = 'https://sites.google.com/site/fb2pdfj' at 'data/library.xq'; ",
-        morpherProlog:              "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\"; declare namespace l = \"http://www.w3.org/1999/xlink\"; import module namespace fb = 'https://sites.google.com/site/fb2pdfj' at 'data/library.xq'; ",
+        queryProlog:                "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\"; declare namespace l = \"http://www.w3.org/1999/xlink\"; ",
+        morpherProlog:              "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\"; declare namespace l = \"http://www.w3.org/1999/xlink\"; ",
         transformationsMap: [
                 /*
                 {   // make digits superscript in notes (depends on font)
