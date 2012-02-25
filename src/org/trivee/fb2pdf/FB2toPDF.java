@@ -266,10 +266,11 @@ public class FB2toPDF {
             queryBuilder.append("declare variable $authorFirstLastName := string-join($author/string-join((first-name, last-name), ' '), ', '); "); 
             queryBuilder.append("declare variable $authorFirstInitialLastName := string-join($author/string-join((substring(first-name, 1, 1), last-name), '. '), ', '); "); 
             queryBuilder.append("declare variable $authorAllInitialsLastName := string-join($author/string-join((substring(first-name, 1, 1), substring(middle-name, 1, 1), last-name), '. '), ', '); "); 
-            declareDynamicVariables(queryBuilder);
+            queryBuilder.append("declare variable $pageNum as xs:string external; ");
+            queryBuilder.append("declare variable $chapterTitle as xs:string external; ");
             queryBuilder.append(slotSettings.query); 
             String query = queryBuilder.toString();
-            String txt = XQueryUtilities.getString(fb2.getRootElement(), stylesheet.getTransformationSettings(), query, " ");
+            String txt = XQueryUtilities.getString(fb2.getRootElement(), stylesheet.getTransformationSettings(), query, " ", getDynamicVariables());
             chunk.append(txt);
             table.addCell(new Phrase(chunk));
         } else {
@@ -277,16 +278,18 @@ public class FB2toPDF {
         }
     }
 
-    private void declareDynamicVariables(StringBuilder queryBuilder) {
+    private Map<String, Object> getDynamicVariables() {
+        Map<String, Object> result = new HashMap<String, Object>();
         if (stylesheet.getPageStyle().getHeader().dynamic) {
-            queryBuilder.append(String.format("declare variable $pageNum := '%s'; ", new Integer(writer.getPageNumber())));
-            queryBuilder.append(String.format("declare variable $chapterTitle := '%s'; ", chapterTitle.replace("'", "''")));
+            result.put("pageNum", new Integer(writer.getPageNumber()).toString());
+            result.put("chapterTitle", chapterTitle);
         } else {
-            queryBuilder.append("declare variable $pageNum := '$pageNum'; ");
-            queryBuilder.append("declare variable $chapterTitle := '$chapterTitle'; ");
+            result.put("pageNum", "$pageNum");
+            result.put("chapterTitle", "$chapterTitle");
         }
+        return result;
     }
-
+    
     private PdfPTable createHeaderTable(boolean odd) throws DocumentException, FB2toPDFException {
         
         HeaderSettings headerSettings = stylesheet.getPageStyle().getHeader();
@@ -1119,7 +1122,7 @@ public class FB2toPDF {
         //bodies = root.getChildElements("body", NS_FB2);
         String query = stylesheet.getGeneralSettings().bodiesToRender;
         try {
-            bodies = XQueryUtilities.query(XQueryUtilities.defaultProlog + query, fb2);
+            bodies = XQueryUtilities.getNodes(XQueryUtilities.defaultProlog + query, fb2);
         } catch (Exception ex) {
             throw new FB2toPDFException(ex.toString());
         }

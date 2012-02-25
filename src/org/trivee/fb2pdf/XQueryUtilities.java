@@ -10,11 +10,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import nu.xom.Document;
-import nu.xom.Element;
-import nu.xom.Nodes;
-import nu.xom.ParsingException;
-import nu.xom.Serializer;
+import java.util.Map;
+import nu.xom.*;
 import nux.xom.pool.XQueryPool;
 import nux.xom.xquery.XQuery;
 import nux.xom.xquery.XQueryException;
@@ -30,6 +27,7 @@ public class XQueryUtilities {
     
     public static String defaultProlog = "declare default element namespace \"http://www.gribuser.ru/xml/fictionbook/2.0\"; "
         + "declare namespace l = \"http://www.w3.org/1999/xlink\"; ";
+    private static String libImport = null;
     
 
     public static void outputDebugInfo(Document xdoc, TransformationSettings settings, final String fileName) throws IOException {
@@ -73,14 +71,16 @@ public class XQueryUtilities {
     }
 
     private static String getLibImport() {
-        String libpath = getLibPath("library.xq");
-        return String.format("import module namespace fb = 'https://sites.google.com/site/fb2pdfj' at '%s'; ", libpath);
+        if (libImport == null) {
+            String libpath = getLibPath("library.xq");
+            return String.format("import module namespace fb = 'https://sites.google.com/site/fb2pdfj' at '%s'; ", libpath);
+        }
+        return libImport;
     }
 
     public static void transform(Document xdoc, TransformationSettings settings) throws ParsingException, XQueryException, IOException {
-        String libImport = getLibImport();
-        String queryProlog = settings.queryProlog + libImport;
-        String morpherProlog = settings.morpherProlog + libImport;
+        String queryProlog = settings.queryProlog + getLibImport();
+        String morpherProlog = settings.morpherProlog + getLibImport();
         for (Entry entry : settings.transformationsMap)
         {
             if (entry == null) continue;
@@ -91,15 +91,20 @@ public class XQueryUtilities {
 
     public static void transform(Document xdoc, String query, String morpher) throws IOException, XQueryException, ParsingException {
         XQuery xmorpher = XQueryPool.GLOBAL_POOL.getXQuery(morpher, null);
-        Nodes nodes = query(query, xdoc);
+        Nodes nodes = query(query, xdoc, null);
+        System.out.println(String.format("Transformation query '%s' returned %d nodes", query, nodes.size()));
         XQueryUtil.update(nodes, xmorpher, null);
     }
     
     public static String getString(Element element, TransformationSettings settings, String query, String separator) {
+        return getString(element, settings, query, separator, null);
+    }
+    
+    public static String getString(Element element, TransformationSettings settings, String query, String separator, Map<String, Object> variables) {
         StringBuilder sb = new StringBuilder(settings.queryProlog);
         sb.append(getLibImport());
         sb.append(query);
-        Nodes nodes = XQueryUtil.xquery(element, sb.toString());
+        Nodes nodes = query(sb.toString(), (Node)element, variables);
         List<String> strings = new ArrayList<String>(nodes.size());
         for (int i=0; i<nodes.size(); i++) {
             strings.add(nodes.get(i).getValue());
@@ -107,11 +112,19 @@ public class XQueryUtilities {
         return StringUtils.join(strings, separator == null ? " " : separator);
     }
     
-    public static Nodes query(String query, Document xdoc) throws XQueryException {
-        XQuery xselect = XQueryPool.GLOBAL_POOL.getXQuery(query, null);
-        Nodes nodes = xselect.execute(xdoc).toNodes();
+    private static Nodes query(String query, Node contextNode, Map<String, Object> variables) {
+        try {
+            XQuery xselect = XQueryPool.GLOBAL_POOL.getXQuery(query, null);
+            Nodes nodes = xselect.execute(contextNode, null, variables).toNodes();
+            return nodes;
+        } catch (XQueryException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public static Nodes getNodes(String query, Node contextNode) {
+        Nodes nodes = query(query, contextNode, null);
         System.out.println(String.format("Query '%s' returned %d nodes", query, nodes.size()));
         return nodes;
     }
-
 }
