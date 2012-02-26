@@ -204,9 +204,9 @@ public class FootnoteRenderer {
         float delta = noteStyle.getAbsoluteLeading() - ascdesc;
         topMargin = (delta > 0) ? delta : 0;
 
-        pageSize.setBackgroundColor(BaseColor.LIGHT_GRAY);
-        pageSize.setBorder(Rectangle.BOX);
-        pageSize.setBorderColor(BaseColor.DARK_GRAY);
+        //pageSize.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        //pageSize.setBorder(Rectangle.BOX);
+        //pageSize.setBorderColor(BaseColor.DARK_GRAY);
     }
 
     private static float getAscDesc() throws FB2toPDFException {
