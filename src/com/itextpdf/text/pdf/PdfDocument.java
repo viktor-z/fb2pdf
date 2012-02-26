@@ -1468,8 +1468,7 @@ public class PdfDocument extends Document {
                     }
                     if (chunk.isAttribute(Chunk.CHAR_SPACING)) {
                     	Float cs = (Float) chunk.getAttribute(Chunk.CHAR_SPACING);
-                        //text.setCharacterSpacing(cs.floatValue());                                  //VIKTORZ --
-                        text.setCharacterSpacing(baseCharacterSpacing / hScale + cs.floatValue());    //VIKTORZ ++
+                        text.setCharacterSpacing(cs.floatValue());                            
                     }
                     if (chunk.isImage()) {
                         Image image = chunk.getImage();

@@ -4,11 +4,7 @@
  */
 package org.trivee.fb2pdf;
 
-import com.itextpdf.text.Chunk;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfDocument;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
@@ -39,7 +35,7 @@ public class FootnoteRenderer {
     private static boolean subscript;
     static float topMargin = 0;
 
-    private static void addCutMarker(Chunk chunk) throws FB2toPDFException, DocumentException {
+    private static void addCutMarker() throws FB2toPDFException, DocumentException {
         doc.setPageSize(new Rectangle(cutMarkerWidth, pageSize.getHeight()));
         doc.newPage();
         Paragraph paragraph = createParagraph();
@@ -47,7 +43,7 @@ public class FootnoteRenderer {
         paragraph.setIndentationLeft(0);
         paragraph.setIndentationRight(0);
         paragraph.setFirstLineIndent(0);
-        chunk = noteStyle.createChunk();
+        Chunk chunk = noteStyle.createChunk();
         chunk.append("<…> ");
         paragraph.add(chunk);
         doc.add(paragraph);
@@ -57,7 +53,7 @@ public class FootnoteRenderer {
         doc.newPage();
     }
 
-    private static void addNode(Node rootNode, HyphenationAuto hyphenation, Paragraph paragraph) throws FB2toPDFException {
+    private static void addNode(Node rootNode, HyphenationAuto hyphenation, Paragraph paragraph, String marker) throws FB2toPDFException {
         for (int j=0; j<rootNode.getChildCount(); j++) {
             Node node = rootNode.getChild(j);
             if (node instanceof Text) {
@@ -69,7 +65,8 @@ public class FootnoteRenderer {
                 if (subscript) {
                     chunk.setTextRise(-noteStyle.getFontSize().getPoints() / 6);
                 }
-                chunk.append(node.getValue());
+                String value = (marker == null) ? node.getValue() : marker + " " + node.getValue();
+                chunk.append(value);
                 paragraph.add(chunk);
                 continue;
             } 
@@ -79,30 +76,30 @@ public class FootnoteRenderer {
             Element element = (Element)node;
             if (element.getLocalName().equals("emphasis")) {
                 noteStyle.toggleItalic();
-                addNode(node, hyphenation, paragraph);
+                addNode(node, hyphenation, paragraph, marker);
                 noteStyle.toggleItalic();
             } else if (element.getLocalName().equals("strong")) {
                 noteStyle.toggleBold();
-                addNode(node, hyphenation, paragraph);
+                addNode(node, hyphenation, paragraph, marker);
                 noteStyle.toggleBold();
             } else if (element.getLocalName().equals("strikethrough")) {
                 noteStyle.toggleStrikethrough();
-                addNode(node, hyphenation, paragraph);
+                addNode(node, hyphenation, paragraph, marker);
                 noteStyle.toggleStrikethrough();
             } else if (element.getLocalName().equals("sup")) {
                 noteStyle.toggleHalfSize();
                 superscript = true;
-                addNode(node, hyphenation, paragraph);
+                addNode(node, hyphenation, paragraph, marker);
                 noteStyle.toggleHalfSize();
                 superscript = false;
             } else if (element.getLocalName().equals("sub")) {
                 noteStyle.toggleHalfSize();
                 subscript = true;
-                addNode(node, hyphenation, paragraph);
+                addNode(node, hyphenation, paragraph, marker);
                 noteStyle.toggleHalfSize();
                 subscript = false;
             } else {
-                addNode(node, hyphenation, paragraph);
+                addNode(node, hyphenation, paragraph, marker);
             }
    
         }
@@ -127,17 +124,15 @@ public class FootnoteRenderer {
     }
     
     public static void addFootnote(String marker, String refname, Element section, HyphenationAuto hyphenation) throws FB2toPDFException, DocumentException {
-        Chunk chunk = noteStyle.createChunk();
-        chunk.append(marker);
 
-        boolean added = addFootnote(section, hyphenation, chunk, true);
+        boolean added = addFootnote(section, hyphenation, marker, true);
 
         if (added) {
-            addCutMarker(chunk);
+            addCutMarker();
         }
     }
 
-    private static boolean addFootnote(Element element, HyphenationAuto hyphenation, Chunk firstChunk, boolean skipTitle) throws FB2toPDFException, DocumentException {
+    private static boolean addFootnote(Element element, HyphenationAuto hyphenation, String marker, boolean skipTitle) throws FB2toPDFException, DocumentException {
         if (element == null) {
             return false;
         }
@@ -155,22 +150,19 @@ public class FootnoteRenderer {
                localName.equals("stanza") || 
                localName.equals("epigraph") ||
                localName.equals("cite")){
-                added = addFootnote(child, hyphenation, firstChunk, false);
+                added = addFootnote(child, hyphenation, marker, false);
                 if (added) {
-                    firstChunk = null;
+                    marker = null;
                 }
             } else if (localName.equals("p") || localName.equals("v") || localName.equals("text-author") ||
                     localName.equals("date") || 
                     (!skipTitle && localName.equals("title"))) {
                 Paragraph paragraph = createParagraph();
-                if (firstChunk != null) {
+                if (marker != null) {
                     paragraph.setFirstLineIndent(noteStyle.getFirstFirstLineIndent());
-                    firstChunk.append(" ");
-                    paragraph.add(firstChunk);
-                    //paragraph.add(new Chunk(new VerticalPositionMark(), noteStyle.getFirstFirstLineIndent(), true));
-                    firstChunk = null;
                 }
-                addNode(child, hyphenation, paragraph);
+                addNode(child, hyphenation, paragraph, marker);
+                marker = null;
                 doc.add(paragraph);
                 added = true;
             }
@@ -212,9 +204,9 @@ public class FootnoteRenderer {
         float delta = noteStyle.getAbsoluteLeading() - ascdesc;
         topMargin = (delta > 0) ? delta : 0;
 
-        //pageSize.setBackgroundColor(BaseColor.LIGHT_GRAY);
-        //pageSize.setBorder(Rectangle.BOX);
-        //pageSize.setBorderColor(BaseColor.DARK_GRAY);
+        pageSize.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        pageSize.setBorder(Rectangle.BOX);
+        pageSize.setBorderColor(BaseColor.DARK_GRAY);
     }
 
     private static float getAscDesc() throws FB2toPDFException {
