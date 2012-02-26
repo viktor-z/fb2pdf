@@ -68,10 +68,18 @@ public class FootnoteRenderer {
                 String value = (marker == null) ? node.getValue() : marker + " " + node.getValue();
                 chunk.append(value);
                 paragraph.add(chunk);
+                marker = null;
                 continue;
             } 
             if (!(node instanceof Element)) {
                 continue;
+            }
+            if (marker != null) {
+                Chunk chunk = noteStyle.createChunk();
+                chunk.setHyphenation(hyphenation);
+                chunk.append(marker + " ");
+                paragraph.add(chunk);
+                marker = null;
             }
             Element element = (Element)node;
             if (element.getLocalName().equals("emphasis")) {
@@ -80,26 +88,26 @@ public class FootnoteRenderer {
                 noteStyle.toggleItalic();
             } else if (element.getLocalName().equals("strong")) {
                 noteStyle.toggleBold();
-                addNode(node, hyphenation, paragraph, marker);
+                addNode(node, hyphenation, paragraph, null);
                 noteStyle.toggleBold();
             } else if (element.getLocalName().equals("strikethrough")) {
                 noteStyle.toggleStrikethrough();
-                addNode(node, hyphenation, paragraph, marker);
+                addNode(node, hyphenation, paragraph, null);
                 noteStyle.toggleStrikethrough();
             } else if (element.getLocalName().equals("sup")) {
                 noteStyle.toggleHalfSize();
                 superscript = true;
-                addNode(node, hyphenation, paragraph, marker);
+                addNode(node, hyphenation, paragraph, null);
                 noteStyle.toggleHalfSize();
                 superscript = false;
             } else if (element.getLocalName().equals("sub")) {
                 noteStyle.toggleHalfSize();
                 subscript = true;
-                addNode(node, hyphenation, paragraph, marker);
+                addNode(node, hyphenation, paragraph, null);
                 noteStyle.toggleHalfSize();
                 subscript = false;
             } else {
-                addNode(node, hyphenation, paragraph, marker);
+                addNode(node, hyphenation, paragraph, null);
             }
    
         }
