@@ -341,8 +341,8 @@
                 },
                 */
                 /*
-                {   // replace root section of nameless (main) body with it's content
-                    "query":    "//body[not(./@name)]/section",
+                {   // replace a single root section of nameless (main) body with it's content
+                    "query":    "//body[empty(@name) and count(section) = 1]/section",
                     "morpher":  "./*"
                 },
                 */
