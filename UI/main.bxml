@@ -8,7 +8,7 @@
     <bxml:script src="main.js"/>
     <SplitPane orientation="vertical"> 
         <top>
-            <TabPane>
+            <TabPane bxml:id="mainTabPane">
                 <CardPane bxml:id="cardPane">
                     <TabPane.tabData>
                         <content:ButtonData text="%dragDropTab"/>

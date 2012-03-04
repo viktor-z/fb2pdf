@@ -148,6 +148,7 @@ function convertButtonPressed(button) {
 var UIState = (function(){
     var NODE_NAME = "fb2pdf-j gui";
     var FILE_BROWSER_DIR = "file-browser-directory";
+    var MAIN_TAB_SELECTED = "main-tab-selected";
 
     return {
         save: function() {
@@ -155,6 +156,7 @@ var UIState = (function(){
                 var preferences = Preferences.userRoot().node(NODE_NAME);
 
                 preferences.put(FILE_BROWSER_DIR, fileBrowser.getRootDirectory().getAbsolutePath());
+                preferences.putInt(MAIN_TAB_SELECTED, mainTabPane.getSelectedIndex());
                 preferences.flush();
             } catch (ex) {
                 System.out.println("Unable to save GUI state: " + ex);
@@ -168,6 +170,7 @@ var UIState = (function(){
                 if (dir.exists()) {
                     fileBrowser.setRootDirectory(dir);
                 }
+                mainTabPane.setSelectedIndex(preferences.getInt(MAIN_TAB_SELECTED, mainTabPane.getSelectedIndex()));
             } catch (ex) {
                 System.out.println("Unable to restore GUI state: " + ex);
             }
