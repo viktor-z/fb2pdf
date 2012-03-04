@@ -1,6 +1,8 @@
 importPackage(org.apache.pivot.wtk);
+importClass(java.io.File);
 importClass(java.io.FileFilter);
 importClass(java.io.PrintStream);
+importClass(java.util.prefs.Preferences);
 importClass(org.trivee.fb2pdf.CLIDriver);
 importClass(org.trivee.fb2pdf.gui.Task);
 importClass(org.trivee.fb2pdf.gui.TextAreaOutputStream);
@@ -122,6 +124,11 @@ function mainWindowOpened(window) {
     System.setOut(new PrintStream(consoleStream, true));
     System.out.println("fb2pdf-j UI started")
     main.title = "fb2pdf-j " + CLIDriver.getImplementationVersion();
+    UIState.restore();
+}
+
+function mainWindowClosed(window) {
+    UIState.save();
 }
 
 function processFileIterator(iterator) {
@@ -138,3 +145,32 @@ function convertButtonPressed(button) {
     processFileIterator(fileBrowser.getSelectedFiles().iterator());
 }
 
+var UIState = (function(){
+    var NODE_NAME = "fb2pdf-j gui";
+    var FILE_BROWSER_DIR = "file-browser-directory";
+
+    return {
+        save: function() {
+            try {
+                var preferences = Preferences.userRoot().node(NODE_NAME);
+
+                preferences.put(FILE_BROWSER_DIR, fileBrowser.getRootDirectory().getAbsolutePath());
+                preferences.flush();
+            } catch (ex) {
+                System.out.println("Unable to save GUI state: " + ex);
+            }
+        },
+        restore: function() {
+            try {
+                var preferences = Preferences.userRoot().node(NODE_NAME);
+
+                var dir = new File(preferences.get(FILE_BROWSER_DIR, fileBrowser.getRootDirectory()));
+                if (dir.exists()) {
+                    fileBrowser.setRootDirectory(dir);
+                }
+            } catch (ex) {
+                System.out.println("Unable to restore GUI state: " + ex);
+            }
+        }
+    }
+})();

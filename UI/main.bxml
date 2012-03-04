@@ -3,7 +3,8 @@
     xmlns="org.apache.pivot.wtk" 
     xmlns:content="org.apache.pivot.wtk.content"
     xmlns:fb2pdf="org.trivee.fb2pdf.gui" 
-    WindowStateListener.windowOpened="mainWindowOpened(arguments[0])">
+    WindowStateListener.windowOpened="mainWindowOpened(arguments[0])"
+    WindowStateListener.windowClosed="mainWindowClosed(arguments[0])">
     <bxml:script src="main.js"/>
     <SplitPane orientation="vertical"> 
         <top>
