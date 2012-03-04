@@ -149,6 +149,7 @@ var UIState = (function(){
     var NODE_NAME = "fb2pdf-j gui";
     var FILE_BROWSER_DIR = "file-browser-directory";
     var MAIN_TAB_SELECTED = "main-tab-selected";
+    var MAIN_SPLIT_RATIO = "main-split-ratio";
 
     return {
         save: function() {
@@ -157,6 +158,7 @@ var UIState = (function(){
 
                 preferences.put(FILE_BROWSER_DIR, fileBrowser.getRootDirectory().getAbsolutePath());
                 preferences.putInt(MAIN_TAB_SELECTED, mainTabPane.getSelectedIndex());
+                preferences.putFloat(MAIN_SPLIT_RATIO, mainSplitPane.getSplitRatio());
                 preferences.flush();
             } catch (ex) {
                 System.out.println("Unable to save GUI state: " + ex);
@@ -171,6 +173,7 @@ var UIState = (function(){
                     fileBrowser.setRootDirectory(dir);
                 }
                 mainTabPane.setSelectedIndex(preferences.getInt(MAIN_TAB_SELECTED, mainTabPane.getSelectedIndex()));
+                mainSplitPane.setSplitRatio(preferences.getFloat(MAIN_SPLIT_RATIO, mainSplitPane.getSplitRatio()));
             } catch (ex) {
                 System.out.println("Unable to restore GUI state: " + ex);
             }

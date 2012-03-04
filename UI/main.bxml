@@ -6,7 +6,7 @@
     WindowStateListener.windowOpened="mainWindowOpened(arguments[0])"
     WindowStateListener.windowClosed="mainWindowClosed(arguments[0])">
     <bxml:script src="main.js"/>
-    <SplitPane orientation="vertical"> 
+    <SplitPane bxml:id="mainSplitPane" orientation="vertical"> 
         <top>
             <TabPane bxml:id="mainTabPane">
                 <CardPane bxml:id="cardPane">
