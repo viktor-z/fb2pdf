@@ -443,8 +443,11 @@ public class ParagraphStyle {
         if (strokeW > 0) {
             chunk.setTextRenderMode(PdfContentByte.TEXT_RENDER_MODE_FILL_STROKE, strokeW, getColor());
         }
-        chunk.setCharacterSpacing(getCharacterSpacing());
-        chunk.setHorizontalScaling(getHorizontalScaling());
+        
+        float cs = getCharacterSpacing();
+        if (cs != 0.0f) chunk.setCharacterSpacing(cs);
+        float hs = getHorizontalScaling();
+        if (hs != 1.0f) chunk.setHorizontalScaling(hs);
         return chunk;
     }
 
