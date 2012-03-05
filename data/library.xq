@@ -17,5 +17,5 @@ declare function fb:cut-left($string as xs:string?, $length as xs:integer)
 
 declare function fb:note-sections($root as node()?) as node()* {
     let $hrefs := $root//a[@type ='note']/substring(@l:href, 2)
-    return //body[@name]//section[@id = $hrefs]
+    return $root//body[@name]//section[@id = $hrefs]
 };
