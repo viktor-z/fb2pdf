@@ -24,6 +24,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.trivee.utils.Rotate;
 import org.trivee.utils.TwoUp;
@@ -141,7 +142,8 @@ public class CLIDriver {
         println(String.format("Converting %s...\n", fb2name));
 
         if(fb2file.isDirectory()) {
-                processDirectory(fb2file, stylesheetNames);
+                String outpath = cl.getArgs().length == 1 ? fb2file.getPath() : cl.getArgs()[1];
+                processDirectory(fb2file, outpath, stylesheetNames);
         } else {
                 String pdfname = cl.getArgs().length == 1 ? getPdfName(fb2name) : cl.getArgs()[1];
                 if ((new File(pdfname)).isDirectory()) {
@@ -162,8 +164,18 @@ public class CLIDriver {
         return srcName + ".pdf";
     }
 
-    private static void processDirectory(File dir, String[] stylesheetNames) throws FileNotFoundException, UnsupportedEncodingException {
-                File[] files = dir.listFiles(new FileFilter() {
+    private static void processDirectory(File inputDir, String outputPath, String[] stylesheetNames) throws FileNotFoundException, UnsupportedEncodingException {
+                File outDir = new File(outputPath);
+                if (outDir.exists() && !outDir.isDirectory()) {
+                    println(String.format("File %s exists.", outputPath));
+                    return;
+                }
+                
+                if (!outDir.exists()) {
+                    outDir.mkdir();
+                }
+
+                File[] files = inputDir.listFiles(new FileFilter() {
                     @Override
                     public boolean accept(File pathname) {
                         return pathname.isFile() && 
@@ -171,18 +183,19 @@ public class CLIDriver {
                     }
                 });
                 for (File file: files){
-                    translate(file.getPath(), getPdfName(file.getPath()), stylesheetNames);
+                    String outputFile = FilenameUtils.concat(outputPath, getPdfName(file.getName()));
+                    translate(file.getPath(), outputFile, stylesheetNames);
                 }
 
                 if(cl.hasOption('r')) {
-                    File[] subdirs = dir.listFiles(new FileFilter() {
+                    File[] subdirs = inputDir.listFiles(new FileFilter() {
                         @Override
                         public boolean accept(File pathname) {
                             return pathname.isDirectory();
                         }
                     });
                     for(File subdir: subdirs) {
-                        processDirectory(subdir, stylesheetNames);
+                        processDirectory(subdir, FilenameUtils.concat(outputPath, subdir.getName()), stylesheetNames);
                     }
                 }
     }
@@ -221,7 +234,7 @@ public class CLIDriver {
 
                 if (createLog) {
                     if (logFileName == null) {
-                        logFileName = String.format("%s.fb2pdf.log", fb2name);
+                        logFileName = String.format("%s.fb2pdf.log", FilenameUtils.removeExtension(pdfname));
                     }
                     FileOutputStream log = new FileOutputStream(logFileName);
                     PrintStream newOut = new PrintStream(log, true, logEncoding);
