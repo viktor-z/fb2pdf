@@ -92,7 +92,7 @@ public class XQueryUtilities {
     public static void transform(Document xdoc, String query, String morpher) throws IOException, XQueryException, ParsingException {
         XQuery xmorpher = XQueryPool.GLOBAL_POOL.getXQuery(morpher, null);
         Nodes nodes = query(query, xdoc, null);
-        System.out.println(String.format("Transformation query '%s' returned %d nodes", query, nodes.size()));
+        Log.info("Transformation query [{0}] returned {1} nodes", query, nodes.size());
         XQueryUtil.update(nodes, xmorpher, null);
     }
     
@@ -124,7 +124,7 @@ public class XQueryUtilities {
 
     public static Nodes getNodes(String query, Node contextNode) {
         Nodes nodes = query(query, contextNode, null);
-        System.out.println(String.format("Query '%s' returned %d nodes", query, nodes.size()));
+        Log.info("Query [{0}] returned {1} nodes", query, nodes.size());
         return nodes;
     }
 }

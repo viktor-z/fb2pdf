@@ -38,7 +38,7 @@ public class PageSizeEnforceHelper  extends PdfPageEventHelper {
             cb.addImage(marginEnforcerImage, -sz, 0, 0, -sz, dx + sz, sz);
             cb.addImage(marginEnforcerImage, 0, -sz, sz, 0, dx, dy + sz);
         } catch (DocumentException ex) {
-            System.out.println(ex);
+            Log.error(ex.getMessage());
         }
     }
 
@@ -60,7 +60,7 @@ public class PageSizeEnforceHelper  extends PdfPageEventHelper {
         try {
             img = Image.getInstance(5, 5, 3, 8, data, transparency);
         } catch (BadElementException ex) {
-            System.out.println(ex);
+            Log.error(ex.getMessage());
         }
         return img;
     }

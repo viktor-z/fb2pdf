@@ -5,26 +5,10 @@
 
 package org.trivee.fb2pdf;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.SequenceInputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.Vector;
 import java.util.regex.Pattern;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.cli.*;
 import org.apache.commons.io.FilenameUtils;
 import org.trivee.utils.Rotate;
 import org.trivee.utils.TwoUp;
@@ -236,10 +220,11 @@ public class CLIDriver {
                     if (logFileName == null) {
                         logFileName = String.format("%s.fb2pdf.log", FilenameUtils.removeExtension(pdfname));
                     }
-                    FileOutputStream log = new FileOutputStream(logFileName);
-                    PrintStream newOut = new PrintStream(log, true, logEncoding);
-                    System.setOut(newOut);
-                    System.setErr(newOut);
+                    try {
+                        Log.setup(logFileName, logEncoding);
+                    } catch (Exception ex) {
+                        println("Can't setup logger: " + ex.getMessage());
+                    }
                 }
 
                 try
