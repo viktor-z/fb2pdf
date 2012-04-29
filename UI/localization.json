@@ -1,6 +1,30 @@
 {
     dragDropTab: "Drag&Drop",
     fileBrowserTab: "File Browser",
+    parametersTab: "Parameters",
+
     dragDropLabel: "Drop files here",
+    
     convertButton: "Convert",
+    
+    settingsParametersSection: "Settings",
+    settingsFileParameter: "Settings File (-s)",
+
+    logParametersSection: "Log",
+    logCreationParameter: "File path (-l)",
+    logEncodingParameter: "Log file encoding (-e)",
+    logFileNameParameter: "'false' to disable",
+
+    inputParametersSection: "Input",
+    recursiveParameter: "Recursive (-r)",
+
+    outputParametersSection: "Output",
+    overwriteParameter: "Overwrite (-o)",
+    outdirParameter: "Output directory",
+
+    utilsParametersSection: "Utilities",
+    rotateParameter: "Rotate (-rt)",
+    twoupParameter: "Two-up (-t)",
+
+    parametersSave: "Save",
 }

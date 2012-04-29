@@ -1,6 +1,30 @@
 {
     dragDropTab: "Перетащить файлы",
     fileBrowserTab: "Выбрать файлы",
+    parametersTab: "Параметры",
+    
     dragDropLabel: "Бросить файлы сюда.",
+ 
     convertButton: "Конвертировать",
+
+    settingsParametersSection: "Настройки",
+    settingsFileParameter: "Файл настроек (-s)",
+
+    logParametersSection: "Лог",
+    logCreationParameter: "Путь к файлу (-l)",
+    logEncodingParameter: "Кодировка файла (-e)",
+    logFileNameParameter: "'false' для выключения",
+
+    inputParametersSection: "Исходные данные",
+    recursiveParameter: "Вложенные директории (-r)",
+
+    outputParametersSection: "Результат",
+    overwriteParameter: "Перезаписывать (-o)",
+    outdirParameter: "Записывать в директорию",
+
+    utilsParametersSection: "Утилиты",
+    rotateParameter: "Повернуть (-rt)",
+    twoupParameter: "Две страницы в одной (-t)",
+
+    parametersSave: "Сохранить",
 }

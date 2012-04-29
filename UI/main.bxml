@@ -35,6 +35,55 @@
                         </BoxPane>
                     </TablePane.Row>
                 </TablePane>
+                <TablePane>
+                    <TabPane.tabData>
+                        <content:ButtonData text="%parametersTab"/>
+                    </TabPane.tabData>
+                    <columns>
+                        <TablePane.Column width="1*"/>
+                    </columns>
+         
+                    <TablePane.Row height="1*">
+                        <Border styles="{thickness: 1}">
+                            <ScrollPane horizontalScrollBarPolicy="fill" verticalScrollBarPolicy="fill_to_capacity">
+                                <Form styles="{padding: 16}">
+                                    <Form.Section heading="%settingsParametersSection">
+                                        <TextInput Form.label="%settingsFileParameter"/>
+                                    </Form.Section>
+                 
+                                    <Form.Section heading="%logParametersSection">
+                                        <TextInput Form.label="%logCreationParameter" prompt="%logFileNameParameter"/>
+                                        <TextInput Form.label="%logEncodingParameter"/>
+                                    </Form.Section>
+
+                                    <Form.Section heading="%inputParametersSection">
+                                        <Checkbox state="SELECTED" Form.label="%recursiveParameter"/>
+                                    </Form.Section>
+
+                                    <Form.Section heading="%outputParametersSection">
+                                        <Checkbox Form.label="%overwriteParameter"/>
+                                        <TextInput Form.label="%outdirParameter"/>
+                                    </Form.Section>
+
+                                    <Form.Section heading="%utilsParametersSection">
+                                        <BoxPane Form.label="%rotateParameter">
+                                            <Checkbox bxml:id="rotateEnabledCheck" 
+                                                    ButtonStateListener.stateChanged="var b=rotateAngleList; var s=(arguments[0].state == 'SELECTED'); b.setEnabled(s); b.setSelectedIndex(s ? 0 : -1);" />
+                                            <ListButton bxml:id="rotateAngleList" enabled="false" listData="['90&#0176;', '180&#0176;', '270&#0176;']"/>
+                                        </BoxPane>
+                                        <Checkbox Form.label="%twoupParameter"/>
+                                    </Form.Section>
+                                </Form>
+                            </ScrollPane>
+                        </Border>
+                    </TablePane.Row>
+         
+                    <TablePane.Row height="34">
+                        <BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center'}">
+                            <PushButton bxml:id="parametersSaveButton" buttonData="%parametersSave" styles="{minimumAspectRatio:3}"/>
+                        </BoxPane>
+                    </TablePane.Row>
+                </TablePane>
             </TabPane>
         </top>
         <bottom>
