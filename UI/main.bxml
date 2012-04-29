@@ -46,9 +46,9 @@
                     <TablePane.Row height="1*">
                         <Border styles="{thickness: 1}">
                             <ScrollPane horizontalScrollBarPolicy="fill" verticalScrollBarPolicy="fill_to_capacity">
-                                <Form styles="{padding: 16}">
+                                <Form styles="{padding: 16, showFlagMessagesInline: true}">
                                     <Form.Section heading="%settingsParametersSection">
-                                        <TextInput Form.label="%settingsFileParameter"/>
+                                        <TextInput bxml:id="settingsFileParameter" Form.label="%settingsFileParameter"/>
                                     </Form.Section>
                  
                                     <Form.Section heading="%logParametersSection">
@@ -80,7 +80,8 @@
          
                     <TablePane.Row height="34">
                         <BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center'}">
-                            <PushButton bxml:id="parametersSaveButton" buttonData="%parametersSave" styles="{minimumAspectRatio:3}"/>
+                            <PushButton bxml:id="parametersSaveButton" buttonData="%parametersSave" width="120" height="24"
+                                    ButtonPressListener.buttonPressed="parametersSaveButtonPressed(arguments[0])"/>
                         </BoxPane>
                     </TablePane.Row>
                 </TablePane>

@@ -9,7 +9,8 @@ importClass(org.trivee.fb2pdf.gui.TextAreaOutputStream);
 importClass(org.apache.pivot.util.concurrent.TaskListener);
 importClass(org.apache.pivot.util.Filter);
 importClass(org.apache.pivot.wtk.TaskAdapter);
-
+importClass(org.apache.pivot.wtk.Form);
+importClass(org.apache.pivot.wtk.MessageType);
 importClass(java.lang.System);
 
 function processFile(file, fileList) {
@@ -143,6 +144,30 @@ function processFileIterator(iterator) {
 
 function convertButtonPressed(button) {
     processFileIterator(fileBrowser.getSelectedFiles().iterator());
+}
+
+function parametersSaveButtonPressed(button) {
+    if (!validateParameters()) return;
+}
+
+function validateParameters() {
+    try {
+        var result = true;
+
+        Form.clearFlag(settingsFileParameter);
+        var settingsFilePath = settingsFileParameter.text || "";
+        if (settingsFilePath != "") {
+            var settingsFile = new File(settingsFilePath);
+            if (settingsFile.isDirectory() || !settingsFile.exists()) {
+                Form.setFlag(settingsFileParameter, new Form.Flag(MessageType.ERROR, "File Not Found"));
+                result = false;
+            }
+        }
+
+        return result;
+    } catch(ex) {
+        System.out.println(ex);
+    }
 }
 
 var UIState = (function(){
