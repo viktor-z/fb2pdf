@@ -9,11 +9,12 @@
     
     settingsParametersSection: "Settings",
     settingsFileParameter: "Settings File (-s)",
+    settingsFileHint: "./data/stylesheet.json",
 
     logParametersSection: "Log",
-    logCreationParameter: "File path (-l)",
+    logFileNameParameter: "File path (-l)",
     logEncodingParameter: "Log file encoding (-e)",
-    logFileNameParameter: "'false' to disable",
+    logFileNameHint: "'false' to disable",
 
     inputParametersSection: "Input",
     recursiveParameter: "Recursive (-r)",
@@ -28,3 +29,4 @@
 
     parametersSave: "Save",
 }
+

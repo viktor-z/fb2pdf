@@ -9,11 +9,12 @@
 
     settingsParametersSection: "Настройки",
     settingsFileParameter: "Файл настроек (-s)",
+    settingsFileHint: "./data/stylesheet.json",
 
     logParametersSection: "Лог",
-    logCreationParameter: "Путь к файлу (-l)",
+    logFileNameParameter: "Путь к файлу (-l)",
     logEncodingParameter: "Кодировка файла (-e)",
-    logFileNameParameter: "'false' для выключения",
+    logFileNameHint: "'false' для выключения",
 
     inputParametersSection: "Исходные данные",
     recursiveParameter: "Вложенные директории (-r)",

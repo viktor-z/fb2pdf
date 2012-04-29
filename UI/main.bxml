@@ -28,9 +28,9 @@
                     <TablePane.Row height="1*">
                         <FileBrowser bxml:id="fileBrowser" multiSelect="true" disabledFileFilter="$srcBrowserDisabledFilter" styles="{hideDisabledFiles: true}" />
                     </TablePane.Row>
-                    <TablePane.Row height="34">
+                    <TablePane.Row height="44">
                         <BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center'}">
-                            <PushButton bxml:id="convertButton" buttonData="%convertButton" width="120" height="24" 
+                            <PushButton bxml:id="convertButton" buttonData="%convertButton" styles="{minimumAspectRatio:3, padding:6}"
                                     ButtonPressListener.buttonPressed="convertButtonPressed(arguments[0])"/>
                         </BoxPane>
                     </TablePane.Row>
@@ -48,11 +48,11 @@
                             <ScrollPane horizontalScrollBarPolicy="fill" verticalScrollBarPolicy="fill_to_capacity">
                                 <Form styles="{padding: 16, showFlagMessagesInline: true}">
                                     <Form.Section heading="%settingsParametersSection">
-                                        <TextInput bxml:id="settingsFileParameter" Form.label="%settingsFileParameter"/>
+                                        <TextInput bxml:id="settingsFileParameter" Form.label="%settingsFileParameter" prompt="%settingsFileHint"/>
                                     </Form.Section>
                  
                                     <Form.Section heading="%logParametersSection">
-                                        <TextInput Form.label="%logCreationParameter" prompt="%logFileNameParameter"/>
+                                        <TextInput Form.label="%logFileNameParameter" prompt="%logFileNameHint"/>
                                         <TextInput Form.label="%logEncodingParameter"/>
                                     </Form.Section>
 
@@ -78,9 +78,9 @@
                         </Border>
                     </TablePane.Row>
          
-                    <TablePane.Row height="34">
+                    <TablePane.Row height="44">
                         <BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center'}">
-                            <PushButton bxml:id="parametersSaveButton" buttonData="%parametersSave" width="120" height="24"
+                            <PushButton bxml:id="parametersSaveButton" buttonData="%parametersSave" styles="{minimumAspectRatio:3, padding:6}"
                                     ButtonPressListener.buttonPressed="parametersSaveButtonPressed(arguments[0])"/>
                         </BoxPane>
                     </TablePane.Row>
