@@ -46,9 +46,13 @@
                     <TablePane.Row height="1*">
                         <Border styles="{thickness: 1}">
                             <ScrollPane horizontalScrollBarPolicy="fill" verticalScrollBarPolicy="fill_to_capacity">
-                                <Form styles="{padding: 16, showFlagMessagesInline: true}">
+                                <Form bxml:id="settingsForm" styles="{padding: 16, showFlagMessagesInline: true}">
                                     <Form.Section heading="%settingsParametersSection">
-                                        <TextInput bxml:id="settingsFileParameter" Form.label="%settingsFileParameter" prompt="%settingsFileHint"/>
+                                        <BoxPane bxml:id="settingsFileParameterBox" Form.label="%settingsFileParameter">
+                                            <TextInput bxml:id="settingsFileParameter" prompt="%settingsFileHint"/>
+                                            <PushButton buttonData="%settingsBrowseButton" styles="{minimumAspectRatio:3, padding:6}"
+                                                ButtonPressListener.buttonPressed="settingsBrowseButtonPressed()"/>
+                                        </BoxPane>
                                     </Form.Section>
                  
                                     <Form.Section heading="%logParametersSection">

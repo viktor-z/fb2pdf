@@ -8,6 +8,7 @@
     convertButton: "Конвертировать",
 
     settingsParametersSection: "Настройки",
+    settingsBrowseButton: "Выбрать",
     settingsFileParameter: "Файл настроек (-s)",
     settingsFileHint: "./data/stylesheet.json",
 

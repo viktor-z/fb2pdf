@@ -8,6 +8,7 @@
     convertButton: "Convert",
     
     settingsParametersSection: "Settings",
+    settingsBrowseButton: "Browse",
     settingsFileParameter: "Settings File (-s)",
     settingsFileHint: "./data/stylesheet.json",
 

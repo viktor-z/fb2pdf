@@ -10,7 +10,10 @@ importClass(org.apache.pivot.util.concurrent.TaskListener);
 importClass(org.apache.pivot.util.Filter);
 importClass(org.apache.pivot.wtk.TaskAdapter);
 importClass(org.apache.pivot.wtk.Form);
+importClass(org.apache.pivot.wtk.Alert);
 importClass(org.apache.pivot.wtk.MessageType);
+importClass(org.apache.pivot.wtk.FileBrowserSheet);
+importClass(org.apache.pivot.wtk.SheetCloseListener);
 importClass(java.lang.System);
 
 function processFile(file, fileList) {
@@ -91,12 +94,6 @@ var dropTarget = new DropTarget() {
     }
 };
 
-var destBrowserDisabledFilter = new Filter() {
-    include: function(itm) {
-        return !(itm.isDirectory());
-    }
-};
-
 var srcBrowserDisabledFilter = new Filter() {
     include: function(itm) {
         return !(itm.isDirectory() || itm.getName().endsWith(".fb2") || itm.getName().endsWith(".fb2.zip"));
@@ -147,27 +144,51 @@ function convertButtonPressed(button) {
 }
 
 function parametersSaveButtonPressed(button) {
-    if (!validateParameters()) return;
-}
-
-function validateParameters() {
     try {
-        var result = true;
-
-        Form.clearFlag(settingsFileParameter);
-        var settingsFilePath = settingsFileParameter.text || "";
-        if (settingsFilePath != "") {
-            var settingsFile = new File(settingsFilePath);
-            if (settingsFile.isDirectory() || !settingsFile.exists()) {
-                Form.setFlag(settingsFileParameter, new Form.Flag(MessageType.ERROR, "File Not Found"));
-                result = false;
-            }
-        }
-
-        return result;
+        if (!validateParameters()) return;
     } catch(ex) {
         System.out.println(ex);
     }
+}
+
+function settingsBrowseButtonPressed() {
+    try {
+        var fileBrowserSheet = new FileBrowserSheet(FileBrowserSheet.Mode.OPEN);
+        fileBrowserSheet.setRootDirectory(fileBrowser.getRootDirectory());
+        fileBrowserSheet.setDisabledFileFilter(new Filter() {
+            include: function(itm) {
+                return !(itm.isDirectory() || itm.getName().endsWith(".json"));
+            }
+        });
+        fileBrowserSheet.open(main, new SheetCloseListener() {
+            sheetClosed: function(sheet) {
+                try {
+                    if (sheet.getResult()) {
+                        settingsFileParameter.text = sheet.getSelectedFile().getPath();
+                    }
+                } catch(ex) {
+                    System.out.println(ex);
+                }
+            }
+        });
+    } catch(ex) {
+        System.out.println(ex);
+    }
+}
+
+function validateParameters() {
+    var result = true;
+    settingsForm.clearFlags();
+    var settingsFilePath = settingsFileParameter.text || "";
+    if (settingsFilePath != "") {
+        var settingsFile = new File(settingsFilePath);
+        if (settingsFile.isDirectory() || !settingsFile.exists()) {
+            Form.setFlag(settingsFileParameterBox, new Form.Flag(MessageType.ERROR, "File Not Found"));
+            result = false;
+        }
+    }
+
+    return result;
 }
 
 var UIState = (function(){
