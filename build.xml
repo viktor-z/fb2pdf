@@ -66,7 +66,7 @@
                 <tstamp/>
 		<jar destfile="${dist}/fb2pdf.jar" compress="true" level="9">
 			<fileset dir="${build}" excludes="**/Test.class, lib/**" />
-                        <fileset dir="${src}" includes="**/l10n/**" />
+            <fileset dir="${src}" includes="**/*.json" />
 			<manifest>
 				<attribute name="Main-Class" value="org.trivee.fb2pdf.CLIDriver" />
 				<attribute name="Class-Path" value="iText.jar itext-hyph-xml.jar commons-lang3-3.1.jar commons-codec-1.6.jar commons-io-2.1.jar commons-cli-1.2.jar gson-2.1.jar nux.jar xom.jar saxon8.jar" />
@@ -136,6 +136,9 @@
     		<zipfileset prefix="lib" file="${lib}/nux.jar" />
     		<zipfileset prefix="lib" file="${lib}/xom.jar" />
     		<zipfileset prefix="lib" file="${lib}/saxon8.jar" />
+    		<zipfileset prefix="lib" file="${lib}/pivot-wtk-terra-2.0.1.jar" />
+    		<zipfileset prefix="lib" file="${lib}/pivot-wtk-2.0.1.jar" />
+    		<zipfileset prefix="lib" file="${lib}/pivot-core-2.0.1.jar" />
     		<zipfileset prefix="lib" file="${dist}/fb2pdf.jar" />
 
     		<zipfileset prefix="data" file="data/fb2pdf.jar" />
@@ -155,7 +158,6 @@
             <zipfileset prefix="data" file="data/DroidSerif-BoldItalic.ttf" />
             <zipfileset prefix="data" file="data/DroidSerif-Italic.ttf" />
 
-    		<zipfileset file="fb2pdf-GUI.cmd" />
     		<zipfileset file="twoup.cmd" />
     		<zipfileset file="transform.cmd" />
     		<zipfileset file="testTransformation.cmd" />
@@ -164,6 +166,8 @@
     		<zipfileset file="fb2pdf.sh" />
     		<zipfileset file="fb2pdf.desktop" />
     		<zipfileset file="fb2pdf.cmd" />    		
+    		<zipfileset file="fb2pdf-GUI.sh" />
+    		<zipfileset file="fb2pdf-GUI.cmd" />
 
             <zipfileset prefix="UI" dir="UI" />
 		</zip>
