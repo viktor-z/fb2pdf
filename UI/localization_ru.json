@@ -23,6 +23,7 @@
     outputParametersSection: "Результат",
     overwriteParameter: "Перезаписывать (-o)",
     outdirParameter: "Записывать в директорию",
+    outdirBrowseButton: "Выбрать",
 
     utilsParametersSection: "Утилиты",
     rotateParameter: "Повернуть (-rt)",
