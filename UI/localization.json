@@ -23,11 +23,13 @@
     outputParametersSection: "Output",
     overwriteParameter: "Overwrite (-o)",
     outdirParameter: "Output directory",
+    outdirBrowseButton: "Browse",
 
     utilsParametersSection: "Utilities",
     rotateParameter: "Rotate (-rt)",
     twoupParameter: "Two-up (-t)",
 
     parametersSave: "Save",
+    parametersRestore: "Restore",
+    parametersReset: "Reset",
 }
-

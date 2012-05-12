@@ -66,7 +66,11 @@
 
                                     <Form.Section heading="%outputParametersSection">
                                         <Checkbox Form.label="%overwriteParameter"/>
-                                        <TextInput Form.label="%outdirParameter"/>
+                                        <BoxPane bxml:id="outdirParameterBox" Form.label="%outdirParameter">
+                                            <TextInput bxml:id="outdirParameter" />
+                                            <PushButton buttonData="%outdirBrowseButton" styles="{minimumAspectRatio:3, padding:6}"
+                                                ButtonPressListener.buttonPressed="outdirBrowseButtonPressed()"/>
+                                        </BoxPane>
                                     </Form.Section>
 
                                     <Form.Section heading="%utilsParametersSection">
@@ -85,7 +89,11 @@
                     <TablePane.Row height="44">
                         <BoxPane styles="{horizontalAlignment:'center', verticalAlignment:'center'}">
                             <PushButton bxml:id="parametersSaveButton" buttonData="%parametersSave" styles="{minimumAspectRatio:3, padding:6}"
-                                    ButtonPressListener.buttonPressed="parametersSaveButtonPressed(arguments[0])"/>
+                                    ButtonPressListener.buttonPressed="parametersSaveButtonPressed()"/>
+                            <PushButton bxml:id="parametersRestoreButton" buttonData="%parametersRestore" styles="{minimumAspectRatio:3, padding:6}"
+                                    ButtonPressListener.buttonPressed="parametersRestoreButtonPressed()"/>
+                            <PushButton bxml:id="parametersResetButton" buttonData="%parametersReset" styles="{minimumAspectRatio:3, padding:6}"
+                                    ButtonPressListener.buttonPressed="parametersResetButtonPressed()"/>
                         </BoxPane>
                     </TablePane.Row>
                 </TablePane>

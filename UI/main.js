@@ -176,6 +176,26 @@ function settingsBrowseButtonPressed() {
     }
 }
 
+function outdirBrowseButtonPressed() {
+    try {
+        var fileBrowserSheet = new FileBrowserSheet(FileBrowserSheet.Mode.SAVE_TO);
+        fileBrowserSheet.getStyles().put("hideDisabledFiles", true); 
+        fileBrowserSheet.open(main, new SheetCloseListener() {
+            sheetClosed: function(sheet) {
+                try {
+                    if (sheet.getResult()) {
+                        outdirParameter.text = sheet.getSelectedFile().getPath();
+                    }
+                } catch(ex) {
+                    System.out.println(ex);
+                }
+            }
+        });
+    } catch(ex) {
+        System.out.println(ex);
+    }
+}
+
 function validateParameters() {
     var result = true;
     settingsForm.clearFlags();

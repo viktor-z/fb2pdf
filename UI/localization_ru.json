@@ -29,4 +29,6 @@
     twoupParameter: "Две страницы в одной (-t)",
 
     parametersSave: "Сохранить",
+    parametersRestore: "Восстановить",
+    parametersReset: "Сбросить",
 }
