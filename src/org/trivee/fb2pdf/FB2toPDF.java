@@ -21,91 +21,6 @@ public class FB2toPDF {
     private static final String NS_XLINK = "http://www.w3.org/1999/xlink";
     private static final String NS_FB2 = "http://www.gribuser.ru/xml/fictionbook/2.0";
     private static final XPathContext xCtx = new XPathContext("fb", NS_FB2);
-    private static final String[][] TRANSTABLE = {
-        // верхний регистр
-        // трехбуквенные замены
-        {"\u0429", "SCH"},
-        // двухбуквенные замены
-        {"\u0401", "YO"},
-        {"\u0416", "ZH"},
-        {"\u0426", "TS"},
-        {"\u0427", "CH"},
-        {"\u0428", "SH"},
-        {"\u042E", "YU"},
-        {"\u042F", "YA"},
-        // однобуквенные замены
-        {"\u0410", "A"},
-        {"\u0411", "B"},
-        {"\u0412", "V"},
-        {"\u0413", "G"},
-        {"\u0414", "D"},
-        {"\u0415", "E"},
-        {"\u0417", "Z"},
-        {"\u0418", "I"},
-        {"\u0419", "J"},
-        {"\u041A", "K"},
-        {"\u041B", "L"},
-        {"\u041C", "M"},
-        {"\u041D", "N"},
-        {"\u041E", "O"},
-        {"\u041F", "P"},
-        {"\u0420", "R"},
-        {"\u0421", "S"},
-        {"\u0422", "T"},
-        {"\u0423", "U"},
-        {"\u0424", "F"},
-        {"\u0425", "H"},
-        {"\u042D", "E"},
-        {"\u042B", "Y"},
-        {"\u042C", "`"},
-        {"\u042A", "'"},
-        // нижний регистр
-        // трехбуквенные замены
-        {"\u0449", "sch"},
-        // двухбуквенные замены
-        {"\u0451", "yo"},
-        {"\u0436", "zh"},
-        {"\u0446", "ts"},
-        {"\u0447", "ch"},
-        {"\u0448", "sh"},
-        {"\u044E", "yu"},
-        {"\u044F", "ya"},
-        // однобуквенные замены
-        {"\u0430", "a"},
-        {"\u0431", "b"},
-        {"\u0432", "v"},
-        {"\u0433", "g"},
-        {"\u0434", "d"},
-        {"\u0435", "e"},
-        {"\u0437", "z"},
-        {"\u0438", "i"},
-        {"\u0439", "j"},
-        {"\u043A", "k"},
-        {"\u043B", "l"},
-        {"\u043C", "m"},
-        {"\u043D", "n"},
-        {"\u043E", "o"},
-        {"\u043F", "p"},
-        {"\u0440", "r"},
-        {"\u0441", "s"},
-        {"\u0442", "t"},
-        {"\u0443", "u"},
-        {"\u0444", "f"},
-        {"\u0445", "h"},
-        {"\u044D", "e"},
-        {"\u044C", "`"},
-        {"\u044B", "y"},
-        {"\u044A", "'"},
-        // ukrainian
-        {"\u0454", "ie"},
-        {"\u0404", "IE"},
-        {"\u0456", "i"},
-        {"\u0406", "I"},
-        {"\u0457", "yi"},
-        {"\u0407", "YI"},
-        {"\u0491", "g"},
-        {"\u0490", "G"},};
-
     private String fromName;
     private String toName;
     private nu.xom.Document fb2;
@@ -2110,23 +2025,7 @@ public class FB2toPDF {
         if (!stylesheet.getGeneralSettings().transliterateMetaInfo && !force) {
             return text;
         }
-
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < text.length(); ++i) {
-            char c = text.charAt(i);
-            for (int j = 0; j < TRANSTABLE.length; ++j) {
-                if (c != TRANSTABLE[j][0].charAt(0)) {
-                    continue;
-                }
-                sb.append(TRANSTABLE[j][1]);
-                c = 0;
-                break;
-            }
-            if (c != 0) {
-                sb.append(c);
-            }
-        }
-        return sb.toString();
+        return Translit.get(text);
     }
 
     public static void translate(String fromName, String toName)
