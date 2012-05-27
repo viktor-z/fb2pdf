@@ -44,7 +44,7 @@ public class FootnoteRenderer {
         paragraph.setIndentationRight(0);
         paragraph.setFirstLineIndent(0);
         Chunk chunk = noteStyle.createChunk();
-        chunk.append("<…> ");
+        chunk.append("<â€¦> ");
         paragraph.add(chunk);
         doc.add(paragraph);
         
@@ -60,10 +60,10 @@ public class FootnoteRenderer {
                 Chunk chunk = noteStyle.createChunk();
                 chunk.setHyphenation(hyphenation);
                 if (superscript) {
-                    chunk.setTextRise(noteStyle.getFontSize().getPoints() / 3);
+                    chunk.setTextRise(noteStyle.getFontSize() / 3);
                 }
                 if (subscript) {
-                    chunk.setTextRise(-noteStyle.getFontSize().getPoints() / 6);
+                    chunk.setTextRise(-noteStyle.getFontSize() / 6);
                 }
                 String value = (marker == null) ? node.getValue() : marker + " " + node.getValue();
                 chunk.append(value);
@@ -202,9 +202,9 @@ public class FootnoteRenderer {
         pageStyle = stylesheet.getPageStyle();
         noteStyle = stylesheet.getParagraphStyle("footnote");
         float pageWidth = pageStyle.getPageWidth() - pageStyle.getMarginLeft() - pageStyle.getMarginRight();
-        fontSize = noteStyle.getFontSize().getPoints();
+        fontSize = noteStyle.getFontSize();
         basefont = noteStyle.getBaseFont();
-        cutMarkerWidth = basefont.getWidthPointKerned("  <…> ", fontSize);
+        cutMarkerWidth = basefont.getWidthPointKerned("  <â€¦> ", fontSize);
         float ascdesc = getAscDesc();
         float pageHeight = Math.max(ascdesc, noteStyle.getAbsoluteLeading());
         pageSize = new Rectangle(pageWidth, pageHeight);

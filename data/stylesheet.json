@@ -419,31 +419,31 @@
             comment:          "Front matter style: authors, publishers, uuid, creator tool",
             name:             "frontMatter",
             baseStyle:        "default",
-            fontSize:         "7.0pt"
+            fontSize:         "66%"
         },
         {
             name:             "title",
             baseStyle:        "default",
             fontStyle:        "bold",
-            fontSize:         "16.0pt",
+            fontSize:         "150%",
             alignment:        "center"
         },
         {
             name:             "subtitle",
             baseStyle:        "default",
-            fontSize:         "12.0pt",
+            fontSize:         "110%",
             alignment:        "center"
         },
         {
             name:             "author",
             baseStyle:        "default",
-            fontSize:         "14.0pt",
+            fontSize:         "130%",
             alignment:        "center"
         },
         {
             name:             "tocTitle",
             baseStyle:        "default",
-            fontSize:         "16.0pt",
+            fontSize:         "150%",
             alignment:        "center",
             spacingAfter:     "1em",
             text:             "\u0421\u043E\u0434\u0435\u0440\u0436\u0430\u043D\u0438\u0435"
@@ -451,7 +451,7 @@
         {
             name:             "tocItem",
             baseStyle:        "default",
-            fontSize:         "12.0pt",
+            fontSize:         "110%",
             fontStyle:        "bold",
             leftIndent:       "2.0em",
             firstLineIndent:  "-2.0em"
@@ -460,7 +460,7 @@
             name:             "annotation",
             baseStyle:        "default",
             fontFamily:       "serif",
-            fontSize:         "9.0pt",
+            fontSize:         "80%",
             alignment:        "justified",
             firstSpacingBefore:   "0.3em",
             spacingAfter:     "0.3em"
@@ -477,7 +477,7 @@
         {
             name:             "bodyTitle",
             baseStyle:        "default",
-            fontSize:         "16.0pt",
+            fontSize:         "150%",
             fontStyle:        "bold",
             alignment:        "center",
             lastSpacingAfter:     "0.6em",
@@ -486,7 +486,7 @@
         {
             name:             "sectionTitle",
             baseStyle:        "default",
-            fontSize:         "16.0pt",
+            fontSize:         "150%",
             fontStyle:        "bold",
             alignment:        "center",
             lastSpacingAfter:     "0.6em",
@@ -495,7 +495,7 @@
         {
             name:             "subSectionTitle",
             baseStyle:        "default",
-            fontSize:         "14.0pt",
+            fontSize:         "120%",
             fontStyle:        "bold",
             alignment:        "center",
             spacingBefore:        "0.3em",
@@ -506,7 +506,7 @@
         {
             name:             "subSubSectionTitle",
             baseStyle:        "default",
-            fontSize:         "12.0pt",
+            fontSize:         "110%",
             fontStyle:        "bold",
             alignment:        "center",
             disableHyphenation: "true"
@@ -515,7 +515,6 @@
             name:             "poem",
             baseStyle:        "default",
             fontFamily:       "serif",
-            fontSize:         "11.0pt",
             fontStyle:        "italic",
             leftIndent:       "5.0em",
             firstLineIndent:  "0em",
@@ -545,7 +544,6 @@
             name:             "epigraph",
             baseStyle:        "default",
             fontFamily:       "serif",
-            fontSize:         "11.0pt",
             fontStyle:        "italic",
             leftIndent:       "2.5em",
             firstSpacingBefore:   "0.5em",
@@ -576,7 +574,7 @@
             name:             "body",
             baseStyle:        "default",
             fontFamily:       "serif",
-            fontSize:         "10.5pt",
+            fontSize:         "95%",
             alignment:        "justified",
             firstLineIndent:  "1.5em",
             leading:          "1.2em",
@@ -587,7 +585,7 @@
             name:             "header",
             baseStyle:        "default",
             fontFamily:       "serif",
-            fontSize:         "8pt",
+            fontSize:         "70%",
             fontStyle:        "italic",
             spacingAfter:     "3pt",
             spacingBefore:    "0pt",
@@ -614,7 +612,7 @@
             selector:           "//p[code and count(*) = 1 and empty(text())]",
             baseStyle:          "body",
             fontFamily:         "monospaced",
-            fontSize:           "6.0pt",
+            fontSize:           "55%",
             alignment:          "left",
             disableHyphenation: "true",
             preserveWhitespaces: "true",
@@ -648,7 +646,7 @@
             name:             "footnote",
             baseStyle:        "default",
             fontFamily:       "sansSerif",
-            fontSize:         "7.5pt",
+            fontSize:         "70%",
             alignment:        "justified",
             firstFirstLineIndent:  "0pt",
             firstLineIndent:  "1em",
@@ -660,7 +658,7 @@
             baseStyle:      "default",
             enabled: 	    "true",
        		fontFamily:		"serif",
-       		fontSize:		"26.0pt",
+       		fontSize:		"233%",
        		fontStyle:		"regular",
        		spacingBefore:  "6.6pt",
        		spacingAfter:	"1.0pt"
@@ -669,7 +667,7 @@
             name:             "bodySubtitle",
             baseStyle:        "default",
             fontFamily:       "sansSerif",
-            fontSize:         "13.0pt",
+            fontSize:         "120%",
             fontStyle:        "bold",
             alignment:        "center",
             spacingBefore:    "0.3em",

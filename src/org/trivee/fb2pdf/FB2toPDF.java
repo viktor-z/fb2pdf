@@ -258,7 +258,7 @@ public class FB2toPDF {
             PdfTemplate tp = lpnt.template;
             ParagraphStyle tpStyle = lpnt.style;
             BaseFont tpBaseFont = tpStyle.getBaseFont();
-            float tpSize = tpStyle.getFontSize().getPoints();
+            float tpSize = tpStyle.getFontSize();
             String pageNum = String.format(pageNumFormat, linkPageNumbers.get(referenceName));
             float tpHight = tpBaseFont.getFontDescriptor(BaseFont.CAPHEIGHT, tpSize) + tpBaseFont.getAscentPoint(pageNum, tpSize);
             float tpWidth = tpBaseFont.getWidthPointKerned(pageNum, tpSize);
@@ -414,7 +414,7 @@ public class FB2toPDF {
         }
 
         String text = String.format(settings.linkPageNumFormat, settings.linkPageNumMax);
-        float tmpSize = currentStyle.getFontSize().getPoints();
+        float tmpSize = currentStyle.getFontSize();
         BaseFont tmpBasefont = currentStyle.getBaseFont();
         float templateHight = tmpBasefont.getFontDescriptor(BaseFont.CAPHEIGHT, tmpSize);
         float templateWidth = tmpBasefont.getWidthPointKerned(text, tmpSize);
@@ -1836,7 +1836,7 @@ public class FB2toPDF {
 
         ParagraphStyle dropcapStyle = stylesheet.getParagraphStyle(currentStyle.getDropcapStyle());
 
-        float dropCapSize = dropcapStyle.getFontSize().getPoints();
+        float dropCapSize = dropcapStyle.getFontSize();
         float spacingBefore = dropcapStyle.getSpacingBefore();
         float identationRight = dropcapStyle.getSpacingAfter();
         BaseFont basefont = dropcapStyle.getBaseFont();
@@ -2000,10 +2000,10 @@ public class FB2toPDF {
                 if (currentChunk == null) {
                     currentChunk = currentStyle.createChunk();
                     if (superscript) {
-                        currentChunk.setTextRise(currentStyle.getFontSize().getPoints() / 3);
+                        currentChunk.setTextRise(currentStyle.getFontSize() / 3);
                     }
                     if (subscript) {
-                        currentChunk.setTextRise(-currentStyle.getFontSize().getPoints() / 6);
+                        currentChunk.setTextRise(-currentStyle.getFontSize() / 6);
                     }
                     if (!currentStyle.getDisableHyphenation()) {
                         currentChunk.setHyphenation(hyphenation);
@@ -2046,7 +2046,8 @@ public class FB2toPDF {
             }
             translate(args[0], args[1]);
         } catch (Exception e) {
-            Log.info(e.getMessage());
+            Log.error(e.getMessage());
+            e.printStackTrace();
         }
     }
 

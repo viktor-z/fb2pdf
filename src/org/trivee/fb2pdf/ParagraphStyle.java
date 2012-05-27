@@ -1,21 +1,16 @@
 package org.trivee.fb2pdf;
 
-import java.lang.reflect.Type;
 import com.google.gson.*;
-
-import com.itextpdf.text.Anchor;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Chunk;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Font;
+import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import org.apache.commons.lang3.StringUtils;
 
 public class ParagraphStyle {
 
-    private static final class FontStyleInfo {
+    public static final class FontStyleInfo {
 
         private String style;
         private boolean fontBold;
@@ -53,6 +48,7 @@ public class ParagraphStyle {
     private static final class FontStyleInfoIO
             implements JsonDeserializer<FontStyleInfo>, JsonSerializer<FontStyleInfo> {
 
+        @Override
         public FontStyleInfo deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
                 throws JsonParseException {
             try {
@@ -62,6 +58,7 @@ public class ParagraphStyle {
             }
         }
 
+        @Override
         public JsonElement serialize(FontStyleInfo info, Type typeOfId, JsonSerializationContext context) {
             return new JsonPrimitive(info.style);
         }
@@ -96,6 +93,7 @@ public class ParagraphStyle {
     private static final class AlignmentInfoIO
             implements JsonDeserializer<AlignmentInfo>, JsonSerializer<AlignmentInfo> {
 
+        @Override
         public AlignmentInfo deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
                 throws JsonParseException {
             try {
@@ -105,6 +103,7 @@ public class ParagraphStyle {
             }
         }
 
+        @Override
         public JsonElement serialize(AlignmentInfo info, Type typeOfId, JsonSerializationContext context) {
             return new JsonPrimitive(info.alignment);
         }
@@ -215,20 +214,26 @@ public class ParagraphStyle {
         return getProperty(fontStyle, "getFontStyle", new FontStyleInfo("regular"));
     }
 
-    public Dimension getFontSize()
-            throws FB2toPDFException {
-        Dimension result = getProperty(fontSize, "getFontSize", null);
+    public Dimension getFontSizeDimension() throws FB2toPDFException {
+        
+        boolean isRelative = fontSize != null && fontSize.isRelative();
+        
+        Dimension result = getProperty(isRelative ? null : fontSize, "getFontSizeDimension", null);
         
         if (result == null) {
             throw new FB2toPDFException("Font size for style " + name + " not defined.");
         }
         
-        return result;
+        return isRelative ? new Dimension(fontSize.getPoints(result.getPoints()) + "pt") : result;
+    }
+    
+    public float getFontSize() throws FB2toPDFException {
+        return getFontSizeDimension().getPoints();
     }
 
     private <T> T getPropertyFromStyle(String getterName, ParagraphStyle style) throws FB2toPDFException {
         try {
-            Class styleClass = this.getClass();
+            Class<? extends ParagraphStyle> styleClass = this.getClass();
             Method getter = styleClass.getMethod(getterName);
             return (T)getter.invoke(style);
         } catch (Exception ex) {
@@ -310,7 +315,7 @@ public class ParagraphStyle {
             throws FB2toPDFException {
 
         BaseFont bf = getBaseFont();
-        float points = getFontSize().getPoints();
+        float points = getFontSize();
         if (halfSizeToggle) {
             points = points / 2;
         }
@@ -337,7 +342,7 @@ public class ParagraphStyle {
 
     public float getAbsoluteLeading()
             throws FB2toPDFException {
-        return getLeadingDimension().getPoints(getFontSize().getPoints());
+        return getLeadingDimension().getPoints(getFontSize());
     }
 
     public float getRelativeLeading()
@@ -358,7 +363,7 @@ public class ParagraphStyle {
 
     public float getSpacingBefore()
             throws FB2toPDFException {
-        return getSpacingBeforeDimension().getPoints(getFontSize().getPoints());
+        return getSpacingBeforeDimension().getPoints(getFontSize());
     }
 
     public Dimension getSpacingAfterDimension()
@@ -373,12 +378,12 @@ public class ParagraphStyle {
 
     public float getFirstSpacingBefore()
             throws FB2toPDFException {
-        return getFirstSpacingBeforeDimension().getPoints(getFontSize().getPoints());
+        return getFirstSpacingBeforeDimension().getPoints(getFontSize());
     }
 
     public float getSpacingAfter()
             throws FB2toPDFException {
-        return getSpacingAfterDimension().getPoints(getFontSize().getPoints());
+        return getSpacingAfterDimension().getPoints(getFontSize());
     }
 
     public Dimension getLastSpacingAfterDimension()
@@ -388,7 +393,7 @@ public class ParagraphStyle {
 
     public float getLastSpacingAfter()
             throws FB2toPDFException {
-        return getLastSpacingAfterDimension().getPoints(getFontSize().getPoints());
+        return getLastSpacingAfterDimension().getPoints(getFontSize());
     }
 
     public Dimension getLeftIndentDimension()
@@ -403,12 +408,12 @@ public class ParagraphStyle {
 
     public float getLeftIndent()
             throws FB2toPDFException {
-        return getLeftIndentDimension().getPoints(getFontSize().getPoints());
+        return getLeftIndentDimension().getPoints(getFontSize());
     }
 
     public float getRightIndent()
             throws FB2toPDFException {
-        return getRightIndentDimension().getPoints(getFontSize().getPoints());
+        return getRightIndentDimension().getPoints(getFontSize());
     }
 
     public Dimension getFirstLineIndentDimension()
@@ -423,12 +428,12 @@ public class ParagraphStyle {
 
     public float getFirstLineIndent()
             throws FB2toPDFException {
-        return getFirstLineIndentDimension().getPoints(getFontSize().getPoints());
+        return getFirstLineIndentDimension().getPoints(getFontSize());
     }
 
     public float getFirstFirstLineIndent()
             throws FB2toPDFException {
-        return getFirstFirstLineIndentDimension().getPoints(getFontSize().getPoints());
+        return getFirstFirstLineIndentDimension().getPoints(getFontSize());
     }
 
     public String getText() {

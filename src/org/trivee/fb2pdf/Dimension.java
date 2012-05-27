@@ -5,6 +5,7 @@ import com.google.gson.*;
 
 public class Dimension
 {
+    private static final String PCT = "%";
     private static final String EM = "em";
     private static final String PT = "pt";
     private static final String MM = "mm";
@@ -27,6 +28,10 @@ public class Dimension
     {
         setDimension(dimension);
     }
+    
+    private float parseDimension(String suffix) {
+        return Float.parseFloat(dimension.substring(0, dimension.length()-suffix.length()));
+    }
 
     public void setDimension(String dimension)
         throws FB2toPDFException
@@ -35,17 +40,22 @@ public class Dimension
         if (dimension.endsWith(PT))
         {
             relative = false;
-            points = Float.parseFloat(dimension.substring(0, dimension.length()-2));
+            points = parseDimension(PT);
         }
         else if (dimension.endsWith(MM))
         {
             relative = false;
-            points = MM_TO_POINTS * Float.parseFloat(dimension.substring(0, dimension.length()-2));
+            points = MM_TO_POINTS * parseDimension(MM);
         }
         else if (dimension.endsWith(EM))
         {
             relative = true;
-            points = 12.0f * Float.parseFloat(dimension.substring(0, dimension.length()-2));
+            points = 12.0f * parseDimension(EM);
+        }
+        else if (dimension.endsWith(PCT))
+        {
+           relative = true;
+           points = 12.0f * parseDimension(PCT) / 100;
         }
         else
         {
