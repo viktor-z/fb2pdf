@@ -449,9 +449,11 @@
         },
         {
             name:             "tocItem",
+            baseStyle:        "body",
+            alignment:        "left",
             firstFirstLineIndent:  "0pt",
             firstLineIndent:  "0pt",
-            baseStyle:        "body"
+            fontSize:         "90%"
         },
         {
             name:             "annotation",

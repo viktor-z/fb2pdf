@@ -3,6 +3,7 @@ package org.trivee.fb2pdf;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
+import com.itextpdf.text.pdf.draw.DottedLineSeparator;
 import java.awt.Color;
 import java.awt.Toolkit;
 import java.io.*;
@@ -65,6 +66,7 @@ public class FB2toPDF {
 
     protected void addSectionsToTOC(Elements sections, int level) throws DocumentException, FB2toPDFException {
         currentStyle = stylesheet.getParagraphStyle("tocItem");
+        GeneralSettings settings = stylesheet.getGeneralSettings();
         
         float extraIndent = level * currentStyle.getFontSize();
 
@@ -90,14 +92,19 @@ public class FB2toPDF {
 
             currentParagraph.add(chunk);
             currentReference = "#" + ref;
-            addPageNumTemplate();
+            
+            
+            if (settings.enableLinkPageNum) {
+                currentParagraph.add(new Chunk(new DottedLineSeparator()));
+                addPageNumTemplate();
+            }
 
             doc.add(currentParagraph);
             
             currentReference = null;
             
             Elements internalSections = section.getChildElements("section", NS_FB2);
-            if (internalSections.size() > 0 && stylesheet.getGeneralSettings().generateTOCLevels > level) {
+            if (internalSections.size() > 0 && settings.generateTOCLevels > level) {
                 addSectionsToTOC(internalSections, level+1);
             }
 
