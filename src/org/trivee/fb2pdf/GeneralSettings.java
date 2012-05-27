@@ -22,7 +22,7 @@ public class GeneralSettings {
     public boolean cacheImages = true;
     public boolean ignoreEmptyLineBeforeImage;
     public boolean ignoreEmptyLineAfterImage;
-    public boolean generateTOC;
+    public int generateTOCLevels;
     public boolean generateNoteBackLinks = true;
     public boolean generateInternalLinks = true;
     public boolean generateFrontMatter = true;

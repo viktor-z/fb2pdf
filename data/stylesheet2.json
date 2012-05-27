@@ -3,7 +3,7 @@
         enableDoubleRenderingOutline:   "true",
         bodiesToRender:   "//body",
         //bodiesToRender:   "//body[empty(@name) or @name != 'notes']",
-        generateTOC:	"true",
+        generateTOCLevels:	"2",
         generateFrontMatter:	"true",
         generateNoteBackLinks:	"true",
         generateInternalLinks:  "true",

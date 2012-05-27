@@ -97,7 +97,7 @@ public class FB2toPDF {
             currentReference = null;
             
             Elements internalSections = section.getChildElements("section", NS_FB2);
-            if (internalSections.size() > 0) {
+            if (internalSections.size() > 0 && stylesheet.getGeneralSettings().generateTOCLevels > level) {
                 addSectionsToTOC(internalSections, level+1);
             }
 
@@ -414,7 +414,7 @@ public class FB2toPDF {
         }
         
         Element body = (Element)bodies.get(0);
-        if (stylesheet.getGeneralSettings().generateTOC) {
+        if (stylesheet.getGeneralSettings().generateTOCLevels > 0) {
             makeTOCPage(body);
         }
 
