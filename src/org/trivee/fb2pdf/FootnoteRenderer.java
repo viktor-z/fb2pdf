@@ -44,7 +44,7 @@ public class FootnoteRenderer {
         paragraph.setIndentationRight(0);
         paragraph.setFirstLineIndent(0);
         Chunk chunk = noteStyle.createChunk();
-        chunk.append("<…> ");
+        chunk.append("<\u2026> ");
         paragraph.add(chunk);
         doc.add(paragraph);
         
@@ -204,7 +204,7 @@ public class FootnoteRenderer {
         float pageWidth = pageStyle.getPageWidth() - pageStyle.getMarginLeft() - pageStyle.getMarginRight();
         fontSize = noteStyle.getFontSize();
         basefont = noteStyle.getBaseFont();
-        cutMarkerWidth = basefont.getWidthPointKerned("  <…> ", fontSize);
+        cutMarkerWidth = basefont.getWidthPointKerned("  <\u2026> ", fontSize);
         float ascdesc = getAscDesc();
         float pageHeight = Math.max(ascdesc, noteStyle.getAbsoluteLeading());
         pageSize = new Rectangle(pageWidth, pageHeight);
