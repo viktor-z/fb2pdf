@@ -63,6 +63,47 @@ public class FB2toPDF {
         this.toName = toName;
     }
 
+    protected void addSectionsToTOC(Elements sections, int level) throws DocumentException, FB2toPDFException {
+        currentStyle = stylesheet.getParagraphStyle("tocItem");
+        
+        float extraIndent = level * currentStyle.getFontSize();
+
+        for (int i = 0; i < sections.size(); ++i) {
+            Element section = sections.get(i);
+            Nodes nodes = section.query("./fb:title//*[not(@type) or @type != 'note']/text()", xCtx);
+            String title = getTextContent(nodes, null, null);
+            if (title.length() == 0) {
+                title = "#" + (i + 1);
+            }
+
+            Chunk chunk = currentStyle.createChunk();
+            chunk.append(TextPreprocessor.process(title, stylesheet.getTextPreprocessorSettings(), currentStyle));
+
+            String ref = section.getAttributeValue("id");
+            if (isBlank(ref)) {
+                ref = String.format("section%d", section.hashCode());
+            }
+            addGoToActionToChunk(ref, chunk);
+            currentParagraph = currentStyle.createParagraph();
+            
+            currentParagraph.setIndentationLeft(currentParagraph.getIndentationLeft() + extraIndent);
+
+            currentParagraph.add(chunk);
+            currentReference = "#" + ref;
+            addPageNumTemplate();
+
+            doc.add(currentParagraph);
+            
+            currentReference = null;
+            
+            Elements internalSections = section.getChildElements("section", NS_FB2);
+            if (internalSections.size() > 0) {
+                addSectionsToTOC(internalSections, level+1);
+            }
+
+        }
+    }
+
     protected void setupBackgroundImage() throws FB2toPDFException {
         try {
             backgroundImageHelper = new BackgroundImageHelper();
@@ -1468,33 +1509,7 @@ public class FB2toPDF {
         currentStyle = stylesheet.getParagraphStyle("tocTitle");
         addLine(currentStyle.getText(), currentStyle);
 
-        currentStyle = stylesheet.getParagraphStyle("tocItem");
-
-        for (int i = 0; i < sections.size(); ++i) {
-            Element section = sections.get(i);
-            Nodes nodes = section.query("./fb:title//*[not(@type) or @type != 'note']/text()", xCtx);
-            String title = getTextContent(nodes, null, null);
-            if (title.length() == 0) {
-                title = "#" + (i + 1);
-            }
-
-            Chunk chunk = currentStyle.createChunk();
-            chunk.append(TextPreprocessor.process(title, stylesheet.getTextPreprocessorSettings(), currentStyle));
-
-            String ref = section.getAttributeValue("id");
-            if (isBlank(ref)) {
-                ref = String.format("section%d", section.hashCode());
-            }
-            addGoToActionToChunk(ref, chunk);
-            currentParagraph = currentStyle.createParagraph();
-            currentParagraph.add(chunk);
-            currentReference = "#" + ref;
-            addPageNumTemplate();
-
-            doc.add(currentParagraph);
-            
-            currentReference = null;
-        }
+        addSectionsToTOC(sections, 1);
 
         doc.newPage();
     }

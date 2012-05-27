@@ -450,11 +450,9 @@
         },
         {
             name:             "tocItem",
-            baseStyle:        "default",
-            fontSize:         "110%",
-            fontStyle:        "bold",
-            leftIndent:       "2.0em",
-            firstLineIndent:  "-2.0em"
+            firstFirstLineIndent:  "0pt",
+            firstLineIndent:  "0pt",
+            baseStyle:        "body"
         },
         {
             name:             "annotation",
