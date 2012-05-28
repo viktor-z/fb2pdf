@@ -1,8 +1,8 @@
 /*
- * $Id: XfaForm.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: XfaForm.java 5094 2012-03-03 15:15:19Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -60,6 +60,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -169,6 +170,24 @@ public class XfaForm {
             }
             n = n.getNextSibling();
         }
+        if (datasetsNode == null)
+        	createDatasetsNode(domDocument.getFirstChild());
+    }
+
+    /**
+     * Some XFA forms don't have a datasets node.
+     * If this is the case, we have to add one.
+     */
+    private void createDatasetsNode(Node n) {
+    	while (n.getChildNodes().getLength() == 0) {
+    		n = n.getNextSibling();
+    	}
+    	if (n != null) {
+            Element e = n.getOwnerDocument().createElement("xfa:datasets");
+            e.setAttribute("xmlns:xfa", XFA_DATA_SCHEMA);
+            datasetsNode = e;
+            n.appendChild(datasetsNode);
+    	}
     }
 
     /**
@@ -257,8 +276,7 @@ public class XfaForm {
     public org.w3c.dom.Document getDomDocument() {
         return domDocument;
     }
-
-
+    
     /**
      * Finds the complete field name contained in the "classic" forms from a partial
      * name.
@@ -1104,21 +1122,29 @@ public class XfaForm {
     }
 
     public void fillXfaForm(File file) throws IOException {
-		fillXfaForm(new FileInputStream(file));
+    	fillXfaForm(file, false);
+    }
+    public void fillXfaForm(File file, boolean readOnly) throws IOException {
+		fillXfaForm(new FileInputStream(file), readOnly);
     }
 
     public void fillXfaForm(InputStream is) throws IOException {
-    	fillXfaForm(new InputSource(is));
+    	fillXfaForm(is, false);
+    }
+    public void fillXfaForm(InputStream is, boolean readOnly) throws IOException {
+    	fillXfaForm(new InputSource(is), readOnly);
     }
 
-
     public void fillXfaForm(InputSource is) throws IOException {
+    	fillXfaForm(is, false);
+    }
+    public void fillXfaForm(InputSource is, boolean readOnly) throws IOException {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     	DocumentBuilder db;
 		try {
 			db = dbf.newDocumentBuilder();
 	    	Document newdoc = db.parse(is);
-	    	fillXfaForm(newdoc.getDocumentElement());
+	    	fillXfaForm(newdoc.getDocumentElement(), readOnly);
 		} catch (ParserConfigurationException e) {
 			throw new ExceptionConverter(e);
 		} catch (SAXException e) {
@@ -1126,11 +1152,20 @@ public class XfaForm {
 		}
     }
 
+    public void fillXfaForm(Node node) {
+    	fillXfaForm(node, false);
+    }
     /**
      * Replaces the data under datasets/data.
      * @since	iText 5.0.0
      */
-    public void fillXfaForm(Node node) {
+    public void fillXfaForm(Node node, boolean readOnly) {
+    	if (readOnly) {
+        	NodeList nodeList = domDocument.getElementsByTagName("field");
+        	for (int i = 0; i < nodeList.getLength(); i++) {
+    			((Element)nodeList.item(i)).setAttribute("access", "readOnly");
+    		}
+    	}
         NodeList allChilds = datasetsNode.getChildNodes();
         int len = allChilds.getLength();
         Node data = null;
@@ -1150,9 +1185,27 @@ public class XfaForm {
 			data.appendChild(domDocument.importNode(node, true));
 		}
 		else {
-			data.replaceChild(domDocument.importNode(node, true), data.getFirstChild());
+// There's a possibility that first child node of XFA data is not an ELEMENT but simply a TEXT. In this case data will be duplicated.
+//			data.replaceChild(domDocument.importNode(node, true), data.getFirstChild());
+            Node firstNode = getFirstElementNode(data);
+            if (firstNode != null)
+                data.replaceChild(domDocument.importNode(node, true), firstNode);
 		}
         extractNodes();
 		setChanged(true);
     }
+
+    private Node getFirstElementNode(Node src) {
+        Node result = null;
+        NodeList list = src.getChildNodes();
+        for (int i = 0; i < list.getLength(); i++) {
+            if (list.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                result = list.item(i);
+                break;
+            }
+        }
+        return result;
+    }
+
+
 }

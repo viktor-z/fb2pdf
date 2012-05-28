@@ -1,8 +1,8 @@
 /*
- * $Id: XmpReader.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: XmpReader.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -58,6 +58,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.itextpdf.text.ExceptionConverter;
+import com.itextpdf.text.xml.XMLUtil;
 import com.itextpdf.text.xml.XmlDomWriter;
 
 /**
@@ -149,13 +150,16 @@ public class XmpReader {
 			return false;
 		Node pNode;
 		Node node;
+		String prefix;
 		for (int i = 0; i < nodes.getLength(); i++) {
 			pNode = nodes.item(i);
 			NamedNodeMap attrs = pNode.getAttributes();
 			for (int j = 0; j < attrs.getLength(); j++) {
 				node = attrs.item(j);
 				if (namespaceURI.equals(node.getNodeValue())) {
-					node = domDocument.createElement(localName);
+					prefix = node.getLocalName();
+					node = domDocument.createElementNS(namespaceURI, localName);
+					node.setPrefix(prefix);
 					node.appendChild(domDocument.createTextNode(value));
 					pNode.appendChild(node);
 					return true;

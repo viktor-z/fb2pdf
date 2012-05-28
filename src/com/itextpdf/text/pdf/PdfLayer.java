@@ -1,8 +1,8 @@
 /*
- * $Id: PdfLayer.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: PdfLayer.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -114,7 +114,7 @@ public class PdfLayer extends PdfDictionary implements PdfOCG {
      */
     public void addChild(PdfLayer child) {
         if (child.parent != null)
-            throw new IllegalArgumentException(MessageLocalization.getComposedMessage("the.layer.1.already.has.a.parent", ((PdfString)child.get(PdfName.NAME)).toUnicodeString()));
+            throw new IllegalArgumentException(MessageLocalization.getComposedMessage("the.layer.1.already.has.a.parent", child.getAsString(PdfName.NAME).toUnicodeString()));
         child.parent = this;
         if (children == null)
             children = new ArrayList<PdfLayer>();
@@ -189,7 +189,7 @@ public class PdfLayer extends PdfDictionary implements PdfOCG {
     }
 
     private PdfDictionary getUsage() {
-        PdfDictionary usage = (PdfDictionary)get(PdfName.USAGE);
+        PdfDictionary usage = getAsDict(PdfName.USAGE);
         if (usage == null) {
             usage = new PdfDictionary();
             put(PdfName.USAGE, usage);

@@ -1,8 +1,8 @@
 /*
- * $Id: PdfDestination.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: PdfDestination.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -46,9 +46,7 @@ package com.itextpdf.text.pdf;
 import java.util.StringTokenizer;
 
 /**
- * A <CODE>PdfColor</CODE> defines a Color (it's a <CODE>PdfArray</CODE> containing 3 values).
- *
- * @see		PdfDictionary
+ * A <CODE>PdfDestination</CODE> is a reference to a location in a PDF file.
  */
 
 public class PdfDestination extends PdfArray {

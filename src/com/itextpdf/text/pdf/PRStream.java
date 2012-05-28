@@ -1,8 +1,8 @@
 /*
- * $Id: PRStream.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: PRStream.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -55,7 +55,7 @@ import com.itextpdf.text.ExceptionConverter;
 public class PRStream extends PdfStream {
     
     protected PdfReader reader;
-    protected int offset;
+    protected long offset;
     protected int length;
     
     //added by ujihara for decryption
@@ -83,7 +83,7 @@ public class PRStream extends PdfStream {
         this.reader = reader;
     }
 
-    public PRStream(PdfReader reader, int offset) {
+    public PRStream(PdfReader reader, long offset) {
         this.reader = reader;
         this.offset = offset;
     }
@@ -182,7 +182,7 @@ public class PRStream extends PdfStream {
         put(PdfName.LENGTH, new PdfNumber(length));
     }
     
-    public int getOffset() {
+    public long getOffset() {
         return offset;
     }
     

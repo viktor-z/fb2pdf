@@ -410,7 +410,7 @@ public class FB2toPDF {
         final PageStyle pageStyle = stylesheet.getPageStyle();
         Rectangle pageSize = new Rectangle(pageStyle.getPageWidth(), pageStyle.getPageHeight(), pageStyle.getPageRotation());
         if(!isBlank(pageStyle.backgroundColor)) {
-            pageSize.setBackgroundColor(new BaseColor(Color.decode(pageStyle.backgroundColor)));
+            pageSize.setBackgroundColor(new BaseColor(Color.decode(pageStyle.backgroundColor).getRGB()));
         }
         return pageSize;
     }

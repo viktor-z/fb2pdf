@@ -1,8 +1,8 @@
 /*
- * $Id: PdfLine.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: PdfLine.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -287,6 +287,7 @@ public class PdfLine {
     void setExtraIndent(float extra) {
     	left += extra;
     	width -= extra;
+    	originalWidth -= extra;
     }
 
     /**
@@ -440,7 +441,8 @@ public class PdfLine {
 
     /**
      * Gets the difference between the "normal" leading and the maximum
-     * size (for instance when there are images in the chunk).
+     * size (for instance when there are images in the chunk and the leading
+     * has to be taken into account).
      * @return	an extra leading for images
      * @since	2.1.5
      */
@@ -455,8 +457,10 @@ public class PdfLine {
             }
             else {
             	Image img = chunk.getImage();
-            	float height = img.getScaledHeight() + chunk.getImageOffsetY() + img.getSpacingBefore();
-            	image_leading = Math.max(height, image_leading);
+            	if (chunk.changeLeading()) {
+            		float height = img.getScaledHeight() + chunk.getImageOffsetY() + img.getSpacingBefore();
+            		image_leading = Math.max(height, image_leading);
+            	}
             }
         }
         return new float[]{normal_leading, image_leading};

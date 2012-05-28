@@ -1,8 +1,8 @@
 /*
- * $Id: PdfRectangle.java 4793 2011-04-05 15:28:41Z blowagie $
+ * $Id: PdfRectangle.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify

@@ -1,8 +1,8 @@
 /*
- * $Id: MarkedSection.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: MarkedSection.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -46,6 +46,8 @@ package com.itextpdf.text;
 import java.util.Collection;
 import java.util.Iterator;
 
+import com.itextpdf.text.api.Indentable;
+
 /**
  * Wrapper that allows to add properties to a Chapter/Section object.
  * Before iText 1.5 every 'basic building block' implemented the MarkupAttributes interface.
@@ -54,7 +56,7 @@ import java.util.Iterator;
  * the MarkedObject functionality.
  */
 
-public class MarkedSection extends MarkedObject {
+public class MarkedSection extends MarkedObject implements Indentable {
 
 	/** This is the title of this section. */
 	protected MarkedObject title = null;
@@ -274,5 +276,19 @@ public class MarkedSection extends MarkedObject {
 	 */
 	public void newPage() {
 		((Section)element).newPage();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.itextpdf.text.api.Indentable#getIndentationLeft()
+	 */
+	public float getIndentationLeft() {
+		return ((Section)element).getIndentationLeft();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.itextpdf.text.api.Indentable#getIndentationRight()
+	 */
+	public float getIndentationRight() {
+		return ((Section)element).getIndentationRight();
 	}
 }

@@ -1,8 +1,8 @@
 /*
- * $Id: PdfPCell.java 4808 2011-04-15 15:23:49Z blowagie $
+ * $Id: PdfPCell.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -106,7 +106,7 @@ public class PdfPCell extends Rectangle{
     private PdfPCellEvent cellEvent;
 
     /** Holds value of property useDescender. */
-    private boolean useDescender;
+    private boolean useDescender = false;
 
     /** Increases padding to include border if true */
     private boolean useBorderPadding = false;
@@ -166,14 +166,13 @@ public class PdfPCell extends Rectangle{
         super(0, 0, 0, 0);
         borderWidth = 0.5f;
         border = BOX;
+        column.setLeading(0, 1);
         if (fit) {
             this.image = image;
-            column.setLeading(0, 1);
             setPadding(borderWidth / 2);
         }
         else {
-            column.addText(this.phrase = new Phrase(new Chunk(image, 0, 0)));
-            column.setLeading(0, 1);
+            column.addText(this.phrase = new Phrase(new Chunk(image, 0, 0, true)));
             setPadding(0);
         }
     }

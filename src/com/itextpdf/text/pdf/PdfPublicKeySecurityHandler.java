@@ -1,8 +1,8 @@
 /*
- * $Id: PdfPublicKeySecurityHandler.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: PdfPublicKeySecurityHandler.java 5091 2012-03-01 12:39:36Z jerrepip $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -90,6 +90,7 @@ import java.io.IOException;
 import java.security.AlgorithmParameterGenerator;
 import java.security.AlgorithmParameters;
 import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.Certificate;
@@ -263,7 +264,11 @@ public class PdfPublicKeySecurityHandler {
                 tbscertificatestructure.getIssuer(),
                 tbscertificatestructure.getSerialNumber().getValue());
         Cipher cipher = Cipher.getInstance(algorithmidentifier.getObjectId().getId());
+        try{
         cipher.init(1, x509certificate);
+        }catch(InvalidKeyException e){
+        	cipher.init(1,x509certificate.getPublicKey());
+        }
         DEROctetString deroctetstring = new DEROctetString(cipher.doFinal(abyte0));
         RecipientIdentifier recipId = new RecipientIdentifier(issuerandserialnumber);
         return new KeyTransRecipientInfo( recipId, algorithmidentifier, deroctetstring);

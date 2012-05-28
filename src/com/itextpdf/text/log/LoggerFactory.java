@@ -1,7 +1,8 @@
 /*
- * $Id: LoggerFactory.java 4847 2011-05-05 19:46:13Z redlab_b $
+ * $Id: LoggerFactory.java 5075 2012-02-27 16:36:18Z blowagie $
  *
- * This file is part of the iText (R) project. Copyright (c) 1998-2011 1T3XT
+ * This file is part of the iText (R) project.
+ * Copyright (c) 1998-2012 1T3XT
  * BVBA Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -58,10 +59,19 @@ public class LoggerFactory {
 	private static LoggerFactory myself;
 	/**
 	 * Returns the logger set in this LoggerFactory. Defaults to {@link NoOpLogger}
+	 * @param klass
 	 * @return the logger.
 	 */
-	public static Logger getLogger() {
-		return myself.logger;
+	public static Logger getLogger(final Class<?> klass) {
+		return myself.logger.getLogger(klass);
+	}
+	/**
+	 * Returns the logger set in this LoggerFactory. Defaults to {@link NoOpLogger}
+	 * @param name
+	 * @return the logger.
+	 */
+	public static Logger getLogger(final String name) {
+		return myself.logger.getLogger(name);
 	}
 	/**
 	 * Returns the LoggerFactory
@@ -93,4 +103,6 @@ public class LoggerFactory {
 	public Logger logger() {
 		return logger;
 	}
+
+
 }

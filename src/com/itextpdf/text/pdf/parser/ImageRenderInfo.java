@@ -1,8 +1,8 @@
 /*
- * $Id: ImageRenderInfo.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: ImageRenderInfo.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Kevin Day, Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -59,12 +59,25 @@ public class ImageRenderInfo {
     private final Matrix ctm;
     /** A reference to the image XObject */
     private final PdfIndirectReference ref;
+    /** A reference to an inline image */
+    private final InlineImageInfo inlineImageInfo;
+    /** the color space associated with the image */
+    private final PdfDictionary colorSpaceDictionary;
     /** the image object to be rendered, if it has been parsed already.  Null otherwise. */
     private PdfImageObject imageObject = null;
     
-    private ImageRenderInfo(Matrix ctm, PdfIndirectReference ref) {
+    private ImageRenderInfo(Matrix ctm, PdfIndirectReference ref, PdfDictionary colorSpaceDictionary) {
         this.ctm = ctm;
         this.ref = ref;
+        this.inlineImageInfo = null;
+        this.colorSpaceDictionary = colorSpaceDictionary;
+    }
+
+    private ImageRenderInfo(Matrix ctm, InlineImageInfo inlineImageInfo, PdfDictionary colorSpaceDictionary) {
+        this.ctm = ctm;
+        this.ref = null;
+        this.inlineImageInfo = inlineImageInfo;
+        this.colorSpaceDictionary = colorSpaceDictionary;
     }
     
     /**
@@ -74,8 +87,8 @@ public class ImageRenderInfo {
      * @return the ImageRenderInfo representing the rendered XObject
      * @since 5.0.1
      */
-    public static ImageRenderInfo createForXObject(Matrix ctm, PdfIndirectReference ref){
-        return new ImageRenderInfo(ctm, ref);
+    public static ImageRenderInfo createForXObject(Matrix ctm, PdfIndirectReference ref, PdfDictionary colorSpaceDictionary){
+        return new ImageRenderInfo(ctm, ref, colorSpaceDictionary);
     }
     
     /**
@@ -86,9 +99,8 @@ public class ImageRenderInfo {
      * @return the ImageRenderInfo representing the rendered embedded image
      * @since 5.0.1
      */
-    protected static ImageRenderInfo createdForEmbeddedImage(Matrix ctm, PdfImageObject imageObject){
-        ImageRenderInfo renderInfo = new ImageRenderInfo(ctm, null);
-        renderInfo.imageObject = imageObject;
+    protected static ImageRenderInfo createForEmbeddedImage(Matrix ctm, InlineImageInfo inlineImageInfo, PdfDictionary colorSpaceDictionary){
+        ImageRenderInfo renderInfo = new ImageRenderInfo(ctm, inlineImageInfo, colorSpaceDictionary);
         return renderInfo;
     }
     
@@ -97,21 +109,21 @@ public class ImageRenderInfo {
      * @return an object containing the image dictionary and byte[]
      * @since 5.0.2
      */
-    public PdfImageObject getImage() {
-        try {
-            prepareImageObject();
-            return imageObject;
-        } catch (IOException e) {
-            return null;
-        }
+    public PdfImageObject getImage() throws IOException {
+        prepareImageObject();
+        return imageObject;
     }
     
     private void prepareImageObject() throws IOException{
         if (imageObject != null)
             return;
         
-        PRStream stream = (PRStream)PdfReader.getPdfObject(ref);
-        imageObject = new PdfImageObject(stream);        
+        if (ref != null){
+            PRStream stream = (PRStream)PdfReader.getPdfObject(ref);
+            imageObject = new PdfImageObject(stream, colorSpaceDictionary);
+        } else if (inlineImageInfo != null){
+            imageObject = new PdfImageObject(inlineImageInfo.getImageDictionary(), inlineImageInfo.getSamples(), colorSpaceDictionary);
+        }
     }
     
     /**

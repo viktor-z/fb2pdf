@@ -39,7 +39,7 @@ public class Utilities {
     }
 
     public static BaseColor getColor(String c) {
-        return new BaseColor(Color.decode(c));
+        return new BaseColor(Color.decode(c).getRGB());
     }
 
     public static void rescaleImage(Image image, float zoomFactor, float wSpace, float hSpace, Rectangle pageSize, float dpi) {

@@ -1,8 +1,8 @@
 /*
- * $Id: RomanList.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: RomanList.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -96,6 +96,7 @@ public class RomanList extends List {
 			ListItem item = (ListItem) o;
 			Chunk chunk;
 			chunk = new Chunk(preSymbol, symbol.getFont());
+            chunk.setAttributes(symbol.getAttributes());
 			chunk.append(RomanNumberFactory.getString(first + list.size(), lowercase));
 			chunk.append(postSymbol);
 			item.setListSymbol(chunk);

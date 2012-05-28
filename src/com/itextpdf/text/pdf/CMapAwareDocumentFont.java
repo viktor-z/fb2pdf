@@ -1,8 +1,8 @@
 /*
- * $Id: CMapAwareDocumentFont.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: CMapAwareDocumentFont.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Kevin Day, Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -43,12 +43,20 @@
  */
 package com.itextpdf.text.pdf;
 
-import java.io.ByteArrayInputStream;
+import com.itextpdf.text.ExceptionConverter;
+import com.itextpdf.text.Utilities;
 import java.io.IOException;
+import java.util.Map;
+
 import com.itextpdf.text.error_messages.MessageLocalization;
 
-import com.itextpdf.text.pdf.fonts.cmaps.CMap;
-import com.itextpdf.text.pdf.fonts.cmaps.CMapParser;
+import com.itextpdf.text.pdf.fonts.cmaps.CMapByteCid;
+import com.itextpdf.text.pdf.fonts.cmaps.CMapCache;
+import com.itextpdf.text.pdf.fonts.cmaps.CMapCidUni;
+import com.itextpdf.text.pdf.fonts.cmaps.CMapParserEx;
+import com.itextpdf.text.pdf.fonts.cmaps.CMapSequence;
+import com.itextpdf.text.pdf.fonts.cmaps.CMapToUnicode;
+import com.itextpdf.text.pdf.fonts.cmaps.CidLocationFromByte;
 
 
 /**
@@ -64,12 +72,22 @@ public class CMapAwareDocumentFont extends DocumentFont {
     /** The CMap constructed from the ToUnicode map from the font's dictionary, if present.
 	 *  This CMap transforms CID values into unicode equivalent
 	 */
-    private CMap toUnicodeCmap;
+    private CMapToUnicode toUnicodeCmap;
+    private CMapByteCid byteCid;
+    private CMapCidUni cidUni;
 	/**
 	 *	Mapping between CID code (single byte only for now) and unicode equivalent
 	 *  as derived by the font's encoding.  Only needed if the ToUnicode CMap is not provided.
 	 */
     private char[] cidbyte2uni;
+    
+    private Map<Integer,Integer> uni2cid;
+    
+    public CMapAwareDocumentFont(PdfDictionary font) {
+        super(font);
+        fontDic = font;
+        initFont();
+    }
     
     /**
      * Creates an instance of a CMapAwareFont based on an indirect reference to a font.
@@ -78,33 +96,44 @@ public class CMapAwareDocumentFont extends DocumentFont {
     public CMapAwareDocumentFont(PRIndirectReference refFont) {
         super(refFont);
         fontDic = (PdfDictionary)PdfReader.getPdfObjectRelease(refFont);
-
-        processToUnicode();
-        if (toUnicodeCmap == null)
-            processUni2Byte();
-        
-        spaceWidth = super.getWidth(' ');
-        if (spaceWidth == 0){
-            spaceWidth = computeAverageWidth();
-        }
-        
+        initFont();
     }
 
+    private void initFont() {
+        processToUnicode();
+        try {
+        	//if (toUnicodeCmap == null)
+            processUni2Byte();
+        
+            spaceWidth = super.getWidth(' ');
+            if (spaceWidth == 0){
+            	spaceWidth = computeAverageWidth();
+            }
+            if (cjkEncoding != null) {
+                	byteCid = CMapCache.getCachedCMapByteCid(cjkEncoding);
+                	cidUni = CMapCache.getCachedCMapCidUni(uniMap);
+            }
+        }
+        catch (Exception ex) {
+            throw new ExceptionConverter(ex);
+        }
+    }
     /**
      * Parses the ToUnicode entry, if present, and constructs a CMap for it
      * @since 2.1.7
      */
     private void processToUnicode(){
-        
-        PdfObject toUni = fontDic.get(PdfName.TOUNICODE);
-        if (toUni != null){
-            
+        PdfObject toUni = PdfReader.getPdfObjectRelease(fontDic.get(PdfName.TOUNICODE));
+        if (toUni instanceof PRStream){
             try {
-                byte[] touni = PdfReader.getStreamBytes((PRStream)PdfReader.getPdfObjectRelease(toUni));
-    
-                CMapParser cmapParser = new CMapParser();
-                toUnicodeCmap = cmapParser.parse(new ByteArrayInputStream(touni));
+                byte[] touni = PdfReader.getStreamBytes((PRStream)toUni);
+                CidLocationFromByte lb = new CidLocationFromByte(touni);
+                toUnicodeCmap = new CMapToUnicode();
+                CMapParserEx.parseCid("", toUnicodeCmap, lb);
+                uni2cid = toUnicodeCmap.createReverseMapping();
             } catch (IOException e) {
+                toUnicodeCmap = null;
+                uni2cid = null;
                 // technically, we should log this or provide some sort of feedback... but sometimes the cmap will be junk, but it's still possible to get text, so we don't want to throw an exception
                 //throw new IllegalStateException("Unable to process ToUnicode map - " + e.getMessage(), e);
             }
@@ -114,21 +143,34 @@ public class CMapAwareDocumentFont extends DocumentFont {
     /**
      * Inverts DocumentFont's uni2byte mapping to obtain a cid-to-unicode mapping based
      * on the font's encoding
+     * @throws IOException 
      * @since 2.1.7
      */
-    private void processUni2Byte(){
+    private void processUni2Byte() throws IOException{
         IntHashtable uni2byte = getUni2Byte();
         int e[] = uni2byte.toOrderedKeys();
+        if (e.length == 0)
+            return;
         
         cidbyte2uni = new char[256];
-        for (int k = 0; k < e.length; ++k) {
-            int n = uni2byte.get(e[k]);
+        if (toUnicodeCmap == null) {
+        	for (int k = 0; k < e.length; ++k) {
+        		int n = uni2byte.get(e[k]);
             
-            // this is messy, messy - an encoding can have multiple unicode values mapping to the same cid - we are going to arbitrarily choose the first one
-            // what we really need to do is to parse the encoding, and handle the differences info ourselves.  This is a huge duplication of code of what is already
-            // being done in DocumentFont, so I really hate to go down that path without seriously thinking about a change in the organization of the Font class hierarchy
-            if (n < 256 && cidbyte2uni[n] == 0)
+        		// this is messy, messy - an encoding can have multiple unicode values mapping to the same cid - we are going to arbitrarily choose the first one
+        		// what we really need to do is to parse the encoding, and handle the differences info ourselves.  This is a huge duplication of code of what is already
+        		// being done in DocumentFont, so I really hate to go down that path without seriously thinking about a change in the organization of the Font class hierarchy
+        		if (n < 256 && cidbyte2uni[n] == 0)
                 cidbyte2uni[n] = (char)e[k];
+        	}
+        }
+        else {
+        	Map<Integer, Integer> dm = toUnicodeCmap.createDirectMapping();
+        	for (Map.Entry<Integer, Integer> kv : dm.entrySet()) {
+        		if (kv.getKey() < 256) {
+        			cidbyte2uni[kv.getKey().intValue()] = (char)kv.getValue().intValue();
+        		}
+        	}
         }
         IntHashtable diffmap = getDiffmap();
         if (diffmap != null) {
@@ -167,10 +209,10 @@ public class CMapAwareDocumentFont extends DocumentFont {
      * Override to allow special handling for fonts that don't specify width of space character
      * @see com.itextpdf.text.pdf.DocumentFont#getWidth(int)
      */
+    @Override
     public int getWidth(int char1) {
         if (char1 == ' ')
             return spaceWidth;
-        
         return super.getWidth(char1);
     }
     
@@ -185,11 +227,18 @@ public class CMapAwareDocumentFont extends DocumentFont {
         if (toUnicodeCmap != null){
             if (offset + len > bytes.length)
                 throw new ArrayIndexOutOfBoundsException(MessageLocalization.getComposedMessage("invalid.index.1", offset + len));
-            return toUnicodeCmap.lookup(bytes, offset, len);
+            String s = toUnicodeCmap.lookup(bytes, offset, len);
+            if (s != null)
+                return s;
+            if (len != 1 || cidbyte2uni == null)
+                return null;
         }
 
         if (len == 1){
-            return new String(cidbyte2uni, 0xff & bytes[offset], 1);
+            if (cidbyte2uni == null)
+                return "";
+            else
+                return new String(cidbyte2uni, 0xff & bytes[offset], 1);
         }
         
         throw new Error("Multi-byte glyphs not implemented yet");
@@ -204,16 +253,27 @@ public class CMapAwareDocumentFont extends DocumentFont {
      * @since 2.1.7
      */
     public String decode(byte[] cidbytes, final int offset, final int len){
-        StringBuffer sb = new StringBuffer(); // it's a shame we can't make this StringBuilder
-        for(int i = offset; i < offset + len; i++){
-            String rslt = decodeSingleCID(cidbytes, i, 1);
-            if (rslt == null && i < offset + len - 1){
-                rslt = decodeSingleCID(cidbytes, i, 2);
-                i++;
+        StringBuilder sb = new StringBuilder();
+        if (toUnicodeCmap == null && byteCid != null) {
+            CMapSequence seq = new CMapSequence(cidbytes, offset, len);
+            String cid = byteCid.decodeSequence(seq);
+            for (int k = 0; k < cid.length(); ++k) {
+                int c = cidUni.lookup(cid.charAt(k));
+                if (c > 0)
+                    sb.append(Utilities.convertFromUtf32(c));
             }
-            sb.append(rslt);
         }
-
+        else {
+            for(int i = offset; i < offset + len; i++){
+                String rslt = decodeSingleCID(cidbytes, i, 1);
+                if (rslt == null && i < offset + len - 1){
+                    rslt = decodeSingleCID(cidbytes, i, 2);
+                    i++;
+                }
+                if (rslt != null)
+                    sb.append(rslt);
+            }
+        }
         return sb.toString();
     }
 

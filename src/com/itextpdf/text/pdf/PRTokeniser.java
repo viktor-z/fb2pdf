@@ -1,8 +1,8 @@
 /*
- * $Id: PRTokeniser.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: PRTokeniser.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -120,11 +120,11 @@ public class PRTokeniser {
         this.file = file;
     }
     
-    public void seek(int pos) throws IOException {
+    public void seek(long pos) throws IOException {
         file.seek(pos);
     }
     
-    public int getFilePointer() throws IOException {
+    public long getFilePointer() throws IOException {
         return file.getFilePointer();
     }
 
@@ -132,7 +132,7 @@ public class PRTokeniser {
         file.close();
     }
     
-    public int length() throws IOException {
+    public long length() throws IOException {
         return file.length();
     }
 
@@ -149,7 +149,7 @@ public class PRTokeniser {
     }
     
     public String readString(int size) throws IOException {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         int ch;
         while ((size--) > 0) {
             ch = file.read();
@@ -216,15 +216,19 @@ public class PRTokeniser {
         file.setStartOffset(idx);
     }
 
-    public int getStartxref() throws IOException {
-        int size = Math.min(1024, file.length());
-        int pos = file.length() - size;
-        file.seek(pos);
-        String str = readString(1024);
-        int idx = str.lastIndexOf("startxref");
-        if (idx < 0)
-            throw new InvalidPdfException(MessageLocalization.getComposedMessage("pdf.startxref.not.found"));
-        return pos + idx;
+    public long getStartxref() throws IOException {
+    	int arrLength = 1024;
+    	long fileLength = file.length();
+    	long pos = fileLength - arrLength;
+    	if (pos < 1) pos = 1;
+    	while (pos > 0){
+    	    file.seek(pos);
+    	    String str = readString(arrLength);
+    	    int idx = str.lastIndexOf("startxref");
+    	    if (idx >= 0) return pos + idx;
+    	    pos = pos - arrLength + 9; // 9 = "startxref".length()
+    	}
+        throw new InvalidPdfException(MessageLocalization.getComposedMessage("pdf.startxref.not.found"));
     }
 
     public static int getHex(int v) {
@@ -241,7 +245,7 @@ public class PRTokeniser {
         int level = 0;
         String n1 = null;
         String n2 = null;
-        int ptr = 0;
+        long ptr = 0;
         while (nextToken()) {
             if (type == TokenType.COMMENT)
                 continue;
@@ -475,10 +479,24 @@ public class PRTokeniser {
                 outBuf = new StringBuffer();
                 if (ch == '-' || ch == '+' || ch == '.' || (ch >= '0' && ch <= '9')) {
                     type = TokenType.NUMBER;
-                    do {
+                    if (ch == '-') {
+                        // Take care of number like "--234". If Acrobat can read them so must we.
+                        boolean minus = false;
+                        do {
+                            minus = !minus;
+                            ch = file.read();
+                        } while (ch == '-');
+                        if (minus)
+                            outBuf.append('-');
+                    }
+                    else {
                         outBuf.append((char)ch);
                         ch = file.read();
-                    } while (ch != -1 && ((ch >= '0' && ch <= '9') || ch == '.'));
+                    }
+                    while (ch != -1 && ((ch >= '0' && ch <= '9') || ch == '.')) {
+                        outBuf.append((char)ch);
+                        ch = file.read();
+                    }
                 }
                 else {
                     type = TokenType.OTHER;
@@ -494,6 +512,10 @@ public class PRTokeniser {
         if (outBuf != null)
             stringValue = outBuf.toString();
         return true;
+    }
+    
+    public long longValue() {
+        return Long.parseLong(stringValue);
     }
     
     public int intValue() {
@@ -519,7 +541,7 @@ public class PRTokeniser {
                     break;
                 case '\r':
                     eol = true;
-                    int cur = getFilePointer();
+                    long cur = getFilePointer();
                     if ((read()) != '\n') {
                         seek(cur);
                     }
@@ -547,7 +569,7 @@ public class PRTokeniser {
                         break;
                     case '\r':
                         eol = true;
-                        int cur = getFilePointer();
+                        long cur = getFilePointer();
                         if ((read()) != '\n') {
                             seek(cur);
                         }
@@ -566,7 +588,7 @@ public class PRTokeniser {
         return true;
     }
     
-    public static int[] checkObjectStart(byte line[]) {
+    public static long[] checkObjectStart(byte line[]) {
         try {
             PRTokeniser tk = new PRTokeniser(line);
             int num = 0;
@@ -581,7 +603,7 @@ public class PRTokeniser {
                 return null;
             if (!tk.getStringValue().equals("obj"))
                 return null;
-            return new int[]{num, gen};
+            return new long[]{num, gen};
         }
         catch (Exception ioe) {
             // empty on purpose

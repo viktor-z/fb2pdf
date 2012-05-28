@@ -1,8 +1,8 @@
 /*
- * $Id: XmpArray.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: XmpArray.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -45,6 +45,8 @@ package com.itextpdf.text.xml.xmp;
 
 import java.util.ArrayList;
 
+import com.itextpdf.text.xml.XMLUtil;
+
 /**
  * StringBuffer to construct an XMP array.
  */
@@ -82,7 +84,7 @@ public class XmpArray extends ArrayList<String> {
 		for (String string : this) {
 			s = string;
 			buf.append("<rdf:li>");
-			buf.append(XmpSchema.escape(s));
+			buf.append(XMLUtil.escapeXML(s, false));
 			buf.append("</rdf:li>");
 		}
 		buf.append("</");

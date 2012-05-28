@@ -1,8 +1,8 @@
 /*
- * $Id: PdfPageLabels.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: PdfPageLabels.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -197,6 +197,9 @@ public class PdfPageLabels {
 				if (d.contains(PdfName.S)) {
 					type = ((PdfName)d.get(PdfName.S)).toString().charAt(1);
 				}
+				else {
+					type = 'e';
+				}
 			}
 			switch(type) {
 			default:
@@ -213,6 +216,9 @@ public class PdfPageLabels {
 				break;
 			case 'a':
 				labelstrings[i] = prefix + RomanAlphabetFactory.getLowerCaseString(pagecount);
+				break;
+			case 'e':
+				labelstrings[i] = prefix;
 				break;
 			}
 			pagecount++;

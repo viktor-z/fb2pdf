@@ -1,8 +1,8 @@
 /*
- * $Id: SimpleTextExtractionStrategy.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: SimpleTextExtractionStrategy.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Kevin Day, Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -123,7 +123,7 @@ public class SimpleTextExtractionStrategy implements TextExtractionStrategy {
             //System.out.println("<< Hard Return >>");
             result.append('\n');
         } else if (!firstRender){ 
-            if (result.charAt(result.length()-1) != ' ' && renderInfo.getText().charAt(0) != ' '){ // we only insert a blank space if the trailing character of the previous string wasn't a space, and the leading character of the current string isn't a space
+            if (result.charAt(result.length()-1) != ' ' && renderInfo.getText().length() > 0 && renderInfo.getText().charAt(0) != ' '){ // we only insert a blank space if the trailing character of the previous string wasn't a space, and the leading character of the current string isn't a space
                 float spacing = lastEnd.subtract(start).length();
                 if (spacing > renderInfo.getSingleSpaceWidth()/2f){
                     result.append(' ');

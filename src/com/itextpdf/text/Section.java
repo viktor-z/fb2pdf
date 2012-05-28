@@ -1,8 +1,8 @@
 /*
- * $Id: Section.java 4847 2011-05-05 19:46:13Z redlab_b $
+ * $Id: Section.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -43,11 +43,12 @@
  */
 package com.itextpdf.text;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
+import com.itextpdf.text.api.Indentable;
 import com.itextpdf.text.error_messages.MessageLocalization;
 
 /**
@@ -76,7 +77,7 @@ import com.itextpdf.text.error_messages.MessageLocalization;
  * </PRE></BLOCKQUOTE>
  */
 
-public class Section extends ArrayList<Element> implements TextElementArray, LargeElement {
+public class Section extends ArrayList<Element> implements TextElementArray, LargeElement, Indentable {
     // constant
 	/**
 	 * A possible number style. The default number style: "1.2.3."

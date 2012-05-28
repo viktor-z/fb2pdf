@@ -1,8 +1,8 @@
 /*
- * $Id: PdfPrinterGraphics2D.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id:  $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -41,26 +41,15 @@
  * For more information, please contact iText Software Corp. at this
  * address: sales@itextpdf.com
  */
-package com.itextpdf.text.pdf;
+package com.itextpdf.text.pdf.fonts.cmaps;
 
-import java.awt.print.PrinterGraphics;
-import java.awt.print.PrinterJob;
+import com.itextpdf.text.pdf.PRTokeniser;
+import java.io.IOException;
 
 /**
- * This is an extension class for the sole purpose of implementing the
- * {@link java.awt.print.PrinterGraphics PrinterGraphics} interface.
+ *
+ * @author psoares
  */
-public class PdfPrinterGraphics2D extends PdfGraphics2D implements PrinterGraphics
-{
-	private PrinterJob printerJob;
-	
-	public PdfPrinterGraphics2D(PdfContentByte cb, float width, float height, FontMapper fontMapper,
-			boolean onlyShapes, boolean convertImagesToJPEG, float quality, PrinterJob printerJob)	{
-		super(cb, width, height, fontMapper, onlyShapes, convertImagesToJPEG, quality);
-		this.printerJob = printerJob;
-	}
-
-	public PrinterJob getPrinterJob()	{
-		return printerJob;
-	}
+public interface CidLocation {
+    public PRTokeniser getLocation(String location) throws IOException ;
 }

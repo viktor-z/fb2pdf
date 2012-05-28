@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008 by Paulo Soares.
+ * Copyright 2003-2012 by Paulo Soares.
  *
  * This code was originally released in 2001 by SUN (see class
  * com.sun.media.imageio.plugins.tiff.TIFFDirectory.java)
@@ -43,8 +43,8 @@
  * use in the design, construction, operation or maintenance of any 
  * nuclear facility. 
  *
- * $Revision: 4540 $
- * $Date: 2010-07-13 14:57:54 +0200 (Tue, 13 Jul 2010) $
+ * $Revision: 5075 $
+ * $Date: 2012-02-27 17:36:18 +0100 (Mon, 27 Feb 2012) $
  * $State: Exp $
  */
 

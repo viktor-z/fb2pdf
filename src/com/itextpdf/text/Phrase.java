@@ -1,8 +1,8 @@
 /*
- * $Id: Phrase.java 4847 2011-05-05 19:46:13Z redlab_b $
+ * $Id: Phrase.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -280,11 +280,12 @@ public class Phrase extends ArrayList<Element> implements TextElementArray {
                 }
                 super.add(index, chunk);
             }
+         // TODO same as in document - change else-if to generic adding that works everywhere
             else if (element.type() == Element.PHRASE ||
             element.type() == Element.ANCHOR ||
             element.type() == Element.ANNOTATION ||
             element.type() == Element.YMARK ||
-            element.type() == Element.MARKED) {
+            element.type() == Element.MARKED || element.type() == Element.WRITABLE_DIRECT) {
                 super.add(index, element);
             }
             else {
@@ -323,6 +324,7 @@ public class Phrase extends ArrayList<Element> implements TextElementArray {
     public boolean add(final Element element) {
         if (element == null) return false;
         try {
+        	// TODO same as in document - change switch to generic adding that works everywhere
             switch(element.type()) {
                 case Element.CHUNK:
                     return addChunk((Chunk) element);
@@ -347,6 +349,7 @@ public class Phrase extends ArrayList<Element> implements TextElementArray {
                 case Element.PTABLE: // case added by mr. Karen Vardanyan
                 case Element.LIST:
                 case Element.YMARK:
+                case Element.WRITABLE_DIRECT:
                         return super.add(element);
                     default:
                         throw new ClassCastException(String.valueOf(element.type()));

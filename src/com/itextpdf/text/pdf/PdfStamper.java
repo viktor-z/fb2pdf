@@ -1,8 +1,8 @@
 /*
- * $Id: PdfStamper.java 4847 2011-05-05 19:46:13Z redlab_b $
+ * $Id: PdfStamper.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -79,9 +79,10 @@ public class PdfStamper
      * The writer
      */
     protected PdfStamperImp stamper;
-    private HashMap<String, String> moreInfo;
+    private Map<String, String> moreInfo;
     private boolean hasSignature;
     private PdfSignatureAppearance sigApp;
+    private LtvVerification verification;
 
     /** Starts the process of adding extra content to an existing PDF
      * document.
@@ -129,7 +130,7 @@ public class PdfStamper
      * @return the map or <CODE>null</CODE>
      *
      */
-    public HashMap<String, String> getMoreInfo() {
+    public Map<String, String> getMoreInfo() {
         return this.moreInfo;
     }
 
@@ -139,7 +140,7 @@ public class PdfStamper
      * @param moreInfo additional entries to the info dictionary
      *
      */
-    public void setMoreInfo(final HashMap<String, String> moreInfo) {
+    public void setMoreInfo(final Map<String, String> moreInfo) {
         this.moreInfo = moreInfo;
     }
 
@@ -186,6 +187,7 @@ public class PdfStamper
      */
     public void close() throws DocumentException, IOException {
         if (!hasSignature) {
+            mergeVerification();
             stamper.close(moreInfo);
             return;
         }
@@ -756,5 +758,17 @@ public class PdfStamper
      */
     public Map<String, PdfLayer> getPdfLayers() {
     	return stamper.getPdfLayers();
+    }
+    
+    public LtvVerification getLtvVerification() {
+        if (verification == null)
+            verification = new LtvVerification(this);
+        return verification;
+    }
+    
+    void mergeVerification() throws IOException {
+        if (verification == null)
+            return;
+        verification.merge();
     }
 }

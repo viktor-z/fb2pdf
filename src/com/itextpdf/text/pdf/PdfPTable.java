@@ -1,8 +1,8 @@
 /*
- * $Id: PdfPTable.java 4847 2011-05-05 19:46:13Z redlab_b $
+ * $Id: PdfPTable.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -54,6 +54,7 @@ import com.itextpdf.text.Image;
 import com.itextpdf.text.LargeElement;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.api.Spaceable;
 import com.itextpdf.text.error_messages.MessageLocalization;
 import com.itextpdf.text.pdf.events.PdfPTableEventForwarder;
 
@@ -66,7 +67,7 @@ import com.itextpdf.text.pdf.events.PdfPTableEventForwarder;
  * @author Paulo Soares
  */
 
-public class PdfPTable implements LargeElement{
+public class PdfPTable implements LargeElement, Spaceable{
 
     /**
      * The index of the original <CODE>PdfcontentByte</CODE>.
@@ -1646,5 +1647,19 @@ public class PdfPTable implements LargeElement{
 	 */
 	public void setComplete(final boolean complete) {
 		this.complete = complete;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.itextpdf.text.api.Spaceable#getSpacingBefore()
+	 */
+	public float getSpacingBefore() {
+		return spacingBefore;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.itextpdf.text.api.Spaceable#getSpacingAfter()
+	 */
+	public float getSpacingAfter() {
+		return spacingAfter;
 	}
 }

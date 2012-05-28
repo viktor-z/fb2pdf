@@ -1,8 +1,8 @@
 /*
- * $Id: PdfNameTree.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: PdfNameTree.java 5093 2012-03-02 15:44:00Z achingarev $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -132,26 +132,36 @@ public class PdfNameTree {
         }
     }
 
-    private static void iterateItems(PdfDictionary dic, HashMap<String, PdfObject> items) {
+    private static PdfString iterateItems(PdfDictionary dic, HashMap<String, PdfObject> items, PdfString leftOverString) {
         PdfArray nn = (PdfArray)PdfReader.getPdfObjectRelease(dic.get(PdfName.NAMES));
         if (nn != null) {
             for (int k = 0; k < nn.size(); ++k) {
-                PdfString s = (PdfString)PdfReader.getPdfObjectRelease(nn.getPdfObject(k++));
-                items.put(PdfEncodings.convertToString(s.getBytes(), null), nn.getPdfObject(k));
+                PdfString s;
+                if (leftOverString == null)
+                    s = (PdfString)PdfReader.getPdfObjectRelease(nn.getPdfObject(k++));
+                else {
+                    // this is the leftover string from the previous loop
+                    s = leftOverString;
+                    leftOverString = null;
+                }
+                if (k < nn.size()) // could have a mistake int the pdf file
+                    items.put(PdfEncodings.convertToString(s.getBytes(), null), nn.getPdfObject(k));
+                else
+                    return s;
             }
-        }
-        else if ((nn = (PdfArray)PdfReader.getPdfObjectRelease(dic.get(PdfName.KIDS))) != null) {
+        } else if ((nn = (PdfArray)PdfReader.getPdfObjectRelease(dic.get(PdfName.KIDS))) != null) {
             for (int k = 0; k < nn.size(); ++k) {
                 PdfDictionary kid = (PdfDictionary)PdfReader.getPdfObjectRelease(nn.getPdfObject(k));
-                iterateItems(kid, items);
+                leftOverString = iterateItems(kid, items, leftOverString);
             }
         }
+        return null;
     }
 
     public static HashMap<String, PdfObject> readTree(PdfDictionary dic) {
         HashMap<String, PdfObject> items = new HashMap<String, PdfObject>();
         if (dic != null)
-            iterateItems(dic, items);
+            iterateItems(dic, items, null);
         return items;
     }
 }

@@ -1,8 +1,8 @@
 /*
- * $Id: FontMapper.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id:  $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -41,36 +41,26 @@
  * For more information, please contact iText Software Corp. at this
  * address: sales@itextpdf.com
  */
-package com.itextpdf.text.pdf;
+package com.itextpdf.text.pdf.fonts.cmaps;
 
-import java.awt.Font;
+import com.itextpdf.text.error_messages.MessageLocalization;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PRTokeniser;
+import com.itextpdf.text.pdf.RandomAccessFileOrArray;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
- * A FontMapper implementation handles mappings between AWT Fonts and PDF
- * fonts. An interface is used instead of a fixed class because there isn't
- * an exact correlation between the font types, so each application is free
- * to define a mapping which is appropriate for it.
+ *
+ * @author psoares
  */
+public class CidResource implements CidLocation{
 
-public interface FontMapper {
-
-    /**
-     * Returns a BaseFont which can be used to represent the given AWT Font
-     *
-     * @param	font		the font to be converted
-     * @return	a BaseFont which has similar properties to the provided Font
-     */
-
-    public BaseFont awtToPdf(Font font);
-
-    /**
-     * Returns an AWT Font which can be used to represent the given BaseFont
-     *
-     * @param	font		the font to be converted
-     * @param	size		the desired point size of the resulting font
-     * @return	a Font which has similar properties to the provided BaseFont
-     */
-
-    public Font pdfToAwt(BaseFont font, int size);
-
+    public PRTokeniser getLocation(String location) throws IOException {
+        String fullName = BaseFont.RESOURCE_PATH + "cmaps/" + location;
+        InputStream inp = BaseFont.getResourceStream(fullName);
+        if (inp == null)
+            throw new IOException(MessageLocalization.getComposedMessage("the.cmap.1.was.not.found", fullName));
+        return new PRTokeniser(new RandomAccessFileOrArray(inp));
+    }
 }

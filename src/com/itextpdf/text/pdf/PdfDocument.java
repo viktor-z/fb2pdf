@@ -1,8 +1,8 @@
 /*
- * $Id: PdfDocument.java 4847 2011-05-05 19:46:13Z redlab_b $
+ * $Id: PdfDocument.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -71,6 +71,7 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.Section;
+import com.itextpdf.text.api.WriterOperation;
 import com.itextpdf.text.error_messages.MessageLocalization;
 import com.itextpdf.text.pdf.collection.PdfCollection;
 import com.itextpdf.text.pdf.draw.DrawInterface;
@@ -401,6 +402,7 @@ public class PdfDocument extends Document {
             return false;
         }
         try {
+        	// TODO refactor this uber long switch to State/Strategy or something ...
             switch(element.type()) {
                 // Information (headers)
                 case Element.HEADER:
@@ -718,6 +720,11 @@ public class PdfDocument extends Document {
                 	mo.process(this);
                 	break;
                 }
+                case Element.WRITABLE_DIRECT:
+                	if (null != writer) {
+                		((WriterOperation)element).write(writer, this);
+                	}
+                	break;
                 default:
                     return false;
             }
@@ -1468,8 +1475,8 @@ public class PdfDocument extends Document {
                     }
                     if (chunk.isAttribute(Chunk.CHAR_SPACING)) {
                     	Float cs = (Float) chunk.getAttribute(Chunk.CHAR_SPACING);
-                        text.setCharacterSpacing(cs.floatValue());                            
-                    }
+						text.setCharacterSpacing(cs.floatValue());
+					}
                     if (chunk.isImage()) {
                         Image image = chunk.getImage();
                         float matrix[] = image.matrix();

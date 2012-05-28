@@ -1,8 +1,8 @@
 /*
- * $Id: PdfLiteral.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: PdfLiteral.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -52,7 +52,7 @@ public class PdfLiteral extends PdfObject {
     /**
      * Holds value of property position.
      */
-    private int position;
+    private long position;
         
     public PdfLiteral(String text) {
         super(0, text);
@@ -86,7 +86,7 @@ public class PdfLiteral extends PdfObject {
      * Getter for property position.
      * @return Value of property position.
      */
-    public int getPosition() {
+    public long getPosition() {
         return this.position;
     }
     

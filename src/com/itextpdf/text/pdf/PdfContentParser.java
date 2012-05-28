@@ -1,8 +1,8 @@
 /*
- * $Id: PdfContentParser.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: PdfContentParser.java 5107 2012-03-29 09:20:51Z achingarev $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -122,6 +122,8 @@ public class PdfContentParser {
                 throw new IOException(MessageLocalization.getComposedMessage("unexpected.end.of.file"));
                 if (tokeniser.getTokenType() == TokenType.END_DIC)
                     break;
+                if (tokeniser.getTokenType() == TokenType.OTHER && "def".equals(tokeniser.getStringValue()))
+                    continue;
                 if (tokeniser.getTokenType() != TokenType.NAME)
                     throw new IOException(MessageLocalization.getComposedMessage("dictionary.key.is.not.a.name"));
                 PdfName name = new PdfName(tokeniser.getStringValue(), false);

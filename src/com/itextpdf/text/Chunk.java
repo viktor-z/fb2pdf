@@ -1,8 +1,8 @@
 /*
- * $Id: Chunk.java 4847 2011-05-05 19:46:13Z redlab_b $
+ * $Id: Chunk.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -356,7 +356,7 @@ public class Chunk implements Element {
 	 * @return a <CODE>String</CODE>
 	 */
 	public String getContent() {
-		return content.toString();
+		return content.toString().replaceAll("\t", "");
 	}
 
 	/**

@@ -1,8 +1,8 @@
 /*
- * $Id: List.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: List.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -44,6 +44,8 @@
 package com.itextpdf.text;
 
 import java.util.ArrayList;
+
+import com.itextpdf.text.api.Indentable;
 import com.itextpdf.text.factories.RomanAlphabetFactory;
 
 /**
@@ -91,7 +93,7 @@ import com.itextpdf.text.factories.RomanAlphabetFactory;
  * @see		ListItem
  */
 
-public class List implements TextElementArray {
+public class List implements TextElementArray, Indentable {
 
     // constants
 
@@ -279,6 +281,7 @@ public class List implements TextElementArray {
             ListItem item = (ListItem) o;
             if (numbered || lettered) {
                 Chunk chunk = new Chunk(preSymbol, symbol.getFont());
+                chunk.setAttributes(symbol.getAttributes());
                 int index = first + list.size();
                 if ( lettered )
                     chunk.append(RomanAlphabetFactory.getString(index, lowercase));

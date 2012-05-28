@@ -1,8 +1,8 @@
 /*
- * $Id: TSAClient.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: TSAClient.java 5075 2012-02-27 16:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -61,13 +61,18 @@ public interface TSAClient {
     public int getTokenSizeEstimate();
     
     /**
+     * Gets the algorithm used to digest the data imprint
+     * @return the digest algorithm name
+     */
+    public String getDigestAlgorithm();
+
+    /**
      * Get RFC 3161 timeStampToken.
      * Method may return null indicating that timestamp should be skipped.
-     * @param caller PdfPKCS7 - calling PdfPKCS7 instance (in case caller needs it)
      * @param imprint byte[] - data imprint to be time-stamped
      * @return byte[] - encoded, TSA signed data of the timeStampToken
      * @throws Exception - TSA request failed
      */
-    public byte[] getTimeStampToken(PdfPKCS7 caller, byte[] imprint) throws Exception;
+    public byte[] getTimeStampToken(byte[] imprint) throws Exception;
     
 }

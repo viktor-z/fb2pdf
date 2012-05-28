@@ -1,8 +1,8 @@
 /*
- * $Id: Paragraph.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: Paragraph.java 5104 2012-03-25 08:50:14Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -43,6 +43,11 @@
  */
 package com.itextpdf.text;
 
+import com.itextpdf.text.api.Indentable;
+import com.itextpdf.text.api.Spaceable;
+
+import java.util.ArrayList;
+
 /**
  * A <CODE>Paragraph</CODE> is a series of <CODE>Chunk</CODE>s and/or <CODE>Phrases</CODE>.
  * <P>
@@ -64,7 +69,7 @@ package com.itextpdf.text;
  * @see		ListItem
  */
 
-public class Paragraph extends Phrase {
+public class Paragraph extends Phrase implements Indentable, Spaceable {
 
 	// constants
 	private static final long serialVersionUID = 7852314969733375514L;
@@ -193,12 +198,57 @@ public class Paragraph extends Phrase {
         	setIndentationLeft(p.getIndentationLeft());
         	setIndentationRight(p.getIndentationRight());
         	setFirstLineIndent(p.getFirstLineIndent());
-        	setSpacingAfter(p.spacingAfter());
-        	setSpacingBefore(p.spacingBefore());
+        	setSpacingAfter(p.getSpacingAfter());
+        	setSpacingBefore(p.getSpacingBefore());
         	setExtraParagraphSpace(p.getExtraParagraphSpace());
         }
     }
 
+    /**
+     * Creates a shallow clone of the Paragraph.
+     * @return
+     */
+    public Paragraph cloneShallow(boolean spacingBefore) {
+    	Paragraph copy = new Paragraph();
+        copy.setFont(getFont());
+    	copy.setAlignment(getAlignment());
+    	copy.setLeading(getLeading(), multipliedLeading);
+    	copy.setIndentationLeft(getIndentationLeft());
+    	copy.setIndentationRight(getIndentationRight());
+    	copy.setFirstLineIndent(getFirstLineIndent());
+    	copy.setSpacingAfter(getSpacingAfter());
+    	if (spacingBefore)
+    		copy.setSpacingBefore(getSpacingBefore());
+    	copy.setExtraParagraphSpace(getExtraParagraphSpace());
+    	return copy;
+    }
+    
+    /**
+     * Breaks this Paragraph up in different parts, separating paragraphs, lists and tables from each other.
+     * @return
+     */
+    public java.util.List<Element> breakUp() {
+    	java.util.List<Element> list = new ArrayList<Element>();
+		Paragraph tmp = cloneShallow(true);
+		for (Element e : this) {
+			if (e.type() == Element.LIST || e.type() == Element.PTABLE || e.type() == Element.PARAGRAPH) {
+				if (tmp.size() > 0) {
+                    tmp.setSpacingAfter(0);
+					list.add(tmp);
+					tmp = cloneShallow(false);
+				}
+				list.add(e);
+			}
+			else {
+				tmp.add(e);
+			}
+		}
+		if (tmp.size() > 0) {
+			list.add(tmp);
+        }
+    	return list;
+    }
+    
     // implementation of the Element-methods
 
     /**
@@ -232,16 +282,8 @@ public class Paragraph extends Phrase {
             return true;
         }
         else if (o instanceof Paragraph) {
-            super.add(o);
-            java.util.List<Chunk> chunks = getChunks();
-            if (!chunks.isEmpty()) {
-            	Chunk tmp = chunks.get(chunks.size() - 1);
-            	super.add(new Chunk("\n", tmp.getFont()));
-            }
-            else {
-            	super.add(Chunk.NEWLINE);
-            }
-            return true;
+        	super.addSpecial(o);
+        	return true;
         }
         return super.add(o);
     }
@@ -289,20 +331,16 @@ public class Paragraph extends Phrase {
         this.multipliedLeading = multipliedLeading;
     }
 
-    /**
-     * Sets the indentation of this paragraph on the left side.
-     *
-     * @param	indentation		the new indentation
-     */
+    /* (non-Javadoc)
+	 * @see com.itextpdf.text.Indentable#setIndentationLeft(float)
+	 */
     public void setIndentationLeft(float indentation) {
         this.indentationLeft = indentation;
     }
 
-    /**
-     * Sets the indentation of this paragraph on the right side.
-     *
-     * @param	indentation		the new indentation
-     */
+    /* (non-Javadoc)
+	 * @see com.itextpdf.text.Indentable#setIndentationRight(float)
+	 */
     public void setIndentationRight(float indentation) {
         this.indentationRight = indentation;
     }
@@ -315,20 +353,16 @@ public class Paragraph extends Phrase {
         this.firstLineIndent = firstLineIndent;
     }
 
-    /**
-     * Sets the spacing before this paragraph.
-     *
-     * @param	spacing		the new spacing
-     */
+    /* (non-Javadoc)
+	 * @see com.itextpdf.text.Spaceable#setSpacingBefore(float)
+	 */
     public void setSpacingBefore(float spacing) {
         this.spacingBefore = spacing;
     }
 
-    /**
-     * Sets the spacing after this paragraph.
-     *
-     * @param	spacing		the new spacing
-     */
+    /* (non-Javadoc)
+	 * @see com.itextpdf.text.Spaceable#setSpacingAfter(float)
+	 */
     public void setSpacingAfter(float spacing) {
         this.spacingAfter = spacing;
     }
@@ -387,19 +421,15 @@ public class Paragraph extends Phrase {
     	return getLeading() + m;
     }
 
-	/**
-     * Gets the indentation of this paragraph on the left side.
-     *
-     * @return	the indentation
-     */
+	/* (non-Javadoc)
+	 * @see com.itextpdf.text.Indentable#getIndentationLeft()
+	 */
     public float getIndentationLeft() {
         return indentationLeft;
     }
 
-	/**
-	 * Gets the indentation of this paragraph on the right side.
-	 *
-	 * @return	the indentation
+	/* (non-Javadoc)
+	 * @see com.itextpdf.text.Indentable#getIndentationRight()
 	 */
     public float getIndentationRight() {
         return indentationRight;
@@ -413,20 +443,16 @@ public class Paragraph extends Phrase {
         return this.firstLineIndent;
     }
 
-    /**
-     * Gets the spacing before this paragraph.
-     * @return	the spacing
-     * @since	2.1.5
-     */
+    /* (non-Javadoc)
+	 * @see com.itextpdf.text.Spaceable#getSpacingBefore()
+	 */
     public float getSpacingBefore() {
     	return spacingBefore;
     }
 
-    /**
-     * Gets the spacing after this paragraph.
-     * @return	the spacing
-     * @since	2.1.5
-     */
+    /* (non-Javadoc)
+	 * @see com.itextpdf.text.Spaceable#getSpacingAfter()
+	 */
     public float getSpacingAfter() {
     	return spacingAfter;
     }

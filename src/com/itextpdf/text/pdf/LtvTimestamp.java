@@ -1,8 +1,6 @@
 /*
- * $Id: AsianFontMapper.java 4784 2011-03-15 08:33:00Z blowagie $
- *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -41,57 +39,56 @@
  * For more information, please contact iText Software Corp. at this
  * address: sales@itextpdf.com
  */
+
 package com.itextpdf.text.pdf;
 
-import java.awt.Font;
+import com.itextpdf.text.Rectangle;
+import java.io.InputStream;
+import java.security.MessageDigest;
+import java.util.HashMap;
 
-public class AsianFontMapper extends DefaultFontMapper {
-	
-	public static final String ChineseSimplifiedFont = "STSong-Light";
-	public static final String ChineseSimplifiedEncoding_H = "UniGB-UCS2-H";
-	public static final String ChineseSimplifiedEncoding_V = "UniGB-UCS2-V";
-	
-	public static final String ChineseTraditionalFont_MHei = "MHei-Medium";
-	public static final String ChineseTraditionalFont_MSung = "MSung-Light";
-	public static final String ChineseTraditionalEncoding_H = "UniCNS-UCS2-H";
-	public static final String ChineseTraditionalEncoding_V = "UniCNS-UCS2-V";
-	
-	public static final String JapaneseFont_Go = "HeiseiKakuGo-W5";
-	public static final String JapaneseFont_Min = "HeiseiMin-W3";
-	public static final String JapaneseEncoding_H = "UniJIS-UCS2-H";
-	public static final String JapaneseEncoding_V = "UniJIS-UCS2-V";
-	public static final String JapaneseEncoding_HW_H = "UniJIS-UCS2-HW-H";
-	public static final String JapaneseEncoding_HW_V = "UniJIS-UCS2-HW-V";
-	
-	public static final String KoreanFont_GoThic = "HYGoThic-Medium";
-	public static final String KoreanFont_SMyeongJo = "HYSMyeongJo-Medium";
-	public static final String KoreanEncoding_H = "UniKS-UCS2-H";
-	public static final String KoreanEncoding_V = "UniKS-UCS2-V";
-	
-	private final String defaultFont;
-	private final String encoding;
+/**
+ * PAdES-LTV Timestamp
+ * @author Pulo Soares
+ */
+public class LtvTimestamp {
+    /**
+     * Signs a document with a PAdES-LTV Timestamp. The document is closed at the end.
+     * @param sap the signature appearance
+     * @param tsa the timestamp generator
+     * @param signatureName the signature name or null to have a name generated
+     * automatically
+     * @throws Exception
+     */
+    public static void timestamp(PdfSignatureAppearance sap, TSAClient tsa, String signatureName) throws Exception {
+        int contentEstimated = tsa.getTokenSizeEstimate();
+        sap.setVisibleSignature(new Rectangle(0,0,0,0), 1, signatureName);
 
-	public AsianFontMapper(String font, String encoding) {
-		super();
-		
-		this.defaultFont = font;
-		this.encoding = encoding;
-	}
+        PdfSignature dic = new PdfSignature(PdfName.ADOBE_PPKLITE, PdfName.ETSI_RFC3161);
+        dic.put(PdfName.TYPE, PdfName.DOCTIMESTAMP);
+        sap.setCryptoDictionary(dic);
 
-	public BaseFont awtToPdf(Font font) {
-		try {
-			BaseFontParameters p = getBaseFontParameters(font.getFontName());
-			if (p != null){
-				return BaseFont.createFont(p.fontName, p.encoding, p.embedded, p.cached, p.ttfAfm, p.pfb);
-			}else{
-				return BaseFont.createFont(defaultFont, encoding, true);
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
+        HashMap<PdfName,Integer> exc = new HashMap<PdfName,Integer>();
+        exc.put(PdfName.CONTENTS, new Integer(contentEstimated * 2 + 2));
+        sap.preClose(exc);
+        InputStream data = sap.getRangeStream();
+        MessageDigest messageDigest = MessageDigest.getInstance(tsa.getDigestAlgorithm());
+        byte[] buf = new byte[4096];
+        int n;
+        while ((n = data.read(buf)) > 0) {
+            messageDigest.update(buf, 0, n);
+        }
+        byte[] tsImprint = messageDigest.digest();
+        byte[] tsToken = tsa.getTimeStampToken(tsImprint);
 
-	}
+        if (contentEstimated + 2 < tsToken.length)
+            throw new Exception("Not enough space");
 
+        byte[] paddedSig = new byte[contentEstimated];
+        System.arraycopy(tsToken, 0, paddedSig, 0, tsToken.length);
+
+        PdfDictionary dic2 = new PdfDictionary();
+        dic2.put(PdfName.CONTENTS, new PdfString(paddedSig).setHexWriting(true));
+        sap.close(dic2);
+    }
 }

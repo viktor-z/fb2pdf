@@ -1,8 +1,8 @@
 /*
- * $Id: RandomAccessFileOrArray.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: RandomAccessFileOrArray.java 5108 2012-03-30 07:39:04Z blowagie $
  *
  * This file is part of the iText (R) project.
- * Copyright (c) 1998-2011 1T3XT BVBA
+ * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,6 +50,7 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
@@ -62,18 +63,18 @@ import com.itextpdf.text.error_messages.MessageLocalization;
  * @author Paulo Soares
  */
 public class RandomAccessFileOrArray implements DataInput {
-    
+	
     MappedRandomAccessFile rf;
     RandomAccessFile trf;
     boolean plainRandomAccess;
     String filename;
     byte arrayIn[];
-    int arrayInPtr;
+    long arrayInPtr;
     byte back;
     boolean isBack = false;
     
     /** Holds value of property startOffset. */
-    private int startOffset = 0;
+    private long startOffset = 0;
 
     public RandomAccessFileOrArray(String filename) throws IOException {
     	this(filename, false, Document.plainRandomAccess);
@@ -81,7 +82,7 @@ public class RandomAccessFileOrArray implements DataInput {
     
     /**
      * Constructs a new RandomAccessFileOrArrayObject
-     * @param filename the file to open (can be a file system file or one of hte following url strings: file://, http://, https://, jar:, wsjar:
+     * @param filename the file to open (can be a file system file or one of the following url strings: file://, http://, https://, jar:, wsjar:, vfszip:
      * @param forceRead if true, the entire file will be read into memory
      * @param plainRandomAccess if true, a regular RandomAccessFile is used to access the file contents.  If false, a memory mapped file will be used, unless the file cannot be mapped into memory, in which case regular RandomAccessFile will be used
      * @throws IOException if there is a failure opening or reading the file
@@ -90,8 +91,13 @@ public class RandomAccessFileOrArray implements DataInput {
         this.plainRandomAccess = plainRandomAccess;
         File file = new File(filename);
         if (!file.canRead()) {
-            if (filename.startsWith("file:/") || filename.startsWith("http://") 
-                    || filename.startsWith("https://") || filename.startsWith("jar:") || filename.startsWith("wsjar:")) {
+            if (filename.startsWith("file:/")
+            		|| filename.startsWith("http://") 
+                    || filename.startsWith("https://")
+                    || filename.startsWith("jar:")
+                    || filename.startsWith("wsjar:")
+                    || filename.startsWith("wsjar:")
+                    || filename.startsWith("vfszip:")) {
                 InputStream is = new URL(filename).openStream();
                 try {
                     this.arrayIn = InputStreamToArray(is);
@@ -126,22 +132,47 @@ public class RandomAccessFileOrArray implements DataInput {
         	return;
         }
         this.filename = filename;
+        openFile(filename);
+    }
+
+    /**
+     * Utility method that opens the underlying file in plain random access mode or mapped random access mode
+     * @param filename the file to open
+     * @throws FileNotFoundException if the file does not exist
+     * @since 5.1.2
+     */
+    
+    private void openFile(String filename) throws IOException{
+        
         if (plainRandomAccess){
-            trf = new RandomAccessFile(filename, "r");
+            openForPlainRandomAccess(filename);
         }else{
             try{
                 rf = new MappedRandomAccessFile(filename, "r");
+                trf = null;
             } catch (IOException e){
                 if (exceptionIsMapFailureException(e)){
-                    this.plainRandomAccess = true;
-                    trf = new RandomAccessFile(filename, "r");
+                    openForPlainRandomAccess(filename);
                 } else {
                     throw e;
                 }
             }
         }
+        
     }
-
+    
+    /**
+     * Utility method that opens this RAFOA in plain random access mode
+     * @param filename the file to open
+     * @throws FileNotFoundException if the file does not exist
+     * @since 5.1.2
+     */
+    private void openForPlainRandomAccess(String filename) throws FileNotFoundException{
+        this.plainRandomAccess = true;
+        trf = new RandomAccessFile(filename, "r");
+        rf = null;
+    }
+    
     /**
      * Utility method that determines whether a given IOException is the result
      * of a failure to map a memory mapped file.  It would be better if the runtime
@@ -152,7 +183,7 @@ public class RandomAccessFileOrArray implements DataInput {
      * @since 5.0.3
      */
     private static boolean exceptionIsMapFailureException(IOException e){
-        if (e.getMessage().indexOf("Map failed") >= 0)
+        if (e.getMessage() != null && e.getMessage().indexOf("Map failed") >= 0)
             return true;
 
         return false;
@@ -211,7 +242,7 @@ public class RandomAccessFileOrArray implements DataInput {
         else {
             if (arrayInPtr >= arrayIn.length)
                 return -1;
-            return arrayIn[arrayInPtr++] & 0xff;
+            return arrayIn[(int)(arrayInPtr++)] & 0xff;
         }
     }
     
@@ -238,8 +269,8 @@ public class RandomAccessFileOrArray implements DataInput {
             if (arrayInPtr >= arrayIn.length)
                 return -1;
             if (arrayInPtr + len > arrayIn.length)
-                len = arrayIn.length - arrayInPtr;
-            System.arraycopy(arrayIn, arrayInPtr, b, off, len);
+                len = (int)(arrayIn.length - arrayInPtr);
+            System.arraycopy(arrayIn, (int)arrayInPtr, b, off, len);
             arrayInPtr += len;
             return len + n;
         }
@@ -264,10 +295,6 @@ public class RandomAccessFileOrArray implements DataInput {
     }
     
     public long skip(long n) throws IOException {
-        return skipBytes((int)n);
-    }
-    
-    public int skipBytes(int n) throws IOException {
         if (n <= 0) {
             return 0;
         }
@@ -282,9 +309,9 @@ public class RandomAccessFileOrArray implements DataInput {
                 adj = 1;
             }
         }
-        int pos;
-        int len;
-        int newpos;
+        long pos;
+        long len;
+        long newpos;
         
         pos = getFilePointer();
         len = length();
@@ -298,12 +325,13 @@ public class RandomAccessFileOrArray implements DataInput {
         return newpos - pos + adj;
     }
     
+    public int skipBytes(int n) throws IOException {
+        return (int)skip(n);
+    }
+    
     public void reOpen() throws IOException {
         if (filename != null && rf == null && trf == null) {
-            if (plainRandomAccess)
-                trf = new RandomAccessFile(filename, "r");
-            else
-                rf = new MappedRandomAccessFile(filename, "r");
+            openFile(filename);
         }
         seek(0);
     }
@@ -334,16 +362,16 @@ public class RandomAccessFileOrArray implements DataInput {
         }
     }
     
-    public int length() throws IOException {
+    public long length() throws IOException {
         if (arrayIn == null) {
             insureOpen();
-            return (int)(plainRandomAccess ? trf.length() : rf.length()) - startOffset;
+            return (plainRandomAccess ? trf.length() : rf.length()) - startOffset;
         }
         else
             return arrayIn.length - startOffset;
     }
     
-    public void seek(int pos) throws IOException {
+    public void seek(long pos) throws IOException {
         pos += startOffset;
         isBack = false;
         if (arrayIn == null) {
@@ -357,15 +385,11 @@ public class RandomAccessFileOrArray implements DataInput {
             arrayInPtr = pos;
     }
     
-    public void seek(long pos) throws IOException {
-        seek((int)pos);
-    }
-    
-    public int getFilePointer() throws IOException {
+    public long getFilePointer() throws IOException {
         insureOpen();
         int n = isBack ? 1 : 0;
         if (arrayIn == null) {
-            return (int)(plainRandomAccess ? trf.getFilePointer() : rf.getFilePointer()) - n - startOffset;
+            return (plainRandomAccess ? trf.getFilePointer() : rf.getFilePointer()) - n - startOffset;
         }
         else
             return arrayInPtr - n - startOffset;
@@ -610,7 +634,7 @@ public class RandomAccessFileOrArray implements DataInput {
     }
     
     public String readLine() throws IOException {
-        StringBuffer input = new StringBuffer();
+        StringBuilder input = new StringBuilder();
         int c = -1;
         boolean eol = false;
         
@@ -622,7 +646,7 @@ public class RandomAccessFileOrArray implements DataInput {
                     break;
                 case '\r':
                     eol = true;
-                    int cur = getFilePointer();
+                    long cur = getFilePointer();
                     if ((read()) != '\n') {
                         seek(cur);
                     }
@@ -647,7 +671,7 @@ public class RandomAccessFileOrArray implements DataInput {
      * @return Value of property startOffset.
      *
      */
-    public int getStartOffset() {
+    public long getStartOffset() {
         return this.startOffset;
     }
     
@@ -655,7 +679,7 @@ public class RandomAccessFileOrArray implements DataInput {
      * @param startOffset New value of property startOffset.
      *
      */
-    public void setStartOffset(int startOffset) {
+    public void setStartOffset(long startOffset) {
         this.startOffset = startOffset;
     }
 
