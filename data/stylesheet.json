@@ -26,6 +26,8 @@
         strictImageSequence:	"false",
         enableLinkPageNum:      "false",
         linkPageNumFormat:  "[%04d]",
+        enableTOCPageNum:   "true",
+        tocPageNumFormat:  "%04d",
         linkPageNumMax:     9999,
         hangingPunctuation: ".,;:'-"
     },

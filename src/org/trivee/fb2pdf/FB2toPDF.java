@@ -66,7 +66,6 @@ public class FB2toPDF {
 
     protected void addSectionsToTOC(Elements sections, int level) throws DocumentException, FB2toPDFException {
         currentStyle = stylesheet.getParagraphStyle("tocItem");
-        GeneralSettings settings = stylesheet.getGeneralSettings();
         
         float extraIndent = level * currentStyle.getFontSize();
 
@@ -94,9 +93,9 @@ public class FB2toPDF {
             currentReference = "#" + ref;
             
             
-            if (settings.enableLinkPageNum) {
+            if (settings().enableTOCPageNum) {
                 currentParagraph.add(new Chunk(new DottedLineSeparator()));
-                addPageNumTemplate();
+                addPageNumTemplate(settings().tocPageNumFormat);
             }
 
             doc.add(currentParagraph);
@@ -104,11 +103,15 @@ public class FB2toPDF {
             currentReference = null;
             
             Elements internalSections = section.getChildElements("section", NS_FB2);
-            if (internalSections.size() > 0 && settings.generateTOCLevels > level) {
+            if (internalSections.size() > 0 && settings().generateTOCLevels > level) {
                 addSectionsToTOC(internalSections, level+1);
             }
 
         }
+    }
+
+    private GeneralSettings settings() {
+        return stylesheet.getGeneralSettings();
     }
 
     protected void setupBackgroundImage() throws FB2toPDFException {
@@ -140,7 +143,7 @@ public class FB2toPDF {
     private void addInternalLink() throws FB2toPDFException {
         String refname = currentReference.substring(1); //getting rid of "#" at the begin of the reference
         currentChunk.setGenericTag("FOOTNOTE:" + refname);
-        if (stylesheet.getGeneralSettings().generateInternalLinks) {
+        if (settings().generateInternalLinks) {
             Anchor anchor = currentStyle.createAnchor();
             //Unlike Anchor, Action won't fail even when local destination does not exist
             refname = passNamePrefix + refname;
@@ -301,13 +304,12 @@ public class FB2toPDF {
     }
 
     private void fillPageNumTemplate(String referenceName) throws FB2toPDFException {
-        String pageNumFormat = stylesheet.getGeneralSettings().linkPageNumFormat;
         for (LinkPageNumTemplate lpnt : linkPageNumTemplates.get(referenceName)) {
             PdfTemplate tp = lpnt.template;
             ParagraphStyle tpStyle = lpnt.style;
             BaseFont tpBaseFont = tpStyle.getBaseFont();
             float tpSize = tpStyle.getFontSize();
-            String pageNum = String.format(pageNumFormat, linkPageNumbers.get(referenceName));
+            String pageNum = String.format(lpnt.format, linkPageNumbers.get(referenceName));
             float tpHight = tpBaseFont.getFontDescriptor(BaseFont.CAPHEIGHT, tpSize) + tpBaseFont.getAscentPoint(pageNum, tpSize);
             float tpWidth = tpBaseFont.getWidthPointKerned(pageNum, tpSize);
             tp.setBoundingBox(new Rectangle(0, tpBaseFont.getDescentPoint(pageNum, tpSize), tpWidth, tpHight));
@@ -344,7 +346,7 @@ public class FB2toPDF {
 
     protected void addCenteredImage(Image image) throws DocumentException, FB2toPDFException {
         Rectangle pageSize = doc.getPageSize();
-        float dpi = stylesheet.getGeneralSettings().imageDpi;
+        float dpi = settings().imageDpi;
         float scaleWidth = pageSize.getWidth() - doc.leftMargin() - doc.rightMargin();
         float scaleHeight = pageSize.getHeight() - doc.topMargin() - doc.bottomMargin();
         float imgWidth = image.getWidth() / dpi * 72;
@@ -421,7 +423,7 @@ public class FB2toPDF {
         }
         
         Element body = (Element)bodies.get(0);
-        if (stylesheet.getGeneralSettings().generateTOCLevels > 0) {
+        if (settings().generateTOCLevels > 0) {
             makeTOCPage(body);
         }
 
@@ -443,25 +445,19 @@ public class FB2toPDF {
 
     private void rescaleImage(Image image, float zoomFactor, float wSpace, float hSpace) {
         Rectangle pageSize = doc.getPageSize();
-        float dpi = stylesheet.getGeneralSettings().imageDpi;
+        float dpi = settings().imageDpi;
         Utilities.rescaleImage(image, zoomFactor, wSpace, hSpace, pageSize, dpi);
     }
 
     private void saveLinkPageNumber(String currentAnchorName) {
-        if (!stylesheet.getGeneralSettings().enableLinkPageNum) {
-            return;
+        if (settings().enableLinkPageNum || settings().enableTOCPageNum) {
+            linkPageNumbers.put("#" + currentAnchorName, writer.getPageNumber());
         }
 
-        linkPageNumbers.put("#" + currentAnchorName, writer.getPageNumber());
     }
 
-    private void addPageNumTemplate() throws BadElementException, FB2toPDFException {
-        GeneralSettings settings = stylesheet.getGeneralSettings();
-        if (!settings.enableLinkPageNum || !currentReference.startsWith("#")) {
-            return;
-        }
-
-        String text = String.format(settings.linkPageNumFormat, settings.linkPageNumMax);
+    private void addPageNumTemplate(String format) throws BadElementException, FB2toPDFException {
+        String text = String.format(settings().linkPageNumFormat, settings().linkPageNumMax);
         float tmpSize = currentStyle.getFontSize();
         BaseFont tmpBasefont = currentStyle.getBaseFont();
         float templateHight = tmpBasefont.getFontDescriptor(BaseFont.CAPHEIGHT, tmpSize);
@@ -471,7 +467,7 @@ public class FB2toPDF {
         Chunk chunk = new Chunk(templateImage, 0, 0, false);
         chunk.setFont(currentStyle.getFont());
         currentParagraph.add(chunk);
-        linkPageNumTemplates.put(currentReference, new LinkPageNumTemplate(template, currentStyle));
+        linkPageNumTemplates.put(currentReference, new LinkPageNumTemplate(template, currentStyle, format));
     }
 
     private void rescaleImage(Image image) throws FB2toPDFException {
@@ -639,7 +635,7 @@ public class FB2toPDF {
     }
 
     private void processTable(Element table) throws DocumentException, FB2toPDFException {
-        stylesheet.getGeneralSettings().enableInlineImages = true;
+        settings().enableInlineImages = true;
         List<PdfPCell> cells = new LinkedList<PdfPCell>();
         Elements rows = table.getChildElements("tr", NS_FB2);
         int maxcol = 0;
@@ -780,12 +776,12 @@ public class FB2toPDF {
         Element prevSib = getPrevSibling(element);
         boolean ignore = false;
         if (nextSib != null && nextSib.getLocalName().equalsIgnoreCase("image")
-                && stylesheet.getGeneralSettings().ignoreEmptyLineBeforeImage) {
+                && settings().ignoreEmptyLineBeforeImage) {
             Log.info("Skipping empty line before image");
             ignore = true;
         }
         if (prevSib != null && prevSib.getLocalName().equalsIgnoreCase("image")
-                && stylesheet.getGeneralSettings().ignoreEmptyLineAfterImage) {
+                && settings().ignoreEmptyLineAfterImage) {
             Log.info("Skipping empty line after image");
             ignore = true;
         }
@@ -926,7 +922,6 @@ public class FB2toPDF {
     
     private void createPDFDoc()
             throws DocumentException, FileNotFoundException, FB2toPDFException {
-        final GeneralSettings generalSettings = stylesheet.getGeneralSettings();
 
         final PageStyle pageStyle = stylesheet.getPageStyle();
         Rectangle pageSize = getPageSize();
@@ -949,19 +944,19 @@ public class FB2toPDF {
             setupBackgroundImage();
         }
         
-        if (!isBlank(generalSettings.secondPassStylesheet) && generalSettings.enableDoubleRenderingOutline){
+        if (!isBlank(settings().secondPassStylesheet) && settings().enableDoubleRenderingOutline){
             writer.setPageEvent(new PageElementMapHelper());
         }
         
-        if (generalSettings.fullCompression) {
+        if (settings().fullCompression) {
             writer.setFullCompression();
         }
 
-        writer.setSpaceCharRatio(generalSettings.trackingSpaceCharRatio);
-        writer.setStrictImageSequence(generalSettings.strictImageSequence);
+        writer.setSpaceCharRatio(settings().trackingSpaceCharRatio);
+        writer.setStrictImageSequence(settings().strictImageSequence);
         PdfDocument.preventWidows = pageStyle.preventWidows;
         PdfDocument.maxFootnoteLines = pageStyle.footnotesMaxLines;
-        PdfDocument.hangingPunctuation = generalSettings.hangingPunctuation;
+        PdfDocument.hangingPunctuation = settings().hangingPunctuation;
         doc.setMarginMirroring(pageStyle.getMarginMirroring());
     }
 
@@ -1082,7 +1077,7 @@ public class FB2toPDF {
         extractBinaries(root);
 
         //bodies = root.getChildElements("body", NS_FB2);
-        String query = stylesheet.getGeneralSettings().bodiesToRender;
+        String query = settings().bodiesToRender;
         try {
             bodies = XQueryUtilities.getNodes(XQueryUtilities.defaultProlog + query, fb2);
         } catch (Exception ex) {
@@ -1107,8 +1102,8 @@ public class FB2toPDF {
             FootnoteRenderer.init(stylesheet);
         }
         
-        secondPassStylesheet = stylesheet.getGeneralSettings().secondPassStylesheet;
-        enableDoubleRenderingOutline = stylesheet.getGeneralSettings().enableDoubleRenderingOutline;
+        secondPassStylesheet = settings().secondPassStylesheet;
+        enableDoubleRenderingOutline = settings().enableDoubleRenderingOutline;
 
         if (!isBlank(secondPassStylesheet)) {
             if (enableDoubleRenderingOutline) {
@@ -1286,7 +1281,7 @@ public class FB2toPDF {
                 String href = coverImage.getAttributeValue("href", NS_XLINK);
                 Image image = getImage(href);
                 if (image != null) {
-                    if (stylesheet.getGeneralSettings().stretchCover) {
+                    if (settings().stretchCover) {
                         addStretchedImage(image);
                     } else {
                         addCenteredImage(image);
@@ -1299,7 +1294,7 @@ public class FB2toPDF {
     }
     
     private String getMetaAuthorFullName(Element author) throws FB2toPDFException {
-        String query = stylesheet.getGeneralSettings().metaAuthorQuery;
+        String query = settings().metaAuthorQuery;
         return XQueryUtilities.getString(author, stylesheet.getTransformationSettings(), query, " ");
     }
     
@@ -1315,7 +1310,7 @@ public class FB2toPDF {
             Elements authors = titleInfo.getChildElements("author", NS_FB2);
             StringBuilder allAuthors = new StringBuilder();
 
-            boolean force = stylesheet.getGeneralSettings().forceTransliterateAuthor;
+            boolean force = settings().forceTransliterateAuthor;
 
             for (int i = 0; i < authors.size(); ++i) {
                 Element author = authors.get(i);
@@ -1360,7 +1355,7 @@ public class FB2toPDF {
         ParagraphStyle subtitleStyle = stylesheet.getParagraphStyle("subtitle");
         ParagraphStyle authorStyle = stylesheet.getParagraphStyle("author");
 
-        if (stylesheet.getGeneralSettings().generateFrontMatter) {
+        if (settings().generateFrontMatter) {
             makeFrontMatter(description);
         }
 
@@ -1461,9 +1456,9 @@ public class FB2toPDF {
                 continue;
             }
             try {
-                String overrideTransparency = stylesheet.getGeneralSettings().overrideImageTransparency;
-                boolean makeGrayImageTransparent = stylesheet.getGeneralSettings().makeGrayImageTransparent;
-                boolean cacheImage = stylesheet.getGeneralSettings().cacheImages;
+                String overrideTransparency = settings().overrideImageTransparency;
+                boolean makeGrayImageTransparent = settings().makeGrayImageTransparent;
+                boolean cacheImage = settings().cacheImages;
                 return attachment.getImage(makeGrayImageTransparent, overrideTransparency, cacheImage);
             } catch (Exception ex) {
                 Log.error(ex.getMessage());
@@ -1584,7 +1579,7 @@ public class FB2toPDF {
         processSectionContent(section, level);
 
         if (bodyIndex > 0 && StringUtils.isNotBlank(id) &&
-                stylesheet.getGeneralSettings().generateNoteBackLinks) {
+                settings().generateNoteBackLinks) {
             addBacklink(id);
         }
 
@@ -1632,9 +1627,9 @@ public class FB2toPDF {
                 processCite(element);
             } else if (element.getLocalName().equals("table")) {
                 ParagraphStyle previousStyle = currentStyle;
-                boolean previousInlineMode = stylesheet.getGeneralSettings().enableInlineImages;
+                boolean previousInlineMode = settings().enableInlineImages;
                 processTable(element);
-                stylesheet.getGeneralSettings().enableInlineImages = previousInlineMode;
+                settings().enableInlineImages = previousInlineMode;
                 currentStyle = previousStyle;
             } else if (element.getLocalName().equals("title")) {
                 processTitle(element, level);
@@ -1672,9 +1667,9 @@ public class FB2toPDF {
                 processCite(element);
             } else if (element.getLocalName().equals("table")) {
                 ParagraphStyle previousStyle = currentStyle;
-                boolean previousInlineMode = stylesheet.getGeneralSettings().enableInlineImages;
+                boolean previousInlineMode = settings().enableInlineImages;
                 processTable(element);
-                stylesheet.getGeneralSettings().enableInlineImages = previousInlineMode;
+                settings().enableInlineImages = previousInlineMode;
                 currentStyle = previousStyle;
             } else {
                 Log.warning("Unhandled section tag [{0}]", element.getLocalName());
@@ -1966,7 +1961,10 @@ public class FB2toPDF {
                     }
                     processParagraphContent(child);
                     flushCurrentChunk();
-                    addPageNumTemplate();
+                    if (settings().enableLinkPageNum && currentReference.startsWith("#")) {
+                        addPageNumTemplate(settings().linkPageNumFormat);
+                    }
+
                     addFootnote(child);
                     currentReference = null;
                 } else if (child.getLocalName().equals("style")) {
@@ -1975,7 +1973,7 @@ public class FB2toPDF {
                     processParagraphContent(child);
                 } else if (child.getLocalName().equals("image")) {
                     flushCurrentChunk();
-                    addImage(child, stylesheet.getGeneralSettings().enableInlineImages);
+                    addImage(child, settings().enableInlineImages);
                 } else if (child.getLocalName().equals("strikethrough")) {
                     flushCurrentChunk();
                     currentStyle.toggleStrikethrough();
@@ -2044,7 +2042,7 @@ public class FB2toPDF {
     }
 
     private String transliterate(String text, boolean force) {
-        if (!stylesheet.getGeneralSettings().transliterateMetaInfo && !force) {
+        if (!settings().transliterateMetaInfo && !force) {
             return text;
         }
         return Translit.get(text);

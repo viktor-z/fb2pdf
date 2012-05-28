@@ -29,6 +29,8 @@ public class GeneralSettings {
     public float trackingSpaceCharRatio;
     public boolean strictImageSequence;
     public String hangingPunctuation = ".,;:'-";
+    public boolean enableTOCPageNum;
+    public String tocPageNumFormat = "%04d";
     public boolean enableLinkPageNum;
     public String linkPageNumFormat = "[%04d]";
     public int linkPageNumMax = 9999;
