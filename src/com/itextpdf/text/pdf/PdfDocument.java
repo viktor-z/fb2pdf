@@ -1271,7 +1271,8 @@ public class PdfDocument extends Document {
         numberOfSpaces = line.numberOfSpaces();
         lineLen = line.getLineLengthUtf32();
         // does the line need to be justified?
-        isJustified = line.hasToBeJustified() && (numberOfSpaces != 0 || lineLen > 1);
+        //isJustified = line.hasToBeJustified() && (numberOfSpaces != 0 || lineLen > 1); // VIKTORZ ---
+        isJustified = !line.isNewlineSplit() && line.hasToBeJustified() && (numberOfSpaces != 0 || lineLen > 1); // VIKTORZ ---
         int separatorCount = line.getSeparatorCount();
         if (separatorCount > 0) {
         	glueWidth = line.widthLeft() / separatorCount;
