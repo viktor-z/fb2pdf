@@ -35,7 +35,7 @@
                         </BoxPane>
                     </TablePane.Row>
                 </TablePane>
-                <!--TablePane>
+                <TablePane>
                     <TabPane.tabData>
                         <content:ButtonData text="%parametersTab"/>
                     </TabPane.tabData>
@@ -96,7 +96,7 @@
                                     ButtonPressListener.buttonPressed="parametersResetButtonPressed()"/>
                         </BoxPane>
                     </TablePane.Row>
-                </TablePane-->
+                </TablePane>
             </TabPane>
         </top>
         <bottom>

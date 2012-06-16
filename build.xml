@@ -35,8 +35,6 @@
 				<compilerarg value="-Xlint:unchecked" />
 				<src path="${src}" />
 
-                <exclude name="com/fb2pdf/hadoop/**"/> 
-
 				<classpath>
 					<path refid="lib" />
 				</classpath>
@@ -117,8 +115,6 @@
 			<compilerarg value="-Xlint:unchecked" />
 			<src path="${src}" />
 
-            <exclude name="com/fb2pdf/hadoop/**"/>
-
 			<classpath>
 				<path refid="lib" />
 			</classpath>
@@ -179,24 +175,4 @@
 
     <target name="dist" depends="clean,compile-nodebug,jar,zip"/>
 
-    <target name="profile" depends="compile" description="Profile Project">
-        <fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
-
-        <nbprofiledirect>
-            <classpath>
-                <pathelement path="${build}"/>
-                <path refid="lib"/>
-            </classpath>
-        </nbprofiledirect>
-
-        <java classname="org.trivee.fb2pdf.FB2toPDF" fork="yes">
-            <classpath>
-                <pathelement path="${build}"/>
-                <path refid="lib"/>
-            </classpath>
-            <jvmarg value="${profiler.info.jvmargs.agent}"/>
-            <arg value="input.fb2"/>
-            <arg value="output.pdf"/>
-        </java>
-    </target>
   </project>
