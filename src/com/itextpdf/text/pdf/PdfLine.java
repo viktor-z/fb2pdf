@@ -147,7 +147,8 @@ public class PdfLine {
         }
 
         // we split the chunk to be added
-        PdfChunk overflow = chunk.split(width);
+        //PdfChunk overflow = chunk.split(width); //VIKTORZ ---
+        PdfChunk overflow = adaptiveSplit(chunk, width); //VIKTORZ +++
         newlineSplit = chunk.isNewlineSplit() || overflow == null;
         if (chunk.isTab()) {
         	Object[] tab = (Object[])chunk.getAttribute(Chunk.TAB);
@@ -542,5 +543,48 @@ public class PdfLine {
             }
         }
         return descender;
+    }
+
+    private PdfChunk adaptiveSplit(PdfChunk chunk, float width) {
+        
+        PdfChunk part1 = new PdfChunk(chunk.value, chunk);
+        PdfChunk part2 = part1.split(width);
+        if (part2 == null) {
+            return chunk.split(width);
+        }
+        PdfChunk part3 = part2.split(width);
+        if (part3 == null) {
+            return chunk.split(width);
+        }
+        
+        float diff = part1.width() - part2.width();
+        float spacewidth = chunk.getCharWidth(' ');
+        float treshold = 2 * spacewidth;
+
+        if (diff < treshold) {
+            return chunk.split(width);
+        }
+        
+        float mindiff = diff;
+        float bestwidth = width;
+        for (int i=0; i<4; i++) {
+            width = width - spacewidth;
+            PdfChunk tmp1 = new PdfChunk(chunk.value, chunk);
+            PdfChunk tmp2 = tmp1.split(width);
+            tmp2.split(width);
+
+            diff = tmp1.width() - tmp2.width();
+            if (diff < mindiff) {
+                mindiff = diff;
+                bestwidth = width;
+            }
+            
+            if (diff < treshold) {
+                break;
+            }
+        }
+        
+        return chunk.split(width);
+        
     }
 }
