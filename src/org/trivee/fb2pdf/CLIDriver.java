@@ -75,7 +75,7 @@ public class CLIDriver {
                 .withArgName("PATH")
                 .withDescription("Stylesheet file")
                 .create('s'));
-        options.addOption("l", "log", true, "Log creation");
+        options.addOption("l", "log", true, "Log creation, use 'false' to disable");
         options.addOption("e", "encoding", true, "Log's encoding (default is cp1251)");
         options.addOption("t", "twoup", false, "Create two-up pdf");
         options.addOption(OptionBuilder
