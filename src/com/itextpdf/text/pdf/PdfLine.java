@@ -546,43 +546,47 @@ public class PdfLine {
     }
 
     private PdfChunk adaptiveSplit(PdfChunk chunk, float width) {
-        
-        PdfChunk part1 = new PdfChunk(chunk.value, chunk);
-        PdfChunk part2 = part1.split(width);
-        if (part2 == null) {
-            return chunk.split(width);
-        }
-        PdfChunk part3 = part2.split(width);
-        if (part3 == null) {
-            return chunk.split(width);
-        }
-        
-        float diff = part1.width() - part2.width();
-        float spacewidth = chunk.getCharWidth(' ');
-        float treshold = 2 * spacewidth;
-
-        if (diff < treshold) {
-            return chunk.split(width);
-        }
-        
-        float mindiff = diff;
-        float bestwidth = width;
-        for (int i=0; i<4; i++) {
-            width = width - spacewidth;
-            PdfChunk tmp1 = new PdfChunk(chunk.value, chunk);
-            PdfChunk tmp2 = tmp1.split(width);
-            tmp2.split(width);
-
-            diff = tmp1.width() - tmp2.width();
-            if (diff < mindiff) {
-                mindiff = diff;
-                bestwidth = width;
+        try {
+            PdfChunk part1 = new PdfChunk(chunk.value, chunk);
+            PdfChunk part2 = part1.split(width);
+            if (part2 == null) {
+                return chunk.split(width);
             }
-            
+            PdfChunk part3 = part2.split(width);
+            if (part3 == null) {
+                return chunk.split(width);
+            }
+
+            float diff = width - part2.width();
+            float spacewidth = chunk.getCharWidth(' ');
+            float treshold = 3 * spacewidth;
+
             if (diff < treshold) {
-                break;
+                return chunk.split(width);
             }
-        }
+
+            float mindiff = diff;
+            float bestwidth = width;
+            float tmpwidth = width;
+            for (int i=0; i<4; i++) {
+                tmpwidth = tmpwidth - spacewidth;
+                PdfChunk tmp1 = new PdfChunk(chunk.value, chunk);
+                PdfChunk tmp2 = tmp1.split(tmpwidth);
+                tmp2.split(width);
+
+                float diff1 = width - tmp1.width();
+                float diff2 = width - tmp2.width();
+                if (diff2 < mindiff && diff2 >= diff1) {
+                    mindiff = diff;
+                    bestwidth = tmpwidth;
+                }
+
+                if (diff < treshold) {
+                    break;
+                }
+            }
+            width = bestwidth;
+        } catch (Exception ex) {}
         
         return chunk.split(width);
         
