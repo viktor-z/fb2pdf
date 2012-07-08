@@ -124,7 +124,7 @@ public class FB2toPDF {
 
     private void newPage() {
         doc.newPage();
-        ct.setYLine(doc.top());
+        //ct.setYLine(doc.top());
     }
 
     private GeneralSettings settings() {
