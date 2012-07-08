@@ -26,6 +26,7 @@ public class FB2toPDF {
     private String toName;
     private nu.xom.Document fb2;
     private com.itextpdf.text.Document doc;
+    //private ColumnText ct;
     private PdfWriter writer;
     int bodyIndex;
     private Nodes bodies;
@@ -97,8 +98,7 @@ public class FB2toPDF {
                 currentParagraph.add(new Chunk(new DottedLineSeparator()));
                 addPageNumTemplate(settings().tocPageNumFormat);
             }
-
-            doc.add(currentParagraph);
+            addElement(currentParagraph);
             
             currentReference = null;
             
@@ -108,6 +108,23 @@ public class FB2toPDF {
             }
 
         }
+    }
+
+    private void addElement(com.itextpdf.text.Element element) throws DocumentException {
+        doc.add(element);
+        /*
+        ct.addElement(element);
+        int status = ct.go();
+        while (ColumnText.hasMoreText(status)) {
+            newPage();
+            status = ct.go();
+        }
+        */
+    }
+
+    private void newPage() {
+        doc.newPage();
+        ct.setYLine(doc.top());
     }
 
     private GeneralSettings settings() {
@@ -362,7 +379,7 @@ public class FB2toPDF {
     protected void addImage(Image image) throws DocumentException, FB2toPDFException {
         rescaleImage(image);
         image.setAlignment(Image.MIDDLE);
-        doc.add(image);
+        addElement(image);
     }
 
     private int[] getCellWidths(int colNumber, Elements rows) {
@@ -439,7 +456,7 @@ public class FB2toPDF {
             body = (Element) bodies.get(i);
             bodyIndex = i;
             processBody(body);
-            doc.newPage();
+            newPage();
         }
     }
 
@@ -495,14 +512,14 @@ public class FB2toPDF {
     protected void addLine(Chunk chunk, ParagraphStyle style) throws FB2toPDFException, DocumentException {
         Paragraph para = style.createParagraph();
         para.add(chunk);
-        doc.add(para);
+        addElement(para);
     }
 
     protected void addStretchedImage(Image image) throws DocumentException {
         Rectangle pageSize = doc.getPageSize();
         image.scaleToFit(pageSize.getWidth()/* - doc.leftMargin() - doc.rightMargin()*/, pageSize.getHeight()/* - doc.topMargin() - doc.bottomMargin()*/);
         image.setAlignment(Image.MIDDLE);
-        doc.add(image);
+        addElement(image);
     }
 
     private void addGoToActionToChunk(String refname, Chunk chunk) {
@@ -533,7 +550,7 @@ public class FB2toPDF {
         }
         List<Image> noteLineImages = prepareFootnoteLineImages(footnoteNumber, refname, w, h, cutW);
         for (Image image : noteLineImages) {
-            doc.add(image);
+            addElement(image);
         }
     }
 
@@ -690,7 +707,7 @@ public class FB2toPDF {
             int[] widths = getCellWidths(maxcol, rows);
             pdftable.setWidths(widths);
         }
-        doc.add(pdftable);
+        addElement(pdftable);
     }
 
     private int setTableCellAttributes(Element cellElement, PdfPCell cell) throws NumberFormatException {
@@ -1097,6 +1114,8 @@ public class FB2toPDF {
 
         doc.open();
         currentOutline.put(0, writer.getDirectContent().getRootOutline());
+        //ct = new ColumnText(writer.getDirectContent());
+        //ct.setSimpleColumn(doc.left(), doc.bottom(), doc.right(), doc.top());
 
         if (stylesheet.getPageStyle().footnotes) {
             FootnoteRenderer.init(stylesheet);
@@ -1134,9 +1153,9 @@ public class FB2toPDF {
             pageElementMap = pageElementMap2;
             elementPageMap = elementPageMap2;
             
-            doc.newPage();
+            newPage();
             writer.setPageEmpty(false);
-            doc.newPage();
+            newPage();
 
             renderBook(description);
         }
@@ -1286,7 +1305,7 @@ public class FB2toPDF {
                     } else {
                         addCenteredImage(image);
                     }
-                    doc.newPage();
+                    newPage();
                 }
             }
         }
@@ -1396,7 +1415,7 @@ public class FB2toPDF {
             }
         }
 
-        doc.newPage();
+        newPage();
     }
 
     private void makeFrontMatter(Element description)
@@ -1513,7 +1532,7 @@ public class FB2toPDF {
 
         addSectionsToTOC(sections, 1);
 
-        doc.newPage();
+        newPage();
     }
 
     private PdfOutline addBookmark(String title, int level) {
@@ -1547,7 +1566,7 @@ public class FB2toPDF {
         Float newPagePosition = stylesheet.getPageStyle().sectionNewPage.get(level);
 
         if (newPagePosition != null && writer.getVerticalPosition(false) < doc.getPageSize().getHeight() * newPagePosition) {
-            doc.newPage();
+            newPage();
             writer.setPageEmpty(false);
         }
 
@@ -1844,12 +1863,12 @@ public class FB2toPDF {
         flushCurrentChunk();
 
         currentElementHash = paragraph.hashCode();
-        doc.add(currentParagraph);
+        addElement(currentParagraph);
         currentParagraph = null;
         currentReference = null;
     }
 
-    private void addDropCap(String text, com.itextpdf.text.Document doc) throws DocumentException, FB2toPDFException {
+    private void addDropCap(String text) throws DocumentException, FB2toPDFException {
 
         ParagraphStyle dropcapStyle = stylesheet.getParagraphStyle(currentStyle.getDropcapStyle());
 
@@ -1889,9 +1908,9 @@ public class FB2toPDF {
         dropcap.setSpacingBefore(spacingBefore);
 
         if (writer.getVerticalPosition(false) < spacingBefore + templateHight + doc.bottomMargin()) {
-            doc.newPage();
+            newPage();
         }
-        doc.add(dropcap);
+        addElement(dropcap);
         //tp.setBoundingBox(new Rectangle(0,descent,templateWidth,ascent));
         tp.setBoundingBox(new Rectangle(-100, -100, 100, 100));
     }
@@ -2013,7 +2032,7 @@ public class FB2toPDF {
                     text = text.substring(idx);
                     if (dropcap != null && dropcap.trim().length() > 0) {
                         dropcap = dropcap.replaceAll("^\u2014", "\u2013");
-                        addDropCap(dropcap, doc);
+                        addDropCap(dropcap);
                     }
                 }
 
