@@ -159,6 +159,7 @@ public class FB2toPDF {
 
     private void addInternalLink() throws FB2toPDFException {
         String refname = currentReference.substring(1); //getting rid of "#" at the begin of the reference
+        if (StringUtils.isBlank(refname)) return;
         currentChunk.setGenericTag("FOOTNOTE:" + refname);
         if (settings().generateInternalLinks) {
             Anchor anchor = currentStyle.createAnchor();
