@@ -26,7 +26,6 @@ public class FB2toPDF {
     private String toName;
     private nu.xom.Document fb2;
     private com.itextpdf.text.Document doc;
-    //private ColumnText ct;
     private PdfWriter writer;
     int bodyIndex;
     private Nodes bodies;
@@ -111,20 +110,42 @@ public class FB2toPDF {
     }
 
     private void addElement(com.itextpdf.text.Element element) throws DocumentException {
-        doc.add(element);
-        /*
-        ct.addElement(element);
-        int status = ct.go();
-        while (ColumnText.hasMoreText(status)) {
-            newPage();
-            status = ct.go();
+        if (isColumnTextExperiment() && element instanceof Paragraph) {
+            ColumnText columnText = new ColumnText(writer.getDirectContent());
+            columnText.setSimpleColumn(doc.left(), doc.bottom(), doc.right(), doc.top());
+            
+            float beginYLine = writer.getVerticalPosition(true);
+            columnText.setYLine(beginYLine);
+            columnText.addElement(element);
+            int status = columnText.go();
+            while (ColumnText.hasMoreText(status)) {
+                newPage();
+                beginYLine = writer.getVerticalPosition(true);
+                columnText.setYLine(beginYLine);
+                status = columnText.go();
+            }
+            
+            float endYLine = columnText.getYLine();
+            
+            PdfTemplate tmp = writer.getDirectContent().createTemplate(doc.right(), beginYLine - endYLine );
+            
+            doc.add(Image.getInstance(tmp));
+            
+            return;
         }
-        */
+        doc.add(element);
+    }
+
+    private float getVerticalPosition() {
+        return writer.getVerticalPosition(false);
+    }
+
+    private boolean isColumnTextExperiment() {
+        return "ColumnTextRenderer".equalsIgnoreCase(System.getProperty("fb2pdf.experiment"));
     }
 
     private void newPage() {
         doc.newPage();
-        //ct.setYLine(doc.top());
     }
 
     private GeneralSettings settings() {
@@ -1115,9 +1136,7 @@ public class FB2toPDF {
 
         doc.open();
         currentOutline.put(0, writer.getDirectContent().getRootOutline());
-        //ct = new ColumnText(writer.getDirectContent());
-        //ct.setSimpleColumn(doc.left(), doc.bottom(), doc.right(), doc.top());
-
+        
         if (stylesheet.getPageStyle().footnotes) {
             FootnoteRenderer.init(stylesheet);
         }
@@ -1566,7 +1585,7 @@ public class FB2toPDF {
 
         Float newPagePosition = stylesheet.getPageStyle().sectionNewPage.get(level);
 
-        if (newPagePosition != null && writer.getVerticalPosition(false) < doc.getPageSize().getHeight() * newPagePosition) {
+        if (newPagePosition != null && getVerticalPosition() < doc.getPageSize().getHeight() * newPagePosition) {
             newPage();
             writer.setPageEmpty(false);
         }
@@ -1908,7 +1927,7 @@ public class FB2toPDF {
         dropcap.setIndentationRight(identationRight);
         dropcap.setSpacingBefore(spacingBefore);
 
-        if (writer.getVerticalPosition(false) < spacingBefore + templateHight + doc.bottomMargin()) {
+        if (getVerticalPosition() < spacingBefore + templateHight + doc.bottomMargin()) {
             newPage();
         }
         addElement(dropcap);

@@ -84,6 +84,7 @@ public class CLIDriver {
                 .withArgName("ROTATION")
                 .withDescription("90, 180 or 270")
                 .create("rt"));
+        options.addOption("x", "experiment", true, "Enable experimental features");
 
         cl = new PosixParser().parse(options, args);
 
@@ -104,6 +105,10 @@ public class CLIDriver {
         //for (Option option: cl.getOptions()) {
         //    println(option.getOpt());
         //}
+        
+        if (cl.hasOption("x")) {
+            System.setProperty("fb2pdf.experiment", cl.getOptionValue("x"));
+        }
 
         String[] stylesheetNames = cl.hasOption('s') ? cl.getOptionValues('s') : new String[]{new File(Utilities.getBaseDir() + "/data/stylesheet.json").getCanonicalPath()};
 
