@@ -39,6 +39,9 @@
 					<path refid="lib" />
 				</classpath>
 			</javac>
+            <copy todir="${build}">
+                <fileset dir="${src}" includes="**/*.lng, **/*.afm, **/*.txt" />
+            </copy>
 	</target>
 
 	<target name="all" depends="compile" />
@@ -119,6 +122,9 @@
 				<path refid="lib" />
 			</classpath>
 		</javac>
+        <copy todir="${build}">
+            <fileset dir="${src}" includes="**/*.lng, **/*.afm" />
+        </copy>
 	</target>
 
 	<target name="jar-nodebug" depends="compile-nodebug,jar" />
