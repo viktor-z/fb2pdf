@@ -534,7 +534,8 @@ public class PdfDocument extends Document {
                     }
                     else {
                     	line.setExtraIndent(paragraph.getFirstLineIndent());
-                    	element.process(this);
+                    	//element.process(this);        //VIKTORZ --
+                        processParagraph(paragraph);    //VIKTORZ ++
                         carriageReturn();
                         addSpacing(paragraph.getSpacingAfter(), paragraph.getTotalLeading(), paragraph.getFont());
                     }
@@ -2597,4 +2598,63 @@ public class PdfDocument extends Document {
         return result;
     }
 
+    //Better layout VIKTORZ +++
+    private boolean processParagraph(Paragraph paragraph) {
+
+        try {
+            BidiLine bidiLine = new BidiLine();
+            
+            java.util.List<Chunk> chunks = paragraph.getChunks();
+            for (Chunk chunk: chunks) {
+                PdfChunk pdfChunk = new PdfChunk(chunk, anchorAction);
+                bidiLine.addChunk(pdfChunk);
+            }
+
+            if (line == null) {
+                carriageReturn();
+            }
+
+            PdfLine currentLine = bidiLine.processLine(0, line.width, paragraph.getAlignment(), PdfWriter.RUN_DIRECTION_LTR, 0);
+            while (currentLine != null) {
+                PdfLine nextLine = bidiLine.processLine(0, line.width, paragraph.getAlignment(), PdfWriter.RUN_DIRECTION_LTR, 0);
+                for (int i=0; true; i++) {
+                    PdfChunk chunk = currentLine.getChunk(i);
+                    if (chunk == null) break;
+                    this.add(chunk);
+                    if (nextLine != null && currentLine.getChunk(i+1) == null) {
+                        line.newlineSplit = false;
+                        carriageReturn();
+                    }
+                }
+                currentLine = nextLine;
+            }
+            
+            return true;
+        }
+        catch(DocumentException de) {
+            return false;
+        }
+    }
+
+    private boolean add(PdfChunk chunk) throws DocumentException {
+        try {
+            // we try to add the chunk to the line, until we succeed
+            {
+                PdfChunk overflow;
+                while ((overflow = line.add(chunk)) != null) {
+                    carriageReturn();
+                    chunk = overflow;
+                    chunk.trimFirstSpace();
+                }
+            }
+            pageEmpty = false;
+            if (chunk.isAttribute(Chunk.NEWPAGE)) {
+                newPage();
+            }
+            lastElementType = Element.CHUNK;
+            return true;
+        } catch(Exception e) {
+            throw new DocumentException(e);
+        }
+    }
 }

@@ -346,6 +346,7 @@ public class BidiLine {
         PdfChunk ck = null;
         float charWidth = 0;
         PdfChunk lastValidChunk = null;
+        PdfChunk oldLastValidChunk = null; // VIKTORZ +++
         boolean splitChar = false;
         boolean surrogate = false;
         for (; currentChar < totalTextLength; ++currentChar) {
@@ -381,7 +382,8 @@ public class BidiLine {
             if (splitChar)
                 lastSplit = currentChar;
             width -= charWidth;
-        	lastValidChunk = ck;
+            if (lastValidChunk != ck) oldLastValidChunk = lastValidChunk; // VIKTORZ +++
+            lastValidChunk = ck;
             if (ck.isTab()) {
             	Object[] tab = (Object[])ck.getAttribute(Chunk.TAB);
         		float tabPosition = ((Float)tab[1]).floatValue();
@@ -435,6 +437,20 @@ public class BidiLine {
                         currentChar = word[1] - post.length();
                         return new PdfLine(0, originalWidth, testWidth - lastValidChunk.font().width(pre), alignment, false, createArrayOfPdfChunks(oldCurrentChar, word[0] - 1, extra), isRTL);
                     }
+                } else { // VIKTORZ +++ BEGIN {
+                    try {
+                        word = getWord(oldCurrentChar, newCurrentChar - lastValidChunk.length());
+                        if (word != null) {
+                            float testWidth = getWidth(word[0], word[1] - 1);
+                            String pre = he.getHyphenatedWordPre(new String(text, word[0], word[1] - word[0]), oldLastValidChunk.font().getFont(), oldLastValidChunk.font().size(), testWidth);
+                            String post = he.getHyphenatedWordPost();
+                            if (pre.length() > 0) {
+                                PdfChunk extra = new PdfChunk(pre, oldLastValidChunk);
+                                currentChar = word[1] - post.length();
+                                return new PdfLine(0, originalWidth, testWidth - oldLastValidChunk.font().width(pre), alignment, false, createArrayOfPdfChunks(oldCurrentChar, word[0] - 1, extra), isRTL);
+                            }
+                        }
+                    } catch(Exception ex) {} // } END VIKTORZ +++ 
                 }
             }
         }
