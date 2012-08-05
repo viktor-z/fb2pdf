@@ -438,6 +438,7 @@ public class BidiLine {
                         return new PdfLine(0, originalWidth, testWidth - lastValidChunk.font().width(pre), alignment, false, createArrayOfPdfChunks(oldCurrentChar, word[0] - 1, extra), isRTL);
                     }
                 } else { // VIKTORZ +++ BEGIN {
+                    /*
                     try {
                         word = getWord(oldCurrentChar, newCurrentChar - lastValidChunk.length());
                         if (word != null) {
@@ -451,6 +452,7 @@ public class BidiLine {
                             }
                         }
                     } catch(Exception ex) {} // } END VIKTORZ +++ 
+                    */
                 }
             }
         }
