@@ -110,6 +110,7 @@ public class FB2toPDF {
     }
 
     private void addElement(com.itextpdf.text.Element element) throws DocumentException {
+        /*
         if (isColumnTextExperiment() && element instanceof Paragraph) {
             ColumnText columnText = new ColumnText(writer.getDirectContent());
             columnText.setSimpleColumn(doc.left(), doc.bottom(), doc.right(), doc.top());
@@ -133,6 +134,7 @@ public class FB2toPDF {
             
             return;
         }
+        */
         doc.add(element);
     }
 
@@ -140,9 +142,11 @@ public class FB2toPDF {
         return writer.getVerticalPosition(false);
     }
 
+    /*
     private boolean isColumnTextExperiment() {
         return "ColumnTextRenderer".equalsIgnoreCase(System.getProperty("fb2pdf.experiment"));
     }
+    */
 
     private void newPage() {
         doc.newPage();
