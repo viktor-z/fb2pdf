@@ -2614,19 +2614,20 @@ public class PdfDocument extends Document {
                 carriageReturn();
             }
 
-            PdfLine currentLine = bidiLine.processLine(0, line.width, paragraph.getAlignment(), PdfWriter.RUN_DIRECTION_LTR, 0);
-            while (currentLine != null) {
-                PdfLine nextLine = bidiLine.processLine(0, line.width, paragraph.getAlignment(), PdfWriter.RUN_DIRECTION_LTR, 0);
+            float lineWidth = line.width;
+            ArrayList<PdfLine> pdfLines = splitBidiLine(bidiLine, lineWidth, paragraph.getAlignment());
+            
+            for (int idx=0; idx<pdfLines.size(); idx++) {
+                PdfLine currentLine = pdfLines.get(idx);
                 for (int i=0; true; i++) {
                     PdfChunk chunk = currentLine.getChunk(i);
                     if (chunk == null) break;
                     this.add(chunk);
-                    if (nextLine != null && currentLine.getChunk(i+1) == null) {
+                    if (idx<pdfLines.size()-1 && currentLine.getChunk(i+1) == null) {
                         line.newlineSplit = false;
                         carriageReturn();
                     }
                 }
-                currentLine = nextLine;
             }
             
             return true;
@@ -2657,4 +2658,15 @@ public class PdfDocument extends Document {
             throw new DocumentException(e);
         }
     }
+
+    private ArrayList<PdfLine> splitBidiLine(BidiLine bidiLine, float lineWidth, int alignment) {
+        ArrayList<PdfLine> pdfLines = new ArrayList<PdfLine>();
+        while (true) {
+            PdfLine pdfLine = bidiLine.processLine(0, lineWidth, alignment, PdfWriter.RUN_DIRECTION_LTR, 0);
+            if (pdfLine == null) break;
+            pdfLines.add(pdfLine);
+        }
+        return pdfLines;
+    }
+
 }
