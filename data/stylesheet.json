@@ -348,6 +348,16 @@
                     "morpher":  "./*"
                 },
                 */
+                /*
+                {   // load image from external file
+                    "query":   "//binary", 
+                    "morpher": "(., <binary id='new-cover.jpg' content-type='image/jpg'>{fb:load-binary('./data/NewCover.jpg')}</binary>)" 
+                },
+                {   // replace cover image
+                    "query":   "//coverpage/image/@l:href", 
+                    "morpher": "attribute {'l:href'} {'#new-cover.jpg'}" 
+                },
+                */
         ]
     },
     textPreprocessorSettings: {
