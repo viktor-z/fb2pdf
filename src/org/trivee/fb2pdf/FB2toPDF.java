@@ -1402,7 +1402,7 @@ public class FB2toPDF {
             makeFrontMatter(description);
         }
 
-        addLine(" ", titleStyle);
+        addEmptyLine();
 
         Element titleInfo = getOptionalChildByTagName(description, "title-info");
         if (titleInfo != null) {
@@ -1417,16 +1417,16 @@ public class FB2toPDF {
             Elements sequences = titleInfo.getChildElements("sequence", NS_FB2);
 
             if (bookTitle != null && sequences.size() == 0) {
-                addLine(" ", titleStyle);
+                addEmptyLine();
                 addLine(bookTitle.getValue(), titleStyle);
-                addLine(" ", titleStyle);
+                addEmptyLine();
             } else if (bookTitle != null && sequences.size() != 0) {
-                addLine(" ", titleStyle);
+                addEmptyLine();
                 addLine(bookTitle.getValue(), titleStyle);
                 for (int i = 0; i < sequences.size(); i++) {
                     String subtitle = getSequenceSubtitle(sequences.get(i));
                     addLine(subtitle, subtitleStyle);
-                    addLine(" ", titleStyle);
+                    addEmptyLine();
                 }
             }
 
@@ -1630,7 +1630,7 @@ public class FB2toPDF {
 
     private void addEmptyLine()
             throws DocumentException, FB2toPDFException {
-        addLine(" ", currentStyle);
+        addElement(Chunk.NEWLINE);
     }
 
     private void processSectionContent(Element parent, int level)
