@@ -2602,20 +2602,36 @@ public class PdfDocument extends Document {
     private boolean processParagraph(Paragraph paragraph) {
 
         try {
-            BidiLine bidiLine = new BidiLine();
-            
-            java.util.List<Chunk> chunks = paragraph.getChunks();
-            for (Chunk chunk: chunks) {
-                PdfChunk pdfChunk = new PdfChunk(chunk, anchorAction);
-                bidiLine.addChunk(pdfChunk);
-            }
 
-            if (line == null) {
-                carriageReturn();
-            }
+            ArrayList<PdfLine> pdfLines = null;
+            float minWidth = Float.NEGATIVE_INFINITY;
+            float numLines = Float.POSITIVE_INFINITY;
+            for (int i=0; i<4; i++) {
+                BidiLine bidiLine = new BidiLine();
 
-            float lineWidth = line.width;
-            ArrayList<PdfLine> pdfLines = splitBidiLine(bidiLine, lineWidth, paragraph.getAlignment());
+                java.util.List<Chunk> chunks = paragraph.getChunks();
+                for (Chunk chunk: chunks) {
+                    PdfChunk pdfChunk = new PdfChunk(chunk, anchorAction);
+                    bidiLine.addChunk(pdfChunk);
+                }
+
+                if (line == null) {
+                    carriageReturn();
+                }
+                
+                float lineWidth = line.width - i*5;
+                ArrayList<PdfLine> currentPdfLines = splitBidiLine(bidiLine, lineWidth, paragraph);
+                if (currentPdfLines.size() < 2) {
+                    pdfLines = currentPdfLines;
+                    break;
+                }
+                float currentMinWidth = getMinWidth(currentPdfLines);
+                if (currentMinWidth >= minWidth && currentPdfLines.size() <= numLines) {
+                    pdfLines = currentPdfLines;
+                    numLines = currentPdfLines.size();
+                    minWidth = currentMinWidth;
+                }
+            }
             
             for (int idx=0; idx<pdfLines.size(); idx++) {
                 PdfLine currentLine = pdfLines.get(idx);
@@ -2659,14 +2675,29 @@ public class PdfDocument extends Document {
         }
     }
 
-    private ArrayList<PdfLine> splitBidiLine(BidiLine bidiLine, float lineWidth, int alignment) {
+    private ArrayList<PdfLine> splitBidiLine(BidiLine bidiLine, float lineWidth, Paragraph paragraph) {
         ArrayList<PdfLine> pdfLines = new ArrayList<PdfLine>();
+        boolean isFirst = true;
         while (true) {
-            PdfLine pdfLine = bidiLine.processLine(0, lineWidth, alignment, PdfWriter.RUN_DIRECTION_LTR, 0);
+            PdfLine pdfLine = bidiLine.processLine(0, lineWidth, paragraph.getAlignment(), PdfWriter.RUN_DIRECTION_LTR, 0);
             if (pdfLine == null) break;
+            if (isFirst) {
+                lineWidth = lineWidth + paragraph.getFirstLineIndent();
+            }
+            isFirst = false;
             pdfLines.add(pdfLine);
         }
         return pdfLines;
+    }
+
+    private float getMinWidth(ArrayList<PdfLine> pdfLines) {
+        float result = Float.POSITIVE_INFINITY;
+        for (int i=0; i<pdfLines.size()-1; i++) {
+            PdfLine pdfLine = pdfLines.get(i);
+            float width = pdfLine.getWidthCorrected(0, 0);
+            result = Math.min(width, result);
+        }
+        return result;
     }
 
 }
