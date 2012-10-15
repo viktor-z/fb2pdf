@@ -126,6 +126,10 @@
         //pageWidth:    "196.427mm",
         //pageHeight:   "131.064mm",
 
+        // Pocketbook Touch 
+        //pageWidth:    "84mm",
+        //pageHeight:   "106mm",
+
         marginLeft:   "1.0pt",
         marginRight:  "1.0pt",
         marginTop:    "0.0pt",
