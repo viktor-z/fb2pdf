@@ -10,9 +10,10 @@
         transliterateMetaInfo:	"true",
         forceTransliterateAuthor: "false",
         metaAuthorQuery: "(last-name, first-name,  middle-name)",
-        imageDpi: 168.212,  // PRS-500/505/600/700/650/900/950, Kindle
+        imageDpi: 168.212,  // PRS-500/505/600/700/650/900/950, Kindle, Nook
         //imageDpi: 200,    // PRS-300/350
         //imageDpi: 150,    // Kindle DX
+        //imageDpi: 212,    // Kindle Paperwhite, iRiver Story HD
         stretchCover: "true",
         enableInlineImages: "false",
         fullCompression: "false",
@@ -124,6 +125,16 @@
         // Kindle DX Landscape
         //pageWidth:    "196.427mm",
         //pageHeight:   "131.064mm",
+
+        //Kindle Paperwhite Portrait 
+        // calculated from 658x904 pixels of 0.1198 mm
+        //pageWidth:      "78.836mm", 
+        //pageHeight:      "108.310mm", 
+
+        // Kindle Paperwhite Landscape 
+        // calculated from 924x638 pixels of 0.1198 mm
+        // pageWidth:      "110.706mm", 
+        // pageHeight:      "76.440mm",
 
         // Pocketbook Touch 
         //pageWidth:    "84mm",
