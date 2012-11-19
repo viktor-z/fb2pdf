@@ -1,5 +1,5 @@
 /*
- * $Id: ListItem.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: ListItem.java 5476 2012-10-12 13:49:11Z achingarev $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA

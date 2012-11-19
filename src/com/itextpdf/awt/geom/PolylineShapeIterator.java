@@ -1,5 +1,5 @@
 /*
- * $Id: PolylineShapeIterator.java 4784 2011-03-15 08:33:00Z blowagie $
+ * $Id: PolylineShapeIterator.java 5201 2012-06-19 16:24:25Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA

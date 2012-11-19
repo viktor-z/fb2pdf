@@ -1,5 +1,5 @@
 /*
- * $Id: Element.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: Element.java 5371 2012-08-31 11:47:46Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -161,8 +161,8 @@ public interface Element {
 	 */
 	public static final int JBIG2 = 36;
 
-	/** This is a possible type of <CODE>Element</CODE>. */
-	public static final int MULTI_COLUMN_TEXT = 40;
+    /** This is a possible type of <CODE>Element</CODE>. */
+	public static final int DIV = 37;
 
 	/** This is a possible type of <CODE>Element</CODE>. */
 	public static final int MARKED = 50;

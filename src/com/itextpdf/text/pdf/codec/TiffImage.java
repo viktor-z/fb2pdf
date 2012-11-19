@@ -1,5 +1,5 @@
 /*
- * $Id: TiffImage.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: TiffImage.java 5370 2012-08-30 23:46:19Z psoares33 $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -42,18 +42,18 @@
  * address: sales@itextpdf.com
  */
 package com.itextpdf.text.pdf.codec;
-import com.itextpdf.text.pdf.ICC_Profile;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.zip.DataFormatException;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.Inflater;
-import com.itextpdf.text.error_messages.MessageLocalization;
 
 import com.itextpdf.text.ExceptionConverter;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.ImgRaw;
 import com.itextpdf.text.Jpeg;
+import com.itextpdf.text.error_messages.MessageLocalization;
+import com.itextpdf.text.pdf.ICC_Profile;
 import com.itextpdf.text.pdf.PdfArray;
 import com.itextpdf.text.pdf.PdfDictionary;
 import com.itextpdf.text.pdf.PdfName;
@@ -368,7 +368,7 @@ public class TiffImage {
             if ((size == null || (size.length == 1 && (size[0] == 0 || size[0] + offset[0] > s.length()))) && h == rowsStrip) { // some TIFF producers are really lousy, so...
                 size = new long[]{s.length() - (int)offset[0]};
             }
-            if (compression == TIFFConstants.COMPRESSION_LZW) {
+            if (compression == TIFFConstants.COMPRESSION_LZW || compression == TIFFConstants.COMPRESSION_DEFLATE || compression == TIFFConstants.COMPRESSION_ADOBE_DEFLATE) {
                 TIFFField predictorField = dir.getField(TIFFConstants.TIFFTAG_PREDICTOR);
                 if (predictorField != null) {
                     predictor = predictorField.getAsInt(0);
@@ -379,8 +379,9 @@ public class TiffImage {
                         throw new RuntimeException(MessageLocalization.getComposedMessage("1.bit.samples.are.not.supported.for.horizontal.differencing.predictor", bitsPerSample));
                     }
                 }
-                lzwDecoder = new TIFFLZWDecoder(w, predictor, 
-                                                samplePerPixel);
+            }
+            if (compression == TIFFConstants.COMPRESSION_LZW) {
+                lzwDecoder = new TIFFLZWDecoder(w, predictor, samplePerPixel);
             }
             int rowsLeft = h;
             ByteArrayOutputStream stream = null;
@@ -431,6 +432,30 @@ public class TiffImage {
                 byte[] jpeg = new byte[(int)size[0]];
                 s.seek(offset[0]);
                 s.readFully(jpeg);
+                // if quantization and/or Huffman tables are stored separately in the tiff,
+                // we need to add them to the jpeg data
+                TIFFField jpegtables = dir.getField(TIFFConstants.TIFFTAG_JPEGTABLES);
+                if (jpegtables != null) {
+                	byte[] temp = jpegtables.getAsBytes();
+                	int tableoffset = 0;
+                	int tablelength = temp.length;
+                	// remove FFD8 from start
+                	if (temp[0] == (byte) 0xFF && temp[1] == (byte) 0xD8) {
+                		tableoffset = 2;
+                		tablelength -= 2;
+                	}
+                	// remove FFD9 from end
+                	if (temp[temp.length-2] == (byte) 0xFF && temp[temp.length-1] == (byte) 0xD9)
+                		tablelength -= 2;
+                	byte[] tables = new byte[tablelength];
+                	System.arraycopy(temp, tableoffset, tables, 0, tablelength);
+                    // TODO insert after JFIF header, instead of at the start
+                    byte[] jpegwithtables = new byte[jpeg.length + tables.length];
+                    System.arraycopy(jpeg, 0, jpegwithtables, 0, 2);
+                    System.arraycopy(tables, 0, jpegwithtables, 2, tables.length);
+                    System.arraycopy(jpeg, 2, jpegwithtables, tables.length+2, jpeg.length-2);
+                    jpeg = jpegwithtables;
+                }
                 img = new Jpeg(jpeg);
             } 
             else {
@@ -448,6 +473,7 @@ public class TiffImage {
                         case TIFFConstants.COMPRESSION_DEFLATE:
                         case TIFFConstants.COMPRESSION_ADOBE_DEFLATE:
                             inflate(im, outBuf);
+                            applyPredictor(outBuf, predictor, w, height, samplePerPixel);
                             break;
                         case TIFFConstants.COMPRESSION_NONE:
                             outBuf = im;
@@ -503,6 +529,23 @@ public class TiffImage {
                         palette[k * 3] = (byte)(rgb[k] >>> 8);
                         palette[k * 3 + 1] = (byte)(rgb[k + gColor] >>> 8);
                         palette[k * 3 + 2] = (byte)(rgb[k + bColor] >>> 8);
+                    }
+                    // Colormap components are supposed to go from 0 to 655535 but,
+                    // as usually, some tiff producers just put values from 0 to 255.
+                    // Let's check for these broken tiffs.
+                    boolean colormapBroken = true;
+                    for (int k = 0; k < palette.length; ++k) {
+                        if (palette[k] != 0) {
+                            colormapBroken = false;
+                            break;
+                        }
+                    }
+                    if (colormapBroken) {
+                        for (int k = 0; k < gColor; ++k) {
+                            palette[k * 3] = (byte)rgb[k];
+                            palette[k * 3 + 1] = (byte)rgb[k + gColor];
+                            palette[k * 3 + 2] = (byte)rgb[k + bColor];
+                        }
                     }
                     PdfArray indexed = new PdfArray();
                     indexed.add(PdfName.INDEXED);
@@ -611,4 +654,16 @@ public class TiffImage {
         }
     }
 
+    public static void applyPredictor(byte[] uncompData, int predictor, int w, int h, int samplesPerPixel) {
+        if (predictor != 2)
+            return;
+        int count;
+        for (int j = 0; j < h; j++) {
+            count = samplesPerPixel * (j * w + 1);
+            for (int i = samplesPerPixel; i < w * samplesPerPixel; i++) {
+                uncompData[count] += uncompData[count - samplesPerPixel];
+                count++;
+            }
+        }    
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: PdfSmartCopy.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: PdfSmartCopy.java 5177 2012-06-14 17:47:47Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -91,6 +91,14 @@ public class PdfSmartCopy extends PdfCopy {
         boolean validStream = false;
         if (srcObj.isStream()) {
             streamKey = new ByteStore((PRStream)srcObj);
+            validStream = true;
+            PdfIndirectReference streamRef = streamMap.get(streamKey);
+            if (streamRef != null) {
+                return streamRef;
+            }
+        }
+        else if (srcObj.isDictionary()) {
+            streamKey = new ByteStore((PdfDictionary)srcObj);
             validStream = true;
             PdfIndirectReference streamRef = streamMap.get(streamKey);
             if (streamRef != null) {
@@ -196,6 +204,20 @@ public class PdfSmartCopy extends PdfCopy {
             ByteBuffer bb = new ByteBuffer();
             int level = 100;
             serObject(str, level, bb);
+            this.b = bb.toByteArray();
+            md5 = null;
+        }
+
+        ByteStore(PdfDictionary dict) throws IOException {
+            try {
+                md5 = MessageDigest.getInstance("MD5");
+            }
+            catch (Exception e) {
+                throw new ExceptionConverter(e);
+            }
+            ByteBuffer bb = new ByteBuffer();
+            int level = 100;
+            serObject(dict, level, bb);
             this.b = bb.toByteArray();
             md5 = null;
         }

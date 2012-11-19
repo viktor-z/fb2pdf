@@ -1,5 +1,5 @@
 /*
- * $Id: PdfPSXObject.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: PdfPSXObject.java 5235 2012-07-20 12:35:28Z achingarev $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -72,7 +72,7 @@ public class PdfPSXObject extends PdfTemplate {
      * @throws IOException
      */
     
-    PdfStream getFormXObject(int compressionLevel) throws IOException {
+    public PdfStream getFormXObject(int compressionLevel) throws IOException {
         PdfStream s = new PdfStream(content.toByteArray());
         s.put(PdfName.TYPE, PdfName.XOBJECT);
         s.put(PdfName.SUBTYPE, PdfName.PS);

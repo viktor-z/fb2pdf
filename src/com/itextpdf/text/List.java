@@ -1,5 +1,5 @@
 /*
- * $Id: List.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: List.java 5476 2012-10-12 13:49:11Z achingarev $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -43,10 +43,10 @@
  */
 package com.itextpdf.text;
 
-import java.util.ArrayList;
-
 import com.itextpdf.text.api.Indentable;
 import com.itextpdf.text.factories.RomanAlphabetFactory;
+
+import java.util.ArrayList;
 
 /**
  * A <CODE>List</CODE> contains several <CODE>ListItem</CODE>s.
@@ -589,4 +589,27 @@ public class List implements TextElementArray, Indentable {
 		this.preSymbol = preSymbol;
 	}
 
+    public ListItem getFirstItem() {
+        Element lastElement = list.size() > 0 ? list.get(0) : null;
+        if (lastElement != null) {
+            if (lastElement instanceof ListItem) {
+                return (ListItem)lastElement;
+            } else if (lastElement instanceof List) {
+                return ((List)lastElement).getFirstItem();
+            }
+        }
+        return null;
+    }
+
+    public ListItem getLastItem() {
+        Element lastElement = list.size() > 0 ? list.get(list.size() - 1) : null;
+        if (lastElement != null) {
+            if (lastElement instanceof ListItem) {
+                return (ListItem)lastElement;
+            } else if (lastElement instanceof List) {
+                return ((List)lastElement).getLastItem();
+            }
+        }
+        return null;
+    }
 }

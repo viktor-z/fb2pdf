@@ -1,5 +1,5 @@
 /*
- * $Id: ColumnText.java 5056 2012-02-20 14:56:44Z eugenemark $
+ * $Id: PdfIsoConformanceException.java 5249 2012-07-29 12:37:06Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -41,18 +41,22 @@
  * For more information, please contact iText Software Corp. at this
  * address: sales@itextpdf.com
  */
- package com.itextpdf.text.pdf;
+package com.itextpdf.text.pdf;
 
-import java.security.cert.X509Certificate;
+public class PdfIsoConformanceException extends RuntimeException {
 
-/**
- *
- * @author psoares
- */
-public interface CrlClient {
-	/**
-	 * Gets an encoded byte array.
-	 * @return	a byte array
-	 */
-    public byte[] getEncoded(X509Certificate checkCert, String url);
+	/** Serial version UID */
+	private static final long serialVersionUID = -8972376258066225871L;
+
+	/** Creates a new instance of PdfIsoConformanceException. */
+    public PdfIsoConformanceException() {
+    }
+
+    /**
+     * Creates a new instance of PdfIsoConformanceException.
+     * @param s
+     */
+    public PdfIsoConformanceException(String s) {
+        super(s);
+    }    
 }

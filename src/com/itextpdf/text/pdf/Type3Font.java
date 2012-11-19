@@ -1,5 +1,5 @@
 /*
- * $Id: Type3Font.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: Type3Font.java 5391 2012-09-10 10:45:33Z achingarev $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -43,10 +43,10 @@
  */
 package com.itextpdf.text.pdf;
 
-import java.util.HashMap;
-
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.error_messages.MessageLocalization;
+
+import java.util.HashMap;
 
 /**
  * A class to support Type3 fonts.
@@ -283,7 +283,7 @@ public class Type3Font extends BaseFont {
 
 
     @Override
-    byte[] convertToBytes(String text) {
+    public byte[] convertToBytes(String text) {
         char[] cc = text.toCharArray();
         byte[] b = new byte[cc.length];
         int p = 0;

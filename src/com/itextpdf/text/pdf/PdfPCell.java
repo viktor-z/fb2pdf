@@ -1,5 +1,5 @@
 /*
- * $Id: PdfPCell.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: PdfPCell.java 5491 2012-10-24 14:58:25Z eugenemark $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -261,6 +261,9 @@ public class PdfPCell extends Rectangle{
         if (table != null) {
             table = null;
             column.setText(null);
+        }
+        if (element instanceof PdfPTable) {
+            ((PdfPTable) element).setSplitLate(false);
         }
         column.addElement(element);
     }
@@ -943,7 +946,7 @@ public class PdfPCell extends Rectangle{
 			setBottom(getTop() - getEffectivePaddingTop() - getEffectivePaddingBottom() - refHeight);
 		}
 		else {
-			if (pivoted && hasFixedHeight())
+			if ((pivoted && hasFixedHeight()) || getColumn() == null)
 				setBottom(getTop() - getFixedHeight());
 			else {
 				ColumnText ct = ColumnText.duplicate(getColumn());
@@ -977,6 +980,8 @@ public class PdfPCell extends Rectangle{
 			}
 		}
 		float height = getHeight();
+		if (height == getEffectivePaddingTop() + getEffectivePaddingBottom())
+			height = 0;
 		if (hasFixedHeight())
 			height = getFixedHeight();
 		else if (hasMinimumHeight() && height < getMinimumHeight())

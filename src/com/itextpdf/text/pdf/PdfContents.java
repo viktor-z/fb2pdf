@@ -1,5 +1,5 @@
 /*
- * $Id: PdfContents.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: PdfContents.java 5492 2012-10-24 15:48:12Z achingarev $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -85,7 +85,10 @@ class PdfContents extends PdfStream {
             if (Document.compress)
             {
                 compressed = true;
-                compressionLevel = text.getPdfWriter().getCompressionLevel();
+                if (text != null)
+                    compressionLevel = text.getPdfWriter().getCompressionLevel();
+                else if (content != null)
+                    compressionLevel = content.getPdfWriter().getCompressionLevel();
                 deflater = new Deflater(compressionLevel);
                 out = new DeflaterOutputStream(streamBytes, deflater);
             }

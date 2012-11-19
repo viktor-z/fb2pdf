@@ -1,5 +1,5 @@
 /*
- * $Id: ImageRenderInfo.java 4972 2011-10-07 14:50:27Z blowagie $
+ * $Id: InlineImageInfo.java 5195 2012-06-18 14:25:30Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA

@@ -1,5 +1,5 @@
 /*
- * $Id: PRIndirectReference.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: PRIndirectReference.java 5229 2012-07-09 12:43:33Z achingarev $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -60,7 +60,7 @@ public class PRIndirectReference extends PdfIndirectReference {
  * @param		generation		the generation number.
  */
     
-    PRIndirectReference(PdfReader reader, int number, int generation) {
+    public PRIndirectReference(PdfReader reader, int number, int generation) {
         type = INDIRECT;
         this.number = number;
         this.generation = generation;
@@ -74,7 +74,7 @@ public class PRIndirectReference extends PdfIndirectReference {
  * @param		number			the object number.
  */
     
-    PRIndirectReference(PdfReader reader, int number) {
+    public PRIndirectReference(PdfReader reader, int number) {
         this(reader, number, 0);
     }
     

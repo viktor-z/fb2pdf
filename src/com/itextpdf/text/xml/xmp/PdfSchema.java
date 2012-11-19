@@ -1,5 +1,5 @@
 /*
- * $Id: PdfSchema.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: PdfSchema.java 5245 2012-07-25 10:18:58Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -43,7 +43,7 @@
  */
 package com.itextpdf.text.xml.xmp;
 
-import com.itextpdf.text.Document;
+import com.itextpdf.text.Version;
 
 /**
  * An implementation of an XmpSchema.
@@ -66,7 +66,7 @@ public class PdfSchema extends XmpSchema {
 
 	public PdfSchema() {
 		super("xmlns:" + DEFAULT_XPATH_ID + "=\"" + DEFAULT_XPATH_URI + "\"");
-		addProducer(Document.getVersion());
+		addProducer(Version.getInstance().getVersion());
 	}
 	
 	/**

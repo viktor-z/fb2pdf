@@ -1,5 +1,5 @@
 /*
- * $Id: Document.java 5109 2012-03-31 14:22:55Z blowagie $
+ * $Id: Document.java 5245 2012-07-25 10:18:58Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -94,29 +94,7 @@ import com.itextpdf.text.pdf.PdfDocument;
 
 public class Document implements DocListener {
 
-    // membervariables
     /**
-     * This constant contains the name of the product.
-     * iText is a registered trademark.
-     * Please don't change this constant.
-     * @since	2.1.6
-     */
-	private static final String ITEXT = "iText\u00ae";
-    /**
-     * This constant contains the version number of this iText release.
-     * For debugging purposes, we request you NOT to change this constant.
-     * @since	2.1.6
-     */
-	private static final String RELEASE = "5.2.1";
-	/**
-	 * This constant the iText version as shown in the producer line.
-	 * iText is a product developed by 1T3XT BVBA.
-	 * 1T3XT requests that you retain the iText producer line
-	 * in every PDF that is created or manipulated using iText.
-	 */
-	private static final String ITEXT_VERSION = ITEXT + " " + RELEASE + " \u00a92000-2012 1T3XT BVBA";
-
-	/**
 	 * Allows the pdf documents to be produced without compression for debugging
 	 * purposes.
 	 */
@@ -547,7 +525,7 @@ public class Document implements DocListener {
 
     public boolean addProducer() {
         try {
-            return add(new Meta(Element.PRODUCER, getVersion()));
+            return add(new Meta(Element.PRODUCER, Version.getInstance().getVersion()));
 		} catch (DocumentException de) {
             throw new ExceptionConverter(de);
         }
@@ -717,37 +695,6 @@ public class Document implements DocListener {
      */
     public boolean isOpen() {
         return open;
-    }
-
-	/**
-	 * Gets the product name.
-	 * This method may only be changed by Paulo Soares and/or Bruno Lowagie.
-     * @return the product name
-     * @since	2.1.6
-     */
-    public static final String getProduct() {
-        return ITEXT;
-    }
-
-	/**
-	 * Gets the release number.
-	 * This method may only be changed by Paulo Soares and/or Bruno Lowagie.
-     * @return the product name
-     * @since	2.1.6
-     */
-    public static final String getRelease() {
-        return RELEASE;
-    }
-
-	/**
-	 * Returns the iText version as shown in the producer line.
-	 * iText is a product developed by 1T3XT BVBA.
-	 * 1T3XT requests that you retain the iText producer line
-	 * in every PDF that is created or manipulated using iText.
-     * @return iText version
-     */
-    public static final String getVersion() {
-        return ITEXT_VERSION;
     }
 
 	/**

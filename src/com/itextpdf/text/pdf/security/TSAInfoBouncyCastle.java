@@ -1,5 +1,5 @@
 /*
- * $Id: OcspClient.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: TSAInfoBouncyCastle.java 5345 2012-08-22 08:14:09Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -41,22 +41,21 @@
  * For more information, please contact iText Software Corp. at this
  * address: sales@itextpdf.com
  */
-package com.itextpdf.text.pdf;
+package com.itextpdf.text.pdf.security;
 
-import java.security.cert.X509Certificate;
+import org.bouncycastle.tsp.TimeStampTokenInfo;
 
 /**
- * Interface for the OCSP Client.
- * @since 2.1.6
+ * Interface you can implement and pass to TSAClientBouncyCastle in case
+ * you want to do something with the information returned
  */
-public interface OcspClient {
+public interface TSAInfoBouncyCastle {
+
 	/**
-	 * Gets an encoded byte array with OCSP validation. The method should not throw an exception.
-     * @param checkCert to certificate to check
-     * @param rootCert the parent certificate
-     * @param the url to get the verification. It it's null it will be taken
-     * from the check cert or from other implementation specific source
-	 * @return	a byte array with the validation or null if the validation could not be obtained
+	 * When a timestamp is created using TSAClientBouncyCastle,
+	 * this method is triggered passing an object that contains
+	 * info about the timestamp and the time stamping authority.
+	 * @param info a TimeStampTokenInfo object
 	 */
-    public byte[] getEncoded(X509Certificate checkCert, X509Certificate rootCert, String url);
+	public void inspectTimeStampTokenInfo(final TimeStampTokenInfo info);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: MappedRandomAccessFile.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: MappedRandomAccessFile.java 5141 2012-05-12 12:36:18Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -173,7 +173,7 @@ public class MappedRandomAccessFile {
         int totalRead = 0;
         
         while(totalRead < len){
-            if (mapN > mappedBuffers.length) // we have run out of data to read from
+            if (mapN >= mappedBuffers.length) // we have run out of data to read from
                 break;
             MappedByteBuffer currentBuffer = mappedBuffers[mapN];
             if (offN > currentBuffer.limit())

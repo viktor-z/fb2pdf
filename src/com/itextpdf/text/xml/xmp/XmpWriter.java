@@ -1,5 +1,5 @@
 /*
- * $Id: XmpWriter.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: XmpWriter.java 5237 2012-07-23 10:37:38Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -53,8 +53,6 @@ import com.itextpdf.text.pdf.PdfDictionary;
 import com.itextpdf.text.pdf.PdfName;
 import com.itextpdf.text.pdf.PdfObject;
 import com.itextpdf.text.pdf.PdfString;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.text.xml.XMLUtil;
 
 /**
  * With this class you can create an Xmp Stream that can be used for adding
@@ -189,12 +187,14 @@ public class XmpWriter {
 	}
 
     /**
+     * @deprecated
      * @param os
      * @param info
+     * @param PdfXConformance
      * @throws IOException
      */
     public XmpWriter(OutputStream os, PdfDictionary info, int PdfXConformance) throws IOException {
-        this(os);
+        this(os, info);
         if (info != null) {
         	DublinCoreSchema dc = new DublinCoreSchema();
         	PdfSchema p = new PdfSchema();
@@ -206,6 +206,8 @@ public class XmpWriter {
         		key = pdfName;
         		obj = info.get(key);
         		if (obj == null)
+        			continue;
+        		if (!obj.isString())
         			continue;
         		value = ((PdfString)obj).toUnicodeString();
         		if (PdfName.TITLE.equals(key)) {
@@ -237,14 +239,60 @@ public class XmpWriter {
         	if (dc.size() > 0) addRdfDescription(dc);
         	if (p.size() > 0) addRdfDescription(p);
         	if (basic.size() > 0) addRdfDescription(basic);
-            if (PdfXConformance == PdfWriter.PDFA1A || PdfXConformance == PdfWriter.PDFA1B) {
-                PdfA1Schema a1 = new PdfA1Schema();
-                if (PdfXConformance == PdfWriter.PDFA1A)
-                    a1.addConformance("A");
-                else
-                    a1.addConformance("B");
-                addRdfDescription(a1);
-            }
+        }
+    }
+
+    /**
+     * @param os
+     * @param info
+     * @throws IOException
+     */
+    public XmpWriter(OutputStream os, PdfDictionary info) throws IOException {
+        this(os);
+        if (info != null) {
+        	DublinCoreSchema dc = new DublinCoreSchema();
+        	PdfSchema p = new PdfSchema();
+        	XmpBasicSchema basic = new XmpBasicSchema();
+        	PdfName key;
+        	PdfObject obj;
+        	String value;
+        	for (PdfName pdfName : info.getKeys()) {
+        		key = pdfName;
+        		obj = info.get(key);
+        		if (obj == null)
+        			continue;
+        		if (!obj.isString())
+        			continue;
+        		value = ((PdfString)obj).toUnicodeString();
+        		if (PdfName.TITLE.equals(key)) {
+        			dc.addTitle(value);
+        		}
+        		if (PdfName.AUTHOR.equals(key)) {
+        			dc.addAuthor(value);
+        		}
+        		if (PdfName.SUBJECT.equals(key)) {
+        			dc.addSubject(value);
+        			dc.addDescription(value);
+        		}
+        		if (PdfName.KEYWORDS.equals(key)) {
+        			p.addKeywords(value);
+        		}
+        		if (PdfName.CREATOR.equals(key)) {
+        			basic.addCreatorTool(value);
+        		}
+        		if (PdfName.PRODUCER.equals(key)) {
+        			p.addProducer(value);
+        		}
+        		if (PdfName.CREATIONDATE.equals(key)) {
+        			basic.addCreateDate(PdfDate.getW3CDate(obj.toString()));
+        		}
+        		if (PdfName.MODDATE.equals(key)) {
+        			basic.addModDate(PdfDate.getW3CDate(obj.toString()));
+        		}
+        	}
+        	if (dc.size() > 0) addRdfDescription(dc);
+        	if (p.size() > 0) addRdfDescription(p);
+        	if (basic.size() > 0) addRdfDescription(basic);
         }
     }
 

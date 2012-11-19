@@ -1,5 +1,5 @@
 /*
- * $Id: Image.java 5077 2012-02-28 16:21:14Z blowagie $
+ * $Id: Image.java 5156 2012-05-30 09:47:27Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -1316,7 +1316,7 @@ public abstract class Image extends Rectangle implements Indentable, Spaceable {
 	 * when the image exceeds the available width.
 	 * @since iText 5.0.6
 	 */
-	protected boolean scaleToFitLineWhenOverflow;
+	protected boolean scaleToFitLineWhenOverflow = true;
 
 	/**
 	 * Gets the value of scaleToFitLineWhenOverflow.

@@ -1,5 +1,5 @@
 /*
- * $Id: PdfPages.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: PdfPages.java 5290 2012-08-10 15:15:00Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -46,9 +46,9 @@ package com.itextpdf.text.pdf;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.ExceptionConverter;
+import com.itextpdf.text.Version;
 import com.itextpdf.text.error_messages.MessageLocalization;
 
 /**
@@ -142,9 +142,6 @@ public class PdfPages {
                     if (p % leafSize == 0)
                         nextParents.add(writer.getPdfIndirectReference());
                     top.put(PdfName.PARENT, nextParents.get(p / leafSize));
-                }
-                else {
-                	top.put(PdfName.ITXT, new PdfString(Document.getRelease()));
                 }
                 writer.addToBody(top, tParents.get(p));
             }

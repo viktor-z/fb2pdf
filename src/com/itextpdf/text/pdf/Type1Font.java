@@ -1,5 +1,5 @@
 /*
- * $Id: Type1Font.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: Type1Font.java 5126 2012-04-25 12:06:07Z eugenemark $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -713,6 +713,30 @@ class Type1Font extends BaseFont
                 return UnderlineThickness * fontSize / 1000;
         }
         return 0;
+    }
+
+    /** Sets the font parameter identified by <CODE>key</CODE>. Valid values
+     * for <CODE>key</CODE> are <CODE>ASCENT</CODE>, <CODE>AWT_ASCENT</CODE>, <CODE>CAPHEIGHT</CODE>,
+     * <CODE>DESCENT</CODE>, <CODE>AWT_DESCENT</CODE>,
+     * <CODE>ITALICANGLE</CODE>, <CODE>BBOXLLX</CODE>, <CODE>BBOXLLY</CODE>, <CODE>BBOXURX</CODE>
+     * and <CODE>BBOXURY</CODE>.
+     * @param key the parameter to be updated
+     * @param value the parameter value
+     */
+    @Override
+    public void setFontDescriptor(int key, float value) {
+        switch (key) {
+            case AWT_ASCENT:
+            case ASCENT:
+                Ascender = (int)value;
+                break;
+            case AWT_DESCENT:
+            case DESCENT:
+                Descender = (int)value;
+                break;
+            default:
+                break;
+        }
     }
 
     /** Gets the postscript font name.

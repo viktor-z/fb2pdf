@@ -1,5 +1,5 @@
 /*
- * $Id: Chunk.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: Chunk.java 5481 2012-10-18 15:26:45Z dkoleda $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -43,17 +43,17 @@
  */
 package com.itextpdf.text;
 
-import java.net.URL;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import com.itextpdf.text.error_messages.MessageLocalization;
 import com.itextpdf.text.pdf.HyphenationEvent;
 import com.itextpdf.text.pdf.PdfAction;
 import com.itextpdf.text.pdf.PdfAnnotation;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.draw.DrawInterface;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * This is the smallest significant part of text that can be added to a
@@ -752,6 +752,20 @@ public class Chunk implements Element {
 		return setAttribute(GENERICTAG, text);
 	}
 
+	/** Key for line-height (alternative for leading in Phrase). */
+	public static final String LINEHEIGHT = "LINEHEIGHT";
+
+	/**
+	 * Sets a line height tag.
+	 *
+	 * @return this <CODE>Chunk</CODE>
+	 */
+
+	public Chunk setLineHeight(float lineheight) {
+		return setAttribute(LINEHEIGHT, lineheight);
+	}
+
+
 	/** Key for image. */
 	public static final String IMAGE = "IMAGE";
 
@@ -899,4 +913,43 @@ public class Chunk implements Element {
 		}
 		return 0.0f;
 	}
+
+    public static final String WHITESPACE = "WHITESPACE";
+
+    public static Chunk createWhitespace(final String content) {
+        return createWhitespace(content, false);
+    }
+
+    public static Chunk createWhitespace(final String content, final boolean preserve) {
+        Chunk whitespace = null;
+        if (!preserve) {
+            whitespace = new Chunk(' ');
+            whitespace.setAttribute(WHITESPACE, content);
+        } else {
+             whitespace = new Chunk(content);
+        }
+
+        return whitespace;
+    }
+
+    public boolean isWhitespace() {
+        return attributes != null && attributes.containsKey(WHITESPACE);
+    }
+
+    public static final String TABSPACE = "TABSPACE";
+
+    public static Chunk createTabspace() {
+        return createTabspace(60);
+    }
+
+    public static Chunk createTabspace(float spacing)
+    {
+        Chunk tabspace = new Chunk(" ");
+        tabspace.setAttribute(TABSPACE, spacing);
+        return tabspace;
+    }
+
+    public boolean isTabspace() {
+        return attributes != null && attributes.containsKey(TABSPACE);
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: PdfStamper.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: PdfStamper.java 5434 2012-09-22 13:02:02Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -46,9 +46,7 @@ package com.itextpdf.text.pdf;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.util.HashMap;
 import java.util.List;
@@ -56,13 +54,13 @@ import java.util.Map;
 
 import com.itextpdf.text.DocWriter;
 import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.ExceptionConverter;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.error_messages.MessageLocalization;
 import com.itextpdf.text.pdf.collection.PdfCollection;
 import com.itextpdf.text.pdf.interfaces.PdfEncryptionSettings;
 import com.itextpdf.text.pdf.interfaces.PdfViewerPreferences;
+import com.itextpdf.text.pdf.security.LtvVerification;
 
 /** Applies extra content to the pages of a PDF document.
  * This extra content can be all the objects allowed in PdfContentByte
@@ -80,8 +78,8 @@ public class PdfStamper
      */
     protected PdfStamperImp stamper;
     private Map<String, String> moreInfo;
-    private boolean hasSignature;
-    private PdfSignatureAppearance sigApp;
+    protected boolean hasSignature;
+    protected PdfSignatureAppearance sigApp;
     private LtvVerification verification;
 
     /** Starts the process of adding extra content to an existing PDF
@@ -191,30 +189,9 @@ public class PdfStamper
             stamper.close(moreInfo);
             return;
         }
-        sigApp.preClose();
-        PdfSigGenericPKCS sig = sigApp.getSigStandard();
-        PdfLiteral lit = (PdfLiteral)sig.get(PdfName.CONTENTS);
-        int totalBuf = (lit.getPosLength() - 2) / 2;
-        byte buf[] = new byte[8192];
-        int n;
-        InputStream inp = sigApp.getRangeStream();
-        try {
-            while ((n = inp.read(buf)) > 0) {
-                sig.getSigner().update(buf, 0, n);
-            }
+        else {
+            throw new DocumentException("Signature defined. Must be closed in PdfSignatureAppearance.");
         }
-        catch (SignatureException se) {
-            throw new ExceptionConverter(se);
-        }
-        buf = new byte[totalBuf];
-        byte[] bsig = sig.getSignerContents();
-        System.arraycopy(bsig, 0, buf, 0, bsig.length);
-        PdfString str = new PdfString(buf);
-        str.setHexWriting(true);
-        PdfDictionary dic = new PdfDictionary();
-        dic.put(PdfName.CONTENTS, str);
-        sigApp.close(dic);
-        stamper.reader.close();
     }
 
     /** Gets a <CODE>PdfContentByte</CODE> to write under the page of
@@ -760,6 +737,10 @@ public class PdfStamper
     	return stamper.getPdfLayers();
     }
     
+    public void markUsed(PdfObject obj) {
+        stamper.markUsed(obj);
+    }
+    
     public LtvVerification getLtvVerification() {
         if (verification == null)
             verification = new LtvVerification(this);
@@ -770,5 +751,9 @@ public class PdfStamper
         if (verification == null)
             return;
         verification.merge();
+    }
+
+    protected PdfStamper() {
+
     }
 }

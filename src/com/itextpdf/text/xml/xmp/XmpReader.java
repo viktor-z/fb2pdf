@@ -1,5 +1,5 @@
 /*
- * $Id: XmpReader.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: XmpReader.java 5150 2012-05-21 09:26:28Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -58,7 +58,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.itextpdf.text.ExceptionConverter;
-import com.itextpdf.text.xml.XMLUtil;
 import com.itextpdf.text.xml.XmlDomWriter;
 
 /**

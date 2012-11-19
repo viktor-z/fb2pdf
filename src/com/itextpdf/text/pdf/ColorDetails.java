@@ -1,5 +1,5 @@
 /*
- * $Id: ColorDetails.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: ColorDetails.java 5235 2012-07-20 12:35:28Z achingarev $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -73,7 +73,7 @@ class ColorDetails {
     /** Gets the indirect reference to this color.
      * @return the indirect reference to this color
      */
-    PdfIndirectReference getIndirectReference() {
+    public PdfIndirectReference getIndirectReference() {
         return indirectReference;
     }
 
@@ -87,7 +87,7 @@ class ColorDetails {
     /** Gets the <CODE>SpotColor</CODE> object.
      * @return the <CODE>PdfSpotColor</CODE>
      */
-    PdfObject getSpotColor(PdfWriter writer) {
+    public PdfObject getSpotColor(PdfWriter writer) {
         return spotcolor.getSpotObject(writer);
     }
 }

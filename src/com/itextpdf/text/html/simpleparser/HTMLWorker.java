@@ -1,5 +1,5 @@
 /*
- * $Id: HTMLWorker.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: HTMLWorker.java 5153 2012-05-25 08:04:17Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -73,6 +73,12 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.draw.LineSeparator;
 import com.itextpdf.text.xml.simpleparser.SimpleXMLDocHandler;
 import com.itextpdf.text.xml.simpleparser.SimpleXMLParser;
+
+/**
+ * Old iText class that allows you to convert HTML to PDF.
+ * We've completely rewritten HTML to PDF conversion and we made it a separate project named XML Worker.
+ * @deprecated please switch to XML Worker instead (this is a separate project)
+ */
 
 public class HTMLWorker implements SimpleXMLDocHandler, DocListener {
 

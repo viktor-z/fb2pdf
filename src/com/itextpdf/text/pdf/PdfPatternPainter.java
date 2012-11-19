@@ -1,5 +1,5 @@
 /*
- * $Id: PdfPatternPainter.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: PdfPatternPainter.java 5235 2012-07-20 12:35:28Z achingarev $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -149,7 +149,7 @@ public final class PdfPatternPainter extends PdfTemplate {
      * Gets the stream representing this pattern
      * @return the stream representing this pattern
      */
-    PdfPattern getPattern() {
+    public PdfPattern getPattern() {
         return new PdfPattern(this);
     }
     
@@ -159,7 +159,7 @@ public final class PdfPatternPainter extends PdfTemplate {
      * @return the stream representing this pattern
      * @since	2.1.3
      */
-    PdfPattern getPattern(int compressionLevel) {
+    public PdfPattern getPattern(int compressionLevel) {
         return new PdfPattern(this, compressionLevel);
     }
     

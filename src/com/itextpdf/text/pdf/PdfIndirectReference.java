@@ -1,5 +1,5 @@
 /*
- * $Id: PdfIndirectReference.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: PdfIndirectReference.java 5229 2012-07-09 12:43:33Z achingarev $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -94,7 +94,7 @@ public class PdfIndirectReference extends PdfObject {
  * @param		number			the object number.
  */
     
-    PdfIndirectReference(int type, int number) {
+    protected PdfIndirectReference(int type, int number) {
         this(type, number, 0);
     }
     

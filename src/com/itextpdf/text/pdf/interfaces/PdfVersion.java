@@ -1,5 +1,5 @@
 /*
- * $Id: PdfVersion.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: PdfVersion.java 5275 2012-08-07 15:41:49Z rafhens $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -76,8 +76,9 @@ public interface PdfVersion {
 	/**
 	 * Sets the PDF version as it will appear in the Catalog.
 	 * Note that this only has effect if you use a later version
-	 * than the one that appears in the header; this method
-	 * ignores the parameter if you try to set a lower version.
+	 * than the one that appears in the header. This method
+	 * ignores the parameter if you try to set a lower version
+	 * than the one currently set in the Catalog.
 	 * @param version	the PDF name that will be used for the Version key in the catalog
 	 */
 	public void setPdfVersion(PdfName version);

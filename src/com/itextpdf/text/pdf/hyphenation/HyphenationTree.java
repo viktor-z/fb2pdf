@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/* $Id: HyphenationTree.java 4749 2011-02-14 11:25:32Z blowagie $ */
+/* $Id: HyphenationTree.java 5344 2012-08-22 08:05:59Z rafhens $ */
 
 package com.itextpdf.text.pdf.hyphenation;
 

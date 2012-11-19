@@ -1,5 +1,5 @@
 /*
- * $Id: PdfReader.java 5095 2012-03-11 20:04:27Z psoares33 $
+ * $Id: PdfReader.java 5485 2012-10-21 17:47:52Z psoares33 $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -51,6 +51,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.Key;
 import java.security.MessageDigest;
+import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -105,7 +106,7 @@ public class PdfReader implements PdfViewerPreferences {
     protected HashMap<Integer, IntHashtable> objStmMark;
     protected LongHashtable objStmToOffset;
     protected boolean newXrefType;
-    private ArrayList<PdfObject> xrefObj;
+    protected ArrayList<PdfObject> xrefObj;
     PdfDictionary rootPages;
     protected PdfDictionary trailer;
     protected PdfDictionary catalog;
@@ -276,6 +277,7 @@ public class PdfReader implements PdfViewerPreferences {
         this.eofPos = reader.eofPos;
         this.freeXref = reader.freeXref;
         this.lastXref = reader.lastXref;
+        this.newXrefType = reader.newXrefType;
         this.tokens = new PRTokeniser(reader.tokens.getSafeFile());
         if (reader.decrypt != null)
             this.decrypt = new PdfEncryption(reader.decrypt);
@@ -738,12 +740,13 @@ public class PdfReader implements PdfViewerPreferences {
 
                     while (recipientCertificatesIt.hasNext()) {
                         RecipientInformation recipientInfo = recipientCertificatesIt.next();
-
+                        
                         if (recipientInfo.getRID().match(certificate) && !foundRecipient) {
-                         envelopedData = recipientInfo.getContent(certificateKey, certificateKeyProvider);
-                         foundRecipient = true;
-                        }
+                        	envelopedData = PdfEncryptor.getContent(recipientInfo, (PrivateKey)certificateKey, certificateKeyProvider);
+                        	foundRecipient = true;
+                        } 
                     }
+
                 }
                 catch (Exception f) {
                     throw new ExceptionConverter(f);
@@ -1506,7 +1509,7 @@ public class PdfReader implements PdfViewerPreferences {
             }
         }
         thisStream *= 2;
-        if (thisStream < xref.length)
+        if (thisStream + 1 < xref.length && xref[thisStream] == 0 && xref[thisStream + 1] == 0)
             xref[thisStream] = -1;
 
         if (prev == -1)
@@ -1728,7 +1731,7 @@ public class PdfReader implements PdfViewerPreferences {
         if (obj == null || !obj.isNumber())
             return in;
         int predictor = ((PdfNumber)obj).intValue();
-        if (predictor < 10)
+        if (predictor < 10 && predictor != 2)
             return in;
         int width = 1;
         obj = getPdfObject(dic.get(PdfName.COLUMNS));
@@ -1748,7 +1751,18 @@ public class PdfReader implements PdfViewerPreferences {
         int bytesPerRow = (colors*width*bpc + 7)/8;
         byte[] curr = new byte[bytesPerRow];
         byte[] prior = new byte[bytesPerRow];
-
+        if (predictor == 2) {
+			if (bpc == 8) {
+				int numRows = in.length / bytesPerRow;
+				for (int row = 0; row < numRows; row++) {
+					int rowStart = row * bytesPerRow;
+					for (int col = 0 + bytesPerPixel; col < bytesPerRow; col++) {
+						in[rowStart + col] = (byte)(in[rowStart + col] + in[rowStart + col - bytesPerPixel]);
+					}
+				}
+			}
+			return in;
+		}
         // Decode the (sub)image row-by-row
         while (true) {
             // Read the filter type byte and a row of data
@@ -3108,7 +3122,7 @@ public class PdfReader implements PdfViewerPreferences {
                     PdfObject v = dic.get(key);
                     if (v.isIndirect()) {
                         int num = ((PRIndirectReference)v).getNumber();
-                        if (num >= xrefObj.size() || !partial && xrefObj.get(num) == null) {
+                        if (num < 0 || num >= xrefObj.size() || !partial && xrefObj.get(num) == null) {
                             dic.put(key, PdfNull.PDFNULL);
                             continue;
                         }
@@ -3256,7 +3270,7 @@ public class PdfReader implements PdfViewerPreferences {
         setViewerPreferences(this.viewerPreferences);
     }
 
-    void setViewerPreferences(final PdfViewerPreferencesImp vp) {
+    public void setViewerPreferences(final PdfViewerPreferencesImp vp) {
     	vp.addToCatalog(catalog);
     }
 

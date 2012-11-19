@@ -1,5 +1,5 @@
 /*
- * $Id: Logger.java 4847 2011-05-05 19:46:13Z redlab_b $
+ * $Id: Level.java 5195 2012-06-18 14:25:30Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT

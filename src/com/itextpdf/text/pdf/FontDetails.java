@@ -1,5 +1,5 @@
 /*
- * $Id: FontDetails.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: FontDetails.java 5235 2012-07-20 12:35:28Z achingarev $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -258,7 +258,7 @@ class FontDetails {
      * Writes the font definition to the document.
      * @param writer the <CODE>PdfWriter</CODE> of this document
      */
-    void writeFont(PdfWriter writer) {
+    public void writeFont(PdfWriter writer) {
         try {
             switch (fontType) {
                 case BaseFont.FONT_TYPE_T3:

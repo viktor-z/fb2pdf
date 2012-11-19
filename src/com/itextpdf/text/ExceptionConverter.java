@@ -1,5 +1,5 @@
 /*
- * $Id: ExceptionConverter.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: ExceptionConverter.java 5224 2012-06-28 07:42:35Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -44,7 +44,7 @@
 
 /*
  * The original version of this class was published in an article by professor Heinz Kabutz.
- * Read http://www.javaspecialists.co.za/archive/newsletter.do?issue=033&print=yes&locale=en_US
+ * Read http://www.javaspecialists.eu/archive/Issue033.html
  * "This material from The Java(tm) Specialists' Newsletter by Maximum Solutions (South Africa).
  * Please contact Maximum Solutions for more information."
  * 

@@ -1,5 +1,5 @@
 /*
- * $Id: IncTable.java 4632 2010-11-24 14:44:42Z blowagie $
+ * $Id: TableWrapper.java 5195 2012-06-18 14:25:30Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA

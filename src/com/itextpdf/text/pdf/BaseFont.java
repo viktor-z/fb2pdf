@@ -1,5 +1,5 @@
 /*
- * $Id: BaseFont.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: BaseFont.java 5391 2012-09-10 10:45:33Z achingarev $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -42,14 +42,14 @@
  * address: sales@itextpdf.com
  */
 package com.itextpdf.text.pdf;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.error_messages.MessageLocalization;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
-
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.error_messages.MessageLocalization;
 
 /**
  * Base class for the several font types supported
@@ -1014,7 +1014,7 @@ public abstract class BaseFont {
      * @param text the <CODE>String</CODE> to be converted
      * @return an array of <CODE>byte</CODE> representing the conversion according to the font's encoding
      */
-    byte[] convertToBytes(String text) {
+    public byte[] convertToBytes(String text) {
         if (directTextToByte)
             return PdfEncodings.convertToBytes(text, null);
         if (specialMap != null) {
@@ -1090,6 +1090,16 @@ public abstract class BaseFont {
      * @return the parameter in points
      */
     public abstract float getFontDescriptor(int key, float fontSize);
+
+    /** Sets the font parameter identified by <CODE>key</CODE>. Valid values
+     * for <CODE>key</CODE> are <CODE>ASCENT</CODE>, <CODE>AWT_ASCENT</CODE>, <CODE>CAPHEIGHT</CODE>,
+     * <CODE>DESCENT</CODE>, <CODE>AWT_DESCENT</CODE>,
+     * <CODE>ITALICANGLE</CODE>, <CODE>BBOXLLX</CODE>, <CODE>BBOXLLY</CODE>, <CODE>BBOXURX</CODE>
+     * and <CODE>BBOXURY</CODE>.
+     * @param key the parameter to be updated
+     * @param value the parameter value
+     */
+    public void setFontDescriptor(int key, float value) {}
 
     /** Gets the font type. The font types can be: FONT_TYPE_T1,
      * FONT_TYPE_TT, FONT_TYPE_CJK and FONT_TYPE_TTUNI.

@@ -1,5 +1,5 @@
 /*
- * $Id: PdfXConformanceException.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: PdfXConformanceException.java 5222 2012-06-27 08:54:55Z achingarev $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -47,7 +47,7 @@ package com.itextpdf.text.pdf;
  *
  * @author  psoares
  */
-public class PdfXConformanceException extends RuntimeException {
+public class PdfXConformanceException extends PdfIsoConformanceException {
     
     private static final long serialVersionUID = 9199144538884293397L;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: PdfXConformance.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: PdfXConformance.java 5222 2012-06-27 08:54:55Z achingarev $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -43,7 +43,7 @@
  */
 package com.itextpdf.text.pdf.interfaces;
 
-public interface PdfXConformance {
+public interface PdfXConformance extends PdfIsoConformance {
     
     /**
      * Sets the PDF/X conformance level.

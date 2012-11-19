@@ -1,5 +1,5 @@
 /*
- * $Id: Section.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: Section.java 5246 2012-07-25 16:55:38Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -328,6 +328,8 @@ public class Section extends ArrayList<Element> implements TextElementArray, Lar
      */
     @Override
     public boolean addAll(final Collection<? extends Element> collection) {
+    	if (collection.size() == 0)
+    		return false;
         for (Element element : collection) {
             this.add(element);
         }

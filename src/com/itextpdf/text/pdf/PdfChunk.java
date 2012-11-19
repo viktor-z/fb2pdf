@@ -1,5 +1,5 @@
 /*
- * $Id: PdfChunk.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: PdfChunk.java 5481 2012-10-18 15:26:45Z dkoleda $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -43,16 +43,11 @@
  */
 package com.itextpdf.text.pdf;
 
+import com.itextpdf.text.*;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Chunk;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.SplitCharacter;
-import com.itextpdf.text.Utilities;
 
 /**
  * A <CODE>PdfChunk</CODE> is the PDF translation of a <CODE>Chunk</CODE>.
@@ -91,7 +86,9 @@ public class PdfChunk {
         keysAttributes.add(Chunk.HSCALE);
         keysAttributes.add(Chunk.SEPARATOR);
         keysAttributes.add(Chunk.TAB);
+        keysAttributes.add(Chunk.TABSPACE);
         keysAttributes.add(Chunk.CHAR_SPACING);
+        keysAttributes.add(Chunk.LINEHEIGHT);
         keysNoStroke.add(Chunk.SUBSUPSCRIPT);
         keysNoStroke.add(Chunk.SPLITCHARACTER);
         keysNoStroke.add(Chunk.HYPHENATION);
@@ -144,6 +141,9 @@ public class PdfChunk {
 /** Indicates if the height and offset of the Image has to be taken into account */
     protected boolean changeLeading = false;
 
+/** The leading that can overrule the existing leading. */
+    protected float leading = 0;
+
     // constructors
 
 /**
@@ -160,6 +160,8 @@ public class PdfChunk {
         this.attributes = other.attributes;
         this.noStroke = other.noStroke;
         this.baseFont = other.baseFont;
+        this.changeLeading = other.changeLeading;
+        this.leading = other.leading;
         Object obj[] = (Object[])attributes.get(Chunk.IMAGE);
         if (obj == null)
             image = null;
@@ -239,7 +241,14 @@ public class PdfChunk {
         // the color can't be stored in a PdfFont
         noStroke.put(Chunk.COLOR, f.getColor());
         noStroke.put(Chunk.ENCODING, font.getFont().getEncoding());
-        Object obj[] = (Object[])attributes.get(Chunk.IMAGE);
+
+        Float lh = (Float)attributes.get(Chunk.LINEHEIGHT);
+        if (lh != null) {
+        	changeLeading = true;
+        	leading = lh;
+        }
+        
+        Object[] obj = (Object[])attributes.get(Chunk.IMAGE);
         if (obj == null) {
             image = null;
         }
@@ -535,6 +544,9 @@ public class PdfChunk {
         if (isAttribute(Chunk.SEPARATOR)) {
         	return 0;
         }
+        if (isAttribute(Chunk.TABSPACE)) {
+            return 0;
+        }
         return font.width(value);
     }
 
@@ -686,6 +698,15 @@ public class PdfChunk {
      */
     boolean isTab() {
     	return isAttribute(Chunk.TAB);
+    }
+
+    /**
+     * Checks if this <CODE>PdfChunk</CODE> is a tab Chunk.
+     * @return	true if this chunk is a separator.
+     * @since	5.3.4
+     */
+    boolean isTabSpace() {
+        return isAttribute(Chunk.TABSPACE);
     }
 
     /**
@@ -841,6 +862,10 @@ public class PdfChunk {
 
     public boolean changeLeading() {
         return changeLeading;
+    }
+
+    public float getLeading() {
+    	return leading;
     }
 
     float getCharWidth(int c) {

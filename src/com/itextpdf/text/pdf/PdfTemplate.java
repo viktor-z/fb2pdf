@@ -1,5 +1,5 @@
 /*
- * $Id: PdfTemplate.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: PdfTemplate.java 5235 2012-07-20 12:35:28Z achingarev $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -243,7 +243,7 @@ public class PdfTemplate extends PdfContentByte {
      * @return the stream representing this template
      * @since	2.1.3	(replacing the method without param compressionLevel)
      */
-    PdfStream getFormXObject(int compressionLevel) throws IOException {
+    public PdfStream getFormXObject(int compressionLevel) throws IOException {
         return new PdfFormXObject(this, compressionLevel);
     }
         

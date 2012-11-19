@@ -1,5 +1,5 @@
 /*
- * $Id: Indentable.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: Indentable.java 5195 2012-06-18 14:25:30Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA

@@ -1,5 +1,5 @@
 /*
- * $Id: TrueTypeFontUnicode.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: TrueTypeFontUnicode.java 5391 2012-09-10 10:45:33Z achingarev $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -43,15 +43,13 @@
  */
 package com.itextpdf.text.pdf;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Utilities;
 import com.itextpdf.text.error_messages.MessageLocalization;
+
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.HashMap;
 
 /** Represents a True Type font with Unicode encoding. All the character
  * in the font can be used directly by using the encoding Identity-H or
@@ -170,7 +168,7 @@ class TrueTypeFontUnicode extends TrueTypeFont implements Comparator<int[]>{
      * contains the Unicode code
      * @return the stream representing this CMap or <CODE>null</CODE>
      */
-    private PdfStream getToUnicode(Object metrics[]) {
+    public PdfStream getToUnicode(Object metrics[]) {
         if (metrics.length == 0)
             return null;
         StringBuffer buf = new StringBuffer(
@@ -236,7 +234,7 @@ class TrueTypeFontUnicode extends TrueTypeFont implements Comparator<int[]>{
      * @param metrics the horizontal width metrics
      * @return a stream
      */
-    private PdfDictionary getCIDFontType2(PdfIndirectReference fontDescriptor, String subsetPrefix, Object metrics[]) {
+    public PdfDictionary getCIDFontType2(PdfIndirectReference fontDescriptor, String subsetPrefix, Object metrics[]) {
         PdfDictionary dic = new PdfDictionary(PdfName.FONT);
         // sivan; cff
         if (cff) {
@@ -291,7 +289,7 @@ class TrueTypeFontUnicode extends TrueTypeFont implements Comparator<int[]>{
      * @param toUnicode the ToUnicode stream
      * @return the stream
      */
-    private PdfDictionary getFontBaseType(PdfIndirectReference descendant, String subsetPrefix, PdfIndirectReference toUnicode) {
+    public PdfDictionary getFontBaseType(PdfIndirectReference descendant, String subsetPrefix, PdfIndirectReference toUnicode) {
         PdfDictionary dic = new PdfDictionary(PdfName.FONT);
 
         dic.put(PdfName.SUBTYPE, PdfName.TYPE0);
@@ -336,77 +334,8 @@ class TrueTypeFontUnicode extends TrueTypeFont implements Comparator<int[]>{
     @SuppressWarnings("unchecked")
     @Override
     void writeFont(PdfWriter writer, PdfIndirectReference ref, Object params[]) throws DocumentException, IOException {
-        HashMap<Integer, int[]> longTag = (HashMap<Integer, int[]>)params[0];
-        addRangeUni(longTag, true, subset);
-        int metrics[][] = longTag.values().toArray(new int[0][]);
-        Arrays.sort(metrics, this);
-        PdfIndirectReference ind_font = null;
-        PdfObject pobj = null;
-        PdfIndirectObject obj = null;
-        PdfIndirectReference cidset = null;
-        if (writer.getPDFXConformance() == PdfWriter.PDFA1A || writer.getPDFXConformance() == PdfWriter.PDFA1B) {
-            PdfStream stream;
-            if (metrics.length == 0) {
-                stream = new PdfStream(new byte[]{(byte)0x80});
+        writer.getTtfUnicodeWriter().writeFont(this, ref, params, rotbits);
             }
-            else {
-                int top = metrics[metrics.length - 1][0];
-                byte[] bt = new byte[top / 8 + 1];
-                for (int k = 0; k < metrics.length; ++k) {
-                    int v = metrics[k][0];
-                    bt[v / 8] |= rotbits[v % 8];
-                }
-                stream = new PdfStream(bt);
-                stream.flateCompress(compressionLevel);
-            }
-            cidset = writer.addToBody(stream).getIndirectReference();
-        }
-        // sivan: cff
-        if (cff) {
-			byte b[] = readCffFont();
-            if (subset || subsetRanges != null) {
-                CFFFontSubset cff = new CFFFontSubset(new RandomAccessFileOrArray(b),longTag);
-                b = cff.Process(cff.getNames()[0]);
-            }
-			pobj = new StreamFont(b, "CIDFontType0C", compressionLevel);
-			obj = writer.addToBody(pobj);
-			ind_font = obj.getIndirectReference();
-        } else {
-            byte[] b;
-            if (subset || directoryOffset != 0) {
-                TrueTypeFontSubSet sb = new TrueTypeFontSubSet(fileName, new RandomAccessFileOrArray(rf), new HashSet<Integer>(longTag.keySet()), directoryOffset, false, false);
-                b = sb.process();
-            }
-            else {
-                b = getFullFont();
-            }
-            int lengths[] = new int[]{b.length};
-            pobj = new StreamFont(b, lengths, compressionLevel);
-            obj = writer.addToBody(pobj);
-            ind_font = obj.getIndirectReference();
-        }
-        String subsetPrefix = "";
-        if (subset)
-            subsetPrefix = createSubsetPrefix();
-        PdfDictionary dic = getFontDescriptor(ind_font, subsetPrefix, cidset);
-        obj = writer.addToBody(dic);
-        ind_font = obj.getIndirectReference();
-
-        pobj = getCIDFontType2(ind_font, subsetPrefix, metrics);
-        obj = writer.addToBody(pobj);
-        ind_font = obj.getIndirectReference();
-
-        pobj = getToUnicode(metrics);
-        PdfIndirectReference toUnicodeRef = null;
-
-        if (pobj != null) {
-            obj = writer.addToBody(pobj);
-            toUnicodeRef = obj.getIndirectReference();
-        }
-
-        pobj = getFontBaseType(ind_font, subsetPrefix, toUnicodeRef);
-        writer.addToBody(pobj, ref);
-    }
 
     /**
      * Returns a PdfStream object with the full font program.
@@ -426,7 +355,7 @@ class TrueTypeFontUnicode extends TrueTypeFont implements Comparator<int[]>{
      * @return always <CODE>null</CODE>
      */
     @Override
-    byte[] convertToBytes(String text) {
+    public byte[] convertToBytes(String text) {
         return null;
     }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: PdfPageLabels.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: PdfPageLabels.java 5231 2012-07-11 08:36:56Z achingarev $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -150,7 +150,7 @@ public class PdfPageLabels {
     /** Gets the page label dictionary to insert into the document.
      * @return the page label dictionary
      */
-    PdfDictionary getDictionary(PdfWriter writer) {
+    public PdfDictionary getDictionary(PdfWriter writer) {
         try {
             return PdfNumberTree.writeTree(map, writer);
         }

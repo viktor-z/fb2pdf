@@ -1,5 +1,5 @@
 /*
- * $Id: LocationTextExtractionStrategy.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: LocationTextExtractionStrategy.java 5498 2012-10-25 20:59:53Z trumpetinc $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -113,18 +113,41 @@ public class LocationTextExtractionStrategy implements TextExtractionStrategy {
     }
 
     /**
-     * Returns the result so far.
-     * @return  a String with the resulting text.
+     * Filters the provided list with the provided filter
+     * @param textChunks a list of all TextChunks that this strategy found during processing
+     * @param filter the filter to apply.  If null, filtering will be skipped.
+     * @return the filtered list
+     * @since 5.3.3
      */
-    public String getResultantText(){
-
+    private List<TextChunk> filterTextChunks(List<TextChunk> textChunks, TextChunkFilter filter){
+    	if (filter == null)
+    		return textChunks;
+    	
+    	List<TextChunk> filtered = new ArrayList<TextChunk>();
+    	for (TextChunk textChunk : textChunks) {
+			if (filter.accept(textChunk))
+				filtered.add(textChunk);
+		}
+    	return filtered;
+    }
+    
+    /**
+     * Gets text that meets the specified filter
+     * If multiple text extractions will be performed for the same page (i.e. for different physical regions of the page), 
+     * filtering at this level is more efficient than filtering using {@link FilteredRenderListener} - but not nearly as powerful
+     * because most of the RenderInfo state is not captured in {@link TextChunk}
+     * @param chunkFilter the filter to to apply
+     * @return the text results so far, filtered using the specified filter
+     */
+    public String getResultantText(TextChunkFilter chunkFilter){
         if (DUMP_STATE) dumpState();
         
-        Collections.sort(locationalResult);
+        List<TextChunk> filteredTextChunks = filterTextChunks(locationalResult, chunkFilter);
+    	Collections.sort(filteredTextChunks);
 
         StringBuffer sb = new StringBuffer();
         TextChunk lastChunk = null;
-        for (TextChunk chunk : locationalResult) {
+        for (TextChunk chunk : filteredTextChunks) {
 
             if (lastChunk == null){
                 sb.append(chunk.text);
@@ -147,7 +170,16 @@ public class LocationTextExtractionStrategy implements TextExtractionStrategy {
             lastChunk = chunk;
         }
 
-        return sb.toString();
+        return sb.toString();    	
+    }
+    
+    /**
+     * Returns the result so far.
+     * @return  a String with the resulting text.
+     */
+    public String getResultantText(){
+
+    	return getResultantText(null);
 
     }
     
@@ -169,6 +201,10 @@ public class LocationTextExtractionStrategy implements TextExtractionStrategy {
      */
     public void renderText(TextRenderInfo renderInfo) {
     	LineSegment segment = renderInfo.getBaseline();
+    	if (renderInfo.getRise() != 0){ // remove the rise from the baseline - we do this because the text from a super/subscript render operations should probably be considered as part of the baseline of the text the super/sub is relative to 
+	    	Matrix riseOffsetTransform = new Matrix(0, -renderInfo.getRise());
+	    	segment = segment.transformBy(riseOffsetTransform);
+    	}
         TextChunk location = new TextChunk(renderInfo.getText(), segment.getStartPoint(), segment.getEndPoint(), renderInfo.getSingleSpaceWidth());
         locationalResult.add(location);        
     }
@@ -178,26 +214,26 @@ public class LocationTextExtractionStrategy implements TextExtractionStrategy {
     /**
      * Represents a chunk of text, it's orientation, and location relative to the orientation vector
      */
-    private static class TextChunk implements Comparable<TextChunk>{
+    public static class TextChunk implements Comparable<TextChunk>{
         /** the text of the chunk */
-        final String text;
+        private final String text;
         /** the starting location of the chunk */
-        final Vector startLocation;
+        private final Vector startLocation;
         /** the ending location of the chunk */
-        final Vector endLocation;
+        private final Vector endLocation;
         /** unit vector in the orientation of the chunk */
-        final Vector orientationVector;
+        private final Vector orientationVector;
         /** the orientation as a scalar for quick sorting */
-        final int orientationMagnitude;
+        private final int orientationMagnitude;
         /** perpendicular distance to the orientation unit vector (i.e. the Y position in an unrotated coordinate system)
          * we round to the nearest integer to handle the fuzziness of comparing floats */
-        final int distPerpendicular;
+        private final int distPerpendicular;
         /** distance of the start of the chunk parallel to the orientation unit vector (i.e. the X position in an unrotated coordinate system) */
-        final float distParallelStart;
+        private final float distParallelStart;
         /** distance of the end of the chunk parallel to the orientation unit vector (i.e. the X position in an unrotated coordinate system) */
-        final float distParallelEnd;
+        private final float distParallelEnd;
         /** the width of a single space character in the font of the chunk */
-        final float charSpaceWidth;
+        private final float charSpaceWidth;
         
         public TextChunk(String string, Vector startLocation, Vector endLocation, float charSpaceWidth) {
             this.text = string;
@@ -222,6 +258,18 @@ public class LocationTextExtractionStrategy implements TextExtractionStrategy {
             distParallelEnd = orientationVector.dot(endLocation);
         }
 
+        /**
+         * @return the start location of the text
+         */
+        public Vector getStartLocation(){
+        	return startLocation;
+        }
+        /**
+         * @return the end location of the text
+         */
+        public Vector getEndLocation(){
+        	return endLocation;
+        }
         private void printDiagnostics(){
             System.out.println("Text (@" + startLocation + " -> " + endLocation + "): " + text);
             System.out.println("orientationMagnitude: " + orientationMagnitude);
@@ -266,12 +314,7 @@ public class LocationTextExtractionStrategy implements TextExtractionStrategy {
             rslt = compareInts(distPerpendicular, rhs.distPerpendicular);
             if (rslt != 0) return rslt;
 
-            // note: it's never safe to check floating point numbers for equality, and if two chunks
-            // are truly right on top of each other, which one comes first or second just doesn't matter
-            // so we arbitrarily choose this way.
-            rslt = distParallelStart < rhs.distParallelStart ? -1 : 1;
-
-            return rslt;
+            return Float.compare(distParallelStart, rhs.distParallelStart);
         }
 
         /**
@@ -296,6 +339,16 @@ public class LocationTextExtractionStrategy implements TextExtractionStrategy {
         // do nothing
     }
 
-
-
+    /**
+     * Specifies a filter for filtering {@link TextChunk} objects during text extraction 
+     * @see LocationTextExtractionStrategy#getResultantText(TextChunkFilter)
+     * @since 5.3.3
+     */
+    public static interface TextChunkFilter{
+    	/**
+    	 * @param textChunk the chunk to check
+    	 * @return true if the chunk should be allowed
+    	 */
+    	public boolean accept(TextChunk textChunk);
+    }
 }

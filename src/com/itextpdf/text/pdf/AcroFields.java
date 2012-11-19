@@ -1,5 +1,5 @@
 /*
- * $Id: AcroFields.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: AcroFields.java 5373 2012-08-31 21:39:19Z psoares33 $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -66,6 +66,7 @@ import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.error_messages.MessageLocalization;
 import com.itextpdf.text.pdf.PRTokeniser.TokenType;
 import com.itextpdf.text.pdf.codec.Base64;
+import com.itextpdf.text.pdf.security.PdfPKCS7;
 import com.itextpdf.text.xml.XmlToTxt;
 
 /**
@@ -2126,6 +2127,8 @@ public class AcroFields {
         dic.put(PdfName.F, new PdfNumber(PdfAnnotation.FLAGS_PRINT));
     }
 
+    private ArrayList<String> orderedSignatureNames;
+    
     /**
      * Gets the field names that have signatures and are signed.
      *
@@ -2133,8 +2136,9 @@ public class AcroFields {
      */
     public ArrayList<String> getSignatureNames() {
         if (sigNames != null)
-            return new ArrayList<String>(sigNames.keySet());
+            return new ArrayList<String>(orderedSignatureNames);
         sigNames = new HashMap<String, int[]>();
+        orderedSignatureNames = new ArrayList<String>();
         ArrayList<Object[]> sorter = new ArrayList<Object[]>();
         for (Map.Entry<String, Item> entry: fields.entrySet()) {
             Item item = entry.getValue();
@@ -2168,9 +2172,10 @@ public class AcroFields {
                 int p[] = (int[])objs[1];
                 p[1] = k + 1;
                 sigNames.put(name, p);
+                orderedSignatureNames.add(name);
             }
         }
-        return new ArrayList<String>(sigNames.keySet());
+        return new ArrayList<String>(orderedSignatureNames);
     }
 
     /**
@@ -2300,11 +2305,8 @@ public class AcroFields {
                     cert = v.getAsArray(PdfName.CERT).getAsString(0);
                 pk = new PdfPKCS7(contents.getOriginalBytes(), cert.getBytes(), provider);
             }
-            else if (sub.equals(PdfName.ETSI_RFC3161)) {
-                pk = new PdfPKCS7(contents.getOriginalBytes(), true, provider);
-            }
             else
-                pk = new PdfPKCS7(contents.getOriginalBytes(), provider);
+                pk = new PdfPKCS7(contents.getOriginalBytes(), sub, provider);
             updateByteRange(pk, v);
             PdfString str = v.getAsString(PdfName.M);
             if (str != null)

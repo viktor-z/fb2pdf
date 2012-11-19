@@ -1,5 +1,5 @@
 /*
- * $Id: BidiLine.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: BidiLine.java 5481 2012-10-18 15:26:45Z dkoleda $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -43,13 +43,13 @@
  */
 package com.itextpdf.text.pdf;
 
-import java.util.ArrayList;
-
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Utilities;
 import com.itextpdf.text.pdf.draw.DrawInterface;
 import com.itextpdf.text.pdf.draw.LineSeparator;
+
+import java.util.ArrayList;
 
 /** Does all the line bidirectional processing with PdfChunk assembly.
  *
@@ -322,7 +322,7 @@ public class BidiLine {
         }
     }
 
-    public PdfLine processLine(float leftX, float width, int alignment, int runDirection, int arabicOptions) {
+    public PdfLine processLine(float leftX, float width, int alignment, int runDirection, int arabicOptions, float minY, float yLine, float descender) {
         this.arabicOptions = arabicOptions;
         save();
         boolean isRTL = runDirection == PdfWriter.RUN_DIRECTION_RTL;
@@ -350,6 +350,13 @@ public class BidiLine {
         boolean surrogate = false;
         for (; currentChar < totalTextLength; ++currentChar) {
             ck = detailChunks[currentChar];
+            if (ck.isImage() && minY < yLine) {
+                Image img = ck.getImage();
+                if (img.isScaleToFitLineWhenOverflow() && yLine + 2 * descender - img.getScaledHeight() - ck.getImageOffsetY() - img.getSpacingBefore() < minY) {
+                    float scalePercent = (yLine + 2 * descender - ck.getImageOffsetY() - img.getSpacingBefore() - minY) / img.getHeight() * 100;
+            		img.scalePercent(scalePercent);
+                }
+            }
             surrogate = Utilities.isSurrogatePair(text, currentChar);
             if (surrogate)
                 uniC = ck.getUnicodeEquivalent(Utilities.convertToUtf32(text, currentChar));
@@ -380,8 +387,11 @@ public class BidiLine {
                 break;
             if (splitChar)
                 lastSplit = currentChar;
-            width -= charWidth;
-            lastValidChunk = ck;
+
+            if (!ck.isTabSpace()) {
+                width -= charWidth;
+            }
+        	lastValidChunk = ck;
             if (ck.isTab()) {
             	Object[] tab = (Object[])ck.getAttribute(Chunk.TAB);
         		float tabPosition = ((Float)tab[1]).floatValue();
@@ -391,7 +401,19 @@ public class BidiLine {
         		}
         		detailChunks[currentChar].adjustLeft(leftX);
         		width = originalWidth - tabPosition;
-            } else if (ck.isSeparator()) {
+            }
+            else if (ck.isTabSpace())
+            {
+                Float module = (Float)ck.getAttribute(Chunk.TABSPACE);
+                float decrement = module - ((originalWidth - width) % module);
+
+                if (width < decrement)
+                    return new PdfLine(0, originalWidth, width, alignment, true,
+                            createArrayOfPdfChunks(oldCurrentChar, currentChar-1), isRTL);
+
+                width -= decrement;
+            }
+            else if (ck.isSeparator()) {
                 Object[] sep = (Object[])ck.getAttribute(Chunk.SEPARATOR);
                 DrawInterface di = (DrawInterface)sep[0];
                 Boolean vertical = (Boolean)sep[1];

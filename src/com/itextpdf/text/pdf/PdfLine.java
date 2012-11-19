@@ -1,5 +1,5 @@
 /*
- * $Id: PdfLine.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: PdfLine.java 5481 2012-10-18 15:26:45Z dkoleda $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -43,13 +43,13 @@
  */
 package com.itextpdf.text.pdf;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.ListItem;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * <CODE>PdfLine</CODE> defines an array with <CODE>PdfChunk</CODE>-objects
@@ -161,6 +161,17 @@ public class PdfLine {
     		chunk.adjustLeft(left);
             addToLine(chunk);
         }
+        else if (chunk.isTabSpace()) {
+            if (!line.isEmpty())
+            {
+                Float module = (Float)chunk.getAttribute(Chunk.TABSPACE);
+                float decrement = module - ((originalWidth - width) % module);
+                if (width < decrement)
+                    return chunk;
+                width -= decrement;
+                addToLine(chunk);
+            }
+        }
         // if the length of the chunk > 0 we add it to the line
         else if (chunk.length() > 0 || chunk.isImage()) {
             if (overflow != null)
@@ -192,10 +203,16 @@ public class PdfLine {
     }
 
     private void addToLine(PdfChunk chunk) {
-        if (chunk.changeLeading && chunk.isImage()) {
-        	Image img = chunk.getImage();
-        	float f = img.getScaledHeight() + chunk.getImageOffsetY()
-        		+ img.getBorderWidthTop() + img.getSpacingBefore();
+        if (chunk.changeLeading) {
+        	float f;
+        	if (chunk.isImage()) {
+        		Image img = chunk.getImage();
+        		f = img.getScaledHeight() + chunk.getImageOffsetY()
+        				+ img.getBorderWidthTop() + img.getSpacingBefore();
+        	}
+        	else {
+        		f = chunk.getLeading();
+        	}
         	if (f > height) height = f;
         }
     	line.add(chunk);
@@ -447,14 +464,17 @@ public class PdfLine {
      * @return	an extra leading for images
      * @since	2.1.5
      */
-    float[] getMaxSize() {
+    float[] getMaxSize(float fixedLeading, float multipliedLeading) {
     	float normal_leading = 0;
     	float image_leading = -10000;
         PdfChunk chunk;
         for (int k = 0; k < line.size(); ++k) {
             chunk = line.get(k);
             if (!chunk.isImage()) {
-                normal_leading = Math.max(chunk.font().size(), normal_leading);
+                if (chunk.changeLeading())
+                    normal_leading = Math.max(chunk.getLeading(), normal_leading);
+                else
+                    normal_leading = Math.max(fixedLeading + multipliedLeading * chunk.font().size(), normal_leading);
             }
             else {
             	Image img = chunk.getImage();
@@ -464,7 +484,7 @@ public class PdfLine {
             	}
             }
         }
-        return new float[]{normal_leading, image_leading};
+        return new float[]{normal_leading > 0 ? normal_leading : fixedLeading, image_leading};
     }
 
     boolean isRTL() {
@@ -520,7 +540,8 @@ public class PdfLine {
                ascender = Math.max(ascender, ck.getImage().getScaledHeight() + ck.getImageOffsetY());
            else {
                PdfFont font = ck.font();
-               ascender = Math.max(ascender, font.getFont().getFontDescriptor(BaseFont.ASCENT, font.size()));
+               float textRise = ck.getTextRise();
+               ascender = Math.max(ascender, (textRise > 0 ? textRise : 0) + font.getFont().getFontDescriptor(BaseFont.ASCENT, font.size()));
            }
        }
        return ascender;
@@ -539,7 +560,8 @@ public class PdfLine {
                 descender = Math.min(descender, ck.getImageOffsetY());
             else {
                 PdfFont font = ck.font();
-                descender = Math.min(descender, font.getFont().getFontDescriptor(BaseFont.DESCENT, font.size()));
+                float textRise = ck.getTextRise();
+                descender = Math.min(descender, (textRise < 0 ? textRise : 0) + font.getFont().getFontDescriptor(BaseFont.DESCENT, font.size()));
             }
         }
         return descender;

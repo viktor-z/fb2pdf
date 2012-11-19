@@ -1,5 +1,5 @@
 /*
- * $Id: PdfAnnotationsImp.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: PdfAnnotationsImp.java 5324 2012-08-17 06:47:59Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -167,7 +167,12 @@ public class PdfAnnotationsImp {
             if (dic.isAnnotation()) {
                 array.add(dic.getIndirectReference());
                 if (!dic.isUsed()) {
-                    PdfRectangle rect = (PdfRectangle)dic.get(PdfName.RECT);
+                	PdfArray tmp = dic.getAsArray(PdfName.RECT);
+                    PdfRectangle rect = new PdfRectangle(tmp.getAsNumber(0).floatValue(), tmp.getAsNumber(1).floatValue());
+                    if (tmp.size() == 4) {
+                    	rect.add(tmp.getAsNumber(2));
+                    	rect.add(tmp.getAsNumber(3));
+                    }
                     if (rect != null) {
                     	switch (rotation) {
                         	case 90:

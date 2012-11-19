@@ -1,4 +1,6 @@
 /*
+ * $Id: LtvVerification.java 5437 2012-10-01 13:17:59Z blowagie $
+ *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
  * Authors: Bruno Lowagie, Paulo Soares, et al.
@@ -39,25 +41,43 @@
  * For more information, please contact iText Software Corp. at this
  * address: sales@itextpdf.com
  */
+package com.itextpdf.text.pdf.security;
 
-package com.itextpdf.text.pdf;
-
+import com.itextpdf.text.Utilities;
+import com.itextpdf.text.log.Logger;
+import com.itextpdf.text.log.LoggerFactory;
+import com.itextpdf.text.pdf.security.OcspClient;
+import com.itextpdf.text.pdf.security.CrlClient;
 import com.itextpdf.text.error_messages.MessageLocalization;
+import com.itextpdf.text.pdf.AcroFields;
+import com.itextpdf.text.pdf.PRIndirectReference;
+import com.itextpdf.text.pdf.PdfArray;
+import com.itextpdf.text.pdf.PdfDictionary;
+import com.itextpdf.text.pdf.PdfIndirectReference;
+import com.itextpdf.text.pdf.PdfName;
+import com.itextpdf.text.pdf.PdfObject;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfStamper;
+import com.itextpdf.text.pdf.PdfStream;
+import com.itextpdf.text.pdf.PdfString;
+import com.itextpdf.text.pdf.PdfWriter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.DEREnumerated;
-import org.bouncycastle.asn1.DERObject;
+import org.bouncycastle.asn1.ASN1Enumerated;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
@@ -65,10 +85,14 @@ import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 
 /**
  * Add verification according to PAdES-LTV (part 4)
- * @author psoares
+ * @author Paulo Soares
  */
 public class LtvVerification {
-    private PdfStamperImp writer;
+	
+	private Logger LOGGER = LoggerFactory.getLogger(LtvVerification.class);
+	
+    private PdfStamper stp;
+    private PdfWriter writer;
     private PdfReader reader;
     private AcroFields acroFields;
     private Map<PdfName,ValidationData> validated = new HashMap<PdfName,ValidationData>();
@@ -124,11 +148,14 @@ public class LtvVerification {
         NO
     }
     /**
-     * The verification constructor
+     * The verification constructor. This class should only be created with
+     * PdfStamper.getLtvVerification() otherwise the information will not be
+     * added to the Pdf.
      * @param stp the PdfStamper to apply the validation to
      */
-    LtvVerification(PdfStamper stp) {
-        writer = (PdfStamperImp)stp.getWriter();
+    public LtvVerification(PdfStamper stp) {
+        this.stp = stp;
+        writer = stp.getWriter();
         reader = stp.getReader();
         acroFields = stp.getAcroFields();
     }
@@ -142,33 +169,44 @@ public class LtvVerification {
      * @param level the validation options to include
      * @param certInclude
      * @return true if a validation was generated, false otherwise
-     * @throws Exception
+     * @throws GeneralSecurityException 
+     * @throws IOException
      */
-    public boolean addVerification(String signatureName, OcspClient ocsp, CrlClient crl, CertificateOption certOption, Level level, CertificateInclusion certInclude) throws Exception {
+    public boolean addVerification(String signatureName, OcspClient ocsp, CrlClient crl, CertificateOption certOption, Level level, CertificateInclusion certInclude) throws IOException, GeneralSecurityException {
         if (used)
             throw new IllegalStateException(MessageLocalization.getComposedMessage("verification.already.output"));
         PdfPKCS7 pk = acroFields.verifySignature(signatureName);
+        LOGGER.info("Adding verification for " + signatureName);
         Certificate[] xc = pk.getSignCertificateChain();
+        X509Certificate cert;
         ValidationData vd = new ValidationData();
         for (int k = 0; k < xc.length; ++k) {
+        	cert = (X509Certificate)xc[k];
+        	System.out.println("Certificate: " + cert.getSubjectDN());
             byte[] ocspEnc = null;
             if (ocsp != null && level != Level.CRL && k < xc.length - 1) {
-                ocspEnc = ocsp.getEncoded((X509Certificate)xc[k], (X509Certificate)xc[k + 1], null);
-                if (ocspEnc != null)
+                ocspEnc = ocsp.getEncoded(cert, (X509Certificate)xc[k + 1], null);
+                if (ocspEnc != null) {
                     vd.ocsps.add(buildOCSPResponse(ocspEnc));
+                    LOGGER.info("OCSP added");
+                }
             }
             if (crl != null && (level == Level.CRL || level == Level.OCSP_CRL || (level == Level.OCSP_OPTIONAL_CRL && ocspEnc == null))) {
-                byte[] cim = crl.getEncoded((X509Certificate)xc[k], null);
-                if (cim != null) {
-                    boolean dup = false;
-                    for (byte[] b : vd.crls) {
-                        if (Arrays.equals(b, cim)) {
-                            dup = true;
-                            break;
+                Collection<byte[]> cims = crl.getEncoded(cert, null);
+                if (cims != null) {
+                    for (byte[] cim : cims) {
+                        boolean dup = false;
+                        for (byte[] b : vd.crls) {
+                            if (Arrays.equals(b, cim)) {
+                                dup = true;
+                                break;
+                            }
+                        }
+                        if (!dup) {
+                            vd.crls.add(cim);
+                            LOGGER.info("CRL added");
                         }
                     }
-                    if (!dup)
-                        vd.crls.add(cim);
                 }
             }
             if (certOption == CertificateOption.SIGNING_CERTIFICATE)
@@ -185,12 +223,44 @@ public class LtvVerification {
         return true;
     }
 
+    /**
+     *
+     * Alternative addVerification.
+     * I assume that inputs are deduplicated.
+     *
+     * @throws IOException
+     * @throws GeneralSecurityException
+     *
+     */
+    public boolean addVerification(String signatureName, Collection<byte[]> ocsps, Collection<byte[]> crls, Collection<byte[]> certs) throws IOException, GeneralSecurityException {
+        if (used)
+            throw new IllegalStateException(MessageLocalization.getComposedMessage("verification.already.output"));
+        ValidationData vd = new ValidationData();
+        if (ocsps != null) {
+            for (byte[] ocsp : ocsps) {
+                vd.ocsps.add(buildOCSPResponse(ocsp));
+            }
+        }
+        if (crls != null) {
+            for (byte[] crl : crls) {
+                vd.crls.add(crl);
+            }
+        }
+        if (certs != null) {
+            for (byte[] cert : certs) {
+                vd.certs.add(cert);
+            }
+        }
+        validated.put(getSignatureHashKey(signatureName), vd);
+        return true;
+    }
+
     private static byte[] buildOCSPResponse(byte[] BasicOCSPResponse) throws IOException {
         DEROctetString doctet = new DEROctetString(BasicOCSPResponse);
         ASN1EncodableVector v2 = new ASN1EncodableVector();
         v2.add(OCSPObjectIdentifiers.id_pkix_ocsp_basic);
         v2.add(doctet);
-        DEREnumerated den = new DEREnumerated(0);
+        ASN1Enumerated den = new ASN1Enumerated(0);
         ASN1EncodableVector v3 = new ASN1EncodableVector();
         v3.add(den);
         v3.add(new DERTaggedObject(true, 0, new DERSequence(v2)));            
@@ -205,21 +275,13 @@ public class LtvVerification {
         byte[] bt = null;
         if (PdfName.ETSI_RFC3161.equals(PdfReader.getPdfObject(dic.get(PdfName.SUBFILTER)))) {
             ASN1InputStream din = new ASN1InputStream(new ByteArrayInputStream(bc));
-            DERObject pkcs = din.readObject();
+            ASN1Primitive pkcs = din.readObject();
             bc = pkcs.getEncoded();
         }
         bt = hashBytesSha1(bc);
-        return new PdfName(convertToHex(bt));
+        return new PdfName(Utilities.convertToHex(bt));
     }
 
-    private static String convertToHex(byte[] bt) {
-        ByteBuffer buf = new ByteBuffer();
-        for (byte b : bt) {
-            buf.appendHex(b);
-        }
-        return PdfEncodings.convertToString(buf.toByteArray(), null).toUpperCase();
-    }
-    
     private static byte[] hashBytesSha1(byte[] b) throws NoSuchAlgorithmException {
         MessageDigest sh = MessageDigest.getInstance("SHA1");
         return sh.digest(b);
@@ -230,7 +292,7 @@ public class LtvVerification {
      * a new one.
      * @throws IOException 
      */
-    void merge() throws IOException {
+    public void merge() throws IOException {
         if (used || validated.isEmpty())
             return;
         used = true;
@@ -244,7 +306,7 @@ public class LtvVerification {
     
     private void updateDss() throws IOException {
         PdfDictionary catalog = reader.getCatalog();
-        writer.markUsed(catalog);
+        stp.markUsed(catalog);
         PdfDictionary dss = catalog.getAsDict(PdfName.DSS);
         PdfArray ocsps = dss.getAsArray(PdfName.OCSPS);
         PdfArray crls = dss.getAsArray(PdfName.CRLS);
@@ -301,7 +363,7 @@ public class LtvVerification {
     
     private void outputDss(PdfDictionary dss, PdfDictionary vrim, PdfArray ocsps, PdfArray crls, PdfArray certs) throws IOException {
         PdfDictionary catalog = reader.getCatalog();
-        writer.markUsed(catalog);
+        stp.markUsed(catalog);
         for (PdfName vkey : validated.keySet()) {
             PdfArray ocsp = new PdfArray();
             PdfArray crl = new PdfArray();

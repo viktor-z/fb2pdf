@@ -1,5 +1,5 @@
 /*
- * $Id: PdfImportedPage.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: PdfImportedPage.java 5504 2012-11-01 10:26:38Z blowagie $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -43,6 +43,7 @@
  */
 package com.itextpdf.text.pdf;
 import java.io.IOException;
+
 import com.itextpdf.text.error_messages.MessageLocalization;
 
 import com.itextpdf.text.DocumentException;
@@ -56,6 +57,8 @@ public class PdfImportedPage extends com.itextpdf.text.pdf.PdfTemplate {
 
     PdfReaderInstance readerInstance;
     int pageNumber;
+    int rotation;
+    
     /**
      * True if the imported page has been copied to a writer.
      * @since iText 5.0.4
@@ -66,6 +69,7 @@ public class PdfImportedPage extends com.itextpdf.text.pdf.PdfTemplate {
         this.readerInstance = readerInstance;
         this.pageNumber = pageNumber;
         this.writer = writer;
+        rotation = readerInstance.getReader().getPageRotation(pageNumber);
         bBox = readerInstance.getReader().getPageSize(pageNumber);
         setMatrix(1, 0, 0, 1, -bBox.getLeft(), -bBox.getBottom());
         type = TYPE_IMPORTED;
@@ -82,6 +86,10 @@ public class PdfImportedPage extends com.itextpdf.text.pdf.PdfTemplate {
 
     public int getPageNumber() {
         return pageNumber;
+    }
+
+    public int getRotation() {
+        return rotation;
     }
 
 
@@ -124,7 +132,7 @@ public class PdfImportedPage extends com.itextpdf.text.pdf.PdfTemplate {
      * @return the stream representing this page
      * @since	2.1.3	(replacing the method without param compressionLevel)
      */
-    PdfStream getFormXObject(int compressionLevel) throws IOException {
+    public PdfStream getFormXObject(int compressionLevel) throws IOException {
          return readerInstance.getFormXObject(pageNumber, compressionLevel);
     }
     

@@ -1,5 +1,5 @@
 /*
- * $Id: DocumentFont.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: DocumentFont.java 5416 2012-09-17 14:57:46Z eugenemark $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -43,15 +43,15 @@
  */
 package com.itextpdf.text.pdf;
 
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.ExceptionConverter;
+import com.itextpdf.text.pdf.fonts.cmaps.CMapParserEx;
+import com.itextpdf.text.pdf.fonts.cmaps.CMapToUnicode;
+import com.itextpdf.text.pdf.fonts.cmaps.CidLocationFromByte;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.ExceptionConverter;
-import com.itextpdf.text.pdf.fonts.cmaps.CMapToUnicode;
-import com.itextpdf.text.pdf.fonts.cmaps.CMapParserEx;
-import com.itextpdf.text.pdf.fonts.cmaps.CidLocationFromByte;
 
 /**
  *
@@ -110,6 +110,10 @@ public class DocumentFont extends BaseFont {
         font = (PdfDictionary)PdfReader.getPdfObject(refFont);
         init();
     }
+
+    public PdfDictionary getFontDictionary() {
+        return font;
+    } 
 
     private void init() {
         encoding = "";
@@ -660,7 +664,7 @@ public class DocumentFont extends BaseFont {
     }
 
     @Override
-    byte[] convertToBytes(String text) {
+    public byte[] convertToBytes(String text) {
         if (cjkMirror != null)
             return cjkMirror.convertToBytes(text);
         else if (isType0) {

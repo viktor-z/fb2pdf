@@ -1,5 +1,5 @@
 /*
- * $Id: PdfReaderInstance.java 5075 2012-02-27 16:36:18Z blowagie $
+ * $Id: PdfReaderInstance.java 5235 2012-07-20 12:35:28Z achingarev $
  *
  * This file is part of the iText (R) project.
  * Copyright (c) 1998-2012 1T3XT BVBA
@@ -163,7 +163,7 @@ class PdfReaderInstance {
         }
     }
 
-    void writeAllPages() throws IOException {
+    public void writeAllPages() throws IOException {
         try {
             file.reOpen();
             for (Object element : importedPages.values()) {
