@@ -363,6 +363,7 @@ public class FB2toPDF {
             //tp.restoreState();
             tp.beginText();
             tp.setFontAndSize(tpStyle.getBaseFont(), tpSize);
+            tp.setColorFill(tpStyle.getColor());
             tp.showText(pageNum);
             tp.endText();
         }
