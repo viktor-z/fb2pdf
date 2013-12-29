@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.trivee.fb2pdf;
 
 import java.io.*;
@@ -19,13 +18,13 @@ import org.trivee.utils.TwoUp;
  */
 public class CLIDriver {
 
-    private static String hlpText = "fb2pdf [-h] [-s styles] [-l <log name>] [-e <log encoding>] <input file | directory> [-r] [<output file | directory>]" +
-            "\n\nExamples:" +
-            "\n\n\tfb2pdf test.fb2" +
-            "\n\n\tfb2pdf \"c:\\My Books\"" +
-            "\n\n\tfb2pdf test.fb2 mybook.pdf" +
-            "\n\n\tfb2pdf -s data\\myStylePart1.json -s data\\myStylePart2.json test.fb2" +
-            "\n\n\tfb2pdf -l my_log.txt -e cp866 test.fb2";
+    private static String hlpText = "fb2pdf [-h] [-s styles] [-l <log name>] [-e <log encoding>] <input file | directory> [-r] [<output file | directory>]"
+            + "\n\nExamples:"
+            + "\n\n\tfb2pdf test.fb2"
+            + "\n\n\tfb2pdf \"c:\\My Books\""
+            + "\n\n\tfb2pdf test.fb2 mybook.pdf"
+            + "\n\n\tfb2pdf -s data\\myStylePart1.json -s data\\myStylePart2.json test.fb2"
+            + "\n\n\tfb2pdf -l my_log.txt -e cp866 test.fb2";
     private static int succeeded = 0;
     private static int failed = 0;
     private static CommandLine cl;
@@ -34,14 +33,14 @@ public class CLIDriver {
 
     private static String getNonExistingFileName(String pdfname) {
         File f = new File(pdfname);
-        for (int i=1; f.exists(); i++) {
+        for (int i = 1; f.exists(); i++) {
             String path = FilenameUtils.getFullPath(pdfname);
             String newName = String.format("%s (%s).%s", FilenameUtils.getBaseName(pdfname), i, FilenameUtils.getExtension(pdfname));
             f = new File(FilenameUtils.concat(path, newName));
         }
         return f.getAbsolutePath();
     }
-    
+
     public static String getImplementationVersion() {
         return CLIDriver.class.getPackage().getImplementationVersion();
     }
@@ -89,23 +88,22 @@ public class CLIDriver {
         cl = new PosixParser().parse(options, args);
 
         HelpFormatter formatter = new HelpFormatter();
-        if(args.length == 0 || cl.hasOption('h')){
-                printNameVersion();
-                formatter.printHelp(hlpText, options);
-                return;
+        if (args.length == 0 || cl.hasOption('h')) {
+            printNameVersion();
+            formatter.printHelp(hlpText, options);
+            return;
         }
 
         if (cl.getArgs().length < 1 || cl.getArgs().length > 2) {
-                printNameVersion();
-                formatter.printHelp(hlpText, options);
-                return;
+            printNameVersion();
+            formatter.printHelp(hlpText, options);
+            return;
         }
 
         //println("Options detected:");
         //for (Option option: cl.getOptions()) {
         //    println(option.getOpt());
         //}
-        
         if (cl.hasOption("x")) {
             System.setProperty("fb2pdf.experiment", cl.getOptionValue("x"));
         }
@@ -123,22 +121,22 @@ public class CLIDriver {
         String fb2name = cl.getArgs()[0].replaceAll("\"", "");
         File fb2file = new File(fb2name);
 
-        if(!fb2file.exists()){
-                println(String.format("Input file or directory %s not found.", fb2name));
-                return;
+        if (!fb2file.exists()) {
+            println(String.format("Input file or directory %s not found.", fb2name));
+            return;
         }
 
         println(String.format("Converting %s...\n", fb2name));
 
-        if(fb2file.isDirectory()) {
-                String outpath = cl.getArgs().length == 1 ? fb2file.getPath() : cl.getArgs()[1];
-                processDirectory(fb2file, outpath, stylesheetNames);
+        if (fb2file.isDirectory()) {
+            String outpath = cl.getArgs().length == 1 ? fb2file.getPath() : cl.getArgs()[1];
+            processDirectory(fb2file, outpath, stylesheetNames);
         } else {
-                String pdfname = cl.getArgs().length == 1 ? getPdfName(fb2name) : cl.getArgs()[1];
-                if ((new File(pdfname)).isDirectory()) {
-                    pdfname = pdfname + "/" + getPdfName((new File(fb2name)).getName());
-                }
-                translate(fb2name, pdfname, stylesheetNames);
+            String pdfname = cl.getArgs().length == 1 ? getPdfName(fb2name) : cl.getArgs()[1];
+            if ((new File(pdfname)).isDirectory()) {
+                pdfname = pdfname + "/" + getPdfName((new File(fb2name)).getName());
+            }
+            translate(fb2name, pdfname, stylesheetNames);
 
         }
 
@@ -147,124 +145,116 @@ public class CLIDriver {
     }
 
     private static String getPdfName(String srcName) {
-        srcName =  Pattern.compile("\\.fbz$", Pattern.CASE_INSENSITIVE).matcher(srcName).replaceAll("");
-        srcName =  Pattern.compile("\\.zip$", Pattern.CASE_INSENSITIVE).matcher(srcName).replaceAll("");
-        srcName =  Pattern.compile("\\.fb2$", Pattern.CASE_INSENSITIVE).matcher(srcName).replaceAll("");
+        srcName = Pattern.compile("\\.fbz$", Pattern.CASE_INSENSITIVE).matcher(srcName).replaceAll("");
+        srcName = Pattern.compile("\\.zip$", Pattern.CASE_INSENSITIVE).matcher(srcName).replaceAll("");
+        srcName = Pattern.compile("\\.fb2$", Pattern.CASE_INSENSITIVE).matcher(srcName).replaceAll("");
         return srcName + ".pdf";
     }
 
     private static void processDirectory(File inputDir, String outputPath, String[] stylesheetNames) throws FileNotFoundException, UnsupportedEncodingException {
-                File outDir = new File(outputPath);
-                if (outDir.exists() && !outDir.isDirectory()) {
-                    println(String.format("File %s exists.", outputPath));
-                    return;
-                }
-                
-                if (!outDir.exists()) {
-                    outDir.mkdir();
-                }
+        File outDir = new File(outputPath);
+        if (outDir.exists() && !outDir.isDirectory()) {
+            println(String.format("File %s exists.", outputPath));
+            return;
+        }
 
-                File[] files = inputDir.listFiles(new FileFilter() {
-                    @Override
-                    public boolean accept(File pathname) {
-                        return pathname.isFile() && 
-                                (pathname.getPath().endsWith(".fb2") || pathname.getPath().endsWith(".fb2.zip"));
-                    }
-                });
-                for (File file: files){
-                    String outputFile = FilenameUtils.concat(outputPath, getPdfName(file.getName()));
-                    translate(file.getPath(), outputFile, stylesheetNames);
-                }
+        if (!outDir.exists()) {
+            outDir.mkdir();
+        }
 
-                if(cl.hasOption('r')) {
-                    File[] subdirs = inputDir.listFiles(new FileFilter() {
-                        @Override
-                        public boolean accept(File pathname) {
-                            return pathname.isDirectory();
-                        }
-                    });
-                    for(File subdir: subdirs) {
-                        processDirectory(subdir, FilenameUtils.concat(outputPath, subdir.getName()), stylesheetNames);
-                    }
+        File[] files = inputDir.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isFile()
+                        && (pathname.getPath().endsWith(".fb2") || pathname.getPath().endsWith(".fb2.zip"));
+            }
+        });
+        for (File file : files) {
+            String outputFile = FilenameUtils.concat(outputPath, getPdfName(file.getName()));
+            translate(file.getPath(), outputFile, stylesheetNames);
+        }
+
+        if (cl.hasOption('r')) {
+            File[] subdirs = inputDir.listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File pathname) {
+                    return pathname.isDirectory();
                 }
+            });
+            for (File subdir : subdirs) {
+                processDirectory(subdir, FilenameUtils.concat(outputPath, subdir.getName()), stylesheetNames);
+            }
+        }
     }
 
     private static void translate(String fb2name, String pdfname, String[] stylesheetNames) throws FileNotFoundException, UnsupportedEncodingException {
-                
-                Vector<FileInputStream> streams = new Vector<FileInputStream>(stylesheetNames.length);
-                for (String name : stylesheetNames) {
-                    FileInputStream stream = new FileInputStream(name);
-                    streams.add(stream);
-                }
-                SequenceInputStream stylesheet = new SequenceInputStream(streams.elements());
 
-                PrintStream saveOut =  System.out;
+        Vector<FileInputStream> streams = new Vector<FileInputStream>(stylesheetNames.length);
+        for (String name : stylesheetNames) {
+            FileInputStream stream = new FileInputStream(name);
+            streams.add(stream);
+        }
+        SequenceInputStream stylesheet = new SequenceInputStream(streams.elements());
 
-                // logging is on by default
-                boolean createLog = true;
-                String logFileName = null;
+        PrintStream saveOut = System.out;
 
-                if (cl.hasOption('l')) {
-                    String lValue = cl.getOptionValue('l');
+        // logging is on by default
+        boolean createLog = true;
+        String logFileName = null;
+
+        if (cl.hasOption('l')) {
+            String lValue = cl.getOptionValue('l');
                     // specifying false turns logging off,
-                    // otherwise we use the value as the file name
-                    createLog = !("false".equalsIgnoreCase(lValue));
+            // otherwise we use the value as the file name
+            createLog = !("false".equalsIgnoreCase(lValue));
 
                     // Protect against user error like this:
-                    // fb2pdf --log book.fb2,
-                    // since book.fb2 would be considered
-                    // a log file and the book will be overridden.
-                    if (!lValue.endsWith(".fb2")) {
-                        logFileName = lValue;
-                    } else {
-                        throw new FileNotFoundException("Wrong log file specified: " + lValue);
-                    }
-                }
+            // fb2pdf --log book.fb2,
+            // since book.fb2 would be considered
+            // a log file and the book will be overridden.
+            if (!lValue.endsWith(".fb2")) {
+                logFileName = lValue;
+            } else {
+                throw new FileNotFoundException("Wrong log file specified: " + lValue);
+            }
+        }
 
-                if (createLog) {
-                    if (logFileName == null) {
-                        logFileName = String.format("%s.fb2pdf.log", FilenameUtils.removeExtension(pdfname));
-                    }
-                    try {
-                        Log.setup(logFileName, logEncoding);
-                    } catch (Exception ex) {
-                        println("Can't setup logger: " + ex.getMessage());
-                    }
-                }
+        if (createLog) {
+            if (logFileName == null) {
+                logFileName = String.format("%s.fb2pdf.log", FilenameUtils.removeExtension(pdfname));
+            }
+            try {
+                Log.setup(logFileName, logEncoding);
+            } catch (Exception ex) {
+                println("Can't setup logger: " + ex.getMessage());
+            }
+        }
 
-                try
-                {
-                    if (!cl.hasOption("o")) {
-                        pdfname = getNonExistingFileName(pdfname);
-                    }
-                    FB2toPDF.translate(fb2name, pdfname, stylesheet);
-                    println(String.format("Success: %s\n", pdfname));
-                    succeeded++;
-                    if (cl.hasOption("t")){
-                        TwoUp.execute(pdfname, pdfname+".booklet.pdf");
-                    }
-                    if (cl.hasOption("rt")){
-                        Rotate.execute(pdfname, pdfname+".rotated.pdf", cl.getOptionValue("rt"));
-                    }
-                }
-                catch (Exception ex)
-                {
-                        println(String.format("Failed:  %s \n", fb2name));
-                        System.out.println("ERROR: " + ex.toString());
-                        failed++;
-                }
-                finally
-                {
-                    if(createLog) {
-                        System.setOut(saveOut);
-                    }
-                }
+        try {
+            if (!cl.hasOption("o")) {
+                pdfname = getNonExistingFileName(pdfname);
+            }
+            FB2toPDF.translate(fb2name, pdfname, stylesheet);
+            println(String.format("Success: %s\n", pdfname));
+            succeeded++;
+            if (cl.hasOption("t")) {
+                TwoUp.execute(pdfname, pdfname + ".booklet.pdf");
+            }
+            if (cl.hasOption("rt")) {
+                Rotate.execute(pdfname, pdfname + ".rotated.pdf", cl.getOptionValue("rt"));
+            }
+        } catch (Exception ex) {
+            println(String.format("Failed:  %s \n", fb2name));
+            Log.error("ERROR: " + ex.toString());
+            failed++;
+        } finally {
+            if (createLog) {
+                System.setOut(saveOut);
+            }
+        }
     }
 
     private CLIDriver() {
     }
 
 }
-
-
-
