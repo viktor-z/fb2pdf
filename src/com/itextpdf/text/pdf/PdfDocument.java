@@ -521,8 +521,12 @@ public class PdfDocument extends Document {
                     }
                     else {
                     	line.setExtraIndent(paragraph.getFirstLineIndent());
-                    	//element.process(this);        //VIKTORZ --
-                        processParagraph(paragraph);    //VIKTORZ ++
+                    	//element.process(this);                                                    //VIKTORZ --
+                        if ("true".equalsIgnoreCase(System.getProperty("fb2pdf.experiment"))) {     //VIKTORZ ++
+                            processParagraph(paragraph);                                            //VIKTORZ ++
+                        } else {                                                                    //VIKTORZ ++
+                            element.process(this);                                                  //VIKTORZ ++
+                        }                                                                           //VIKTORZ ++
                         carriageReturn();
                         addSpacing(paragraph.getSpacingAfter(), paragraph.getTotalLeading(), paragraph.getFont());
                     }
