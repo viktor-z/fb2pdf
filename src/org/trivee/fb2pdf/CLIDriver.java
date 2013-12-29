@@ -169,9 +169,11 @@ public class CLIDriver {
                         && (pathname.getPath().endsWith(".fb2") || pathname.getPath().endsWith(".fb2.zip"));
             }
         });
+
+        String normalOutputPath = FilenameUtils.normalize(outDir.getAbsolutePath());
         for (File file : files) {
-            String outputFile = FilenameUtils.concat(outputPath, getPdfName(file.getName()));
-            translate(file.getPath(), outputFile, stylesheetNames);
+            String outputFile = FilenameUtils.concat(normalOutputPath, getPdfName(file.getName()));
+            translate(file.getAbsolutePath(), outputFile, stylesheetNames);
         }
 
         if (cl.hasOption('r')) {
@@ -245,7 +247,7 @@ public class CLIDriver {
             }
         } catch (Exception ex) {
             println(String.format("Failed:  %s \n", fb2name));
-            Log.error("ERROR: " + ex.toString());
+            Log.error(ex.toString());
             failed++;
         } finally {
             if (createLog) {
