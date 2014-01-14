@@ -110,6 +110,10 @@
         //pageWidth:    "75.802mm",
         //pageHeight:   "83.654mm",
 
+        // PRS-T3 Portrait
+        //pageWidth:    "88.184mm",
+        //pageHeight:   "114.356mm",       
+
         // Kindle 3/4 Portrait  (calculated from 560x735 pixels of 0.151mm; another variant is 85.09mm x 111.76mm, yet another variant is 85.5mm x 112.3mm)
         //pageWidth:    "84.560mm",
         //pageHeight:   "110.985mm",
