@@ -302,7 +302,12 @@ public class PdfLine {
     }
 
     /** Adds extra indentation to the left (for Paragraph.setFirstLineIndent). */
+    private Float extra = null; //VIKTORZ ++
+    Float getExtraIndent() {    //VIKTORZ ++
+        return extra;           //VIKTORZ ++
+    }                           //VIKTORZ ++
     void setExtraIndent(float extra) {
+        this.extra = extra; //VIKTORZ ++
     	left += extra;
     	width -= extra;
     	originalWidth -= extra;

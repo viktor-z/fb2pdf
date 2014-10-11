@@ -1150,6 +1150,9 @@ public class PdfDocument extends Document {
             	line = overflowLine;
                 //update left indent because of mirror margins.
                 overflowLine.left = indentLeft();
+                if (overflowLine.getExtraIndent() != null) {                                 //VIKTORZ ++
+                    overflowLine.left += overflowLine.getExtraIndent();                      //VIKTORZ ++
+                }                                                                            //VIKTORZ ++
             }
             currentHeight += line.height();
             lines.add(line);
