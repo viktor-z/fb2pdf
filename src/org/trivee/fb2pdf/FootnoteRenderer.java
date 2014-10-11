@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.trivee.fb2pdf;
 
 import com.itextpdf.text.*;
@@ -63,7 +59,7 @@ public class FootnoteRenderer {
                     chunk.setTextRise(noteStyle.getFontSize() / 3);
                 }
                 if (subscript) {
-                    chunk.setTextRise(-noteStyle.getFontSize() / 6);
+                    chunk.setTextRise(-noteStyle.getFontSize() / 12);
                 }
                 String value = (marker == null) ? node.getValue() : marker + " " + node.getValue();
                 chunk.append(value);
