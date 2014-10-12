@@ -40,7 +40,8 @@ public class HeaderHelper extends PdfPageEventHelper {
         float templateWidth = doc.getPageSize().getWidth();
         float templateHight = doc.getPageSize().getHeight();
         PdfTemplate tp = PdfTemplate.createTemplate(writer, templateWidth, templateHight);
-        table.writeSelectedRows(0, -1, doc.leftMargin(), templateHight, tp);
+        float leftMargin = (doc.isMarginMirroring() && oddOrEven == EVEN) ? doc.rightMargin() : doc.leftMargin();
+        table.writeSelectedRows(0, -1, leftMargin, templateHight, tp);
         Image footer = Image.getInstance(tp);
         footer.setAbsolutePosition(0, 0);
         this.image = footer;
