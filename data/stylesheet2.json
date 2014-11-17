@@ -14,6 +14,7 @@
         //imageDpi: 200,    // PRS-300/350
         //imageDpi: 150,    // Kindle DX
         //imageDpi: 212,    // PRS-T3, Kindle Paperwhite, iRiver Story HD
+        //imageDpi: 300,    // Kindle Voyage
         stretchCover: "true",
         enableInlineImages: "false",
         fullCompression: "false",
@@ -143,6 +144,16 @@
         //Kindle Paperwhite 2013 (FW ver. 5.4.3.2) Portrait calculated from 718x964 pixels, side margins ~2mm
         //pageWidth:      "86.025mm", 
         //pageHeight:     "115.498mm", 
+
+        // Kindle Voyage Portrait (small margins) 
+        // calculated from 1016x1364 pixels of 0,0847 mm 
+        //pageWidth:   "86.021mm", 
+        //pageHeight:   "115.485mm",
+
+        // Kindle Voyage Landscape (small margins) 
+        // calculated from 1322x988 pixels of 0,0847 mm 
+        //pageWidth:   "111.929mm", 
+        //pageHeight:   "83.651mm",
 
         // Pocketbook Touch 
         //pageWidth:    "84mm",
