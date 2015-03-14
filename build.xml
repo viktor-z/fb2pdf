@@ -87,31 +87,6 @@
 		</jar>
 	</target>
 	
-	<target name="fb2pdf.hamake" depends="jar">
-		<mkdir dir="${build}/fb2pdf-hamake" />
-		<mkdir dir="${build}/fb2pdf-hamake/lib" />
-		<mkdir dir="${build}/fb2pdf-hamake/lib/mahout" />
-		<copy todir="${build}/fb2pdf-hamake">
-			<fileset file="${basedir}/hamake/scripts/LoadSimilarBooks.py"/>
-			<fileset file="${basedir}/hamake/scripts/configuration.json"/>
-			<fileset file="${basedir}/hamake/clusterizer-s3.xml"/>
-			<fileset dir="${basedir}/etc" />
-			<fileset file="${basedir}/hamake/README.txt" />
-		</copy>
-		<mkdir dir="${build}/fb2pdf-hamake/boto" />
-		<copy todir="${build}/fb2pdf-hamake/boto">
-			<fileset dir="${basedir}/hamake/scripts/boto"/>
-		</copy>
-		<copy todir="${build}/fb2pdf-hamake/lib">
-			<fileset file="${basedir}/hamake/lib/hamake-2.0b-3.jar"/>
-			<fileset file="${dist}/fb2pdf.job" />
-		</copy>
-		<copy todir="${build}/fb2pdf-hamake/lib/mahout">
-			<fileset dir="${lib}/cluster/mahout-0.3" includes="*.jar"/>
-		</copy>
-		<tar basedir="${build}/" destfile="${dist}/fb2pdf-hamake.tar.bz2" compression="bzip2" includes="fb2pdf-hamake/**"/>
-	</target>
-
     <target name="compile-nodebug" description="compile the source">
 		<mkdir dir="${build}" />
 		<javac destdir="${build}" source="1.5" target="1.5" deprecation="on" fork="yes" debug="false" encoding="Cp1251">
@@ -130,6 +105,7 @@
 	<target name="jar-nodebug" depends="compile-nodebug,jar" />
 
     <target name="zip">
+        <tstamp/>
     	<zip destfile="${dist}/fb2pdf-j.${DSTAMP}.zip" compress="true" level="9">
 			<zipfileset prefix="lib" file="${lib}/iText.jar" />
     		<zipfileset prefix="lib" file="${lib}/itext-hyph-xml.jar" />
