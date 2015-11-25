@@ -268,16 +268,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <!-- TODO Do I want gui? Probably not -->
-                        <exclude>**/org/trivee/fb2pdf/gui/*.java</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <executions>
                     <execution>
@@ -303,6 +293,9 @@
                             <addClasspath>true</addClasspath>
                             <mainClass>${app.main.class}</mainClass>
                         </manifest>
+            			<manifestEntries>
+              				<Implementation-Version>${project.version}-${timestamp.short}</Implementation-Version>
+            			</manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
