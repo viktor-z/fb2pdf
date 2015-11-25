@@ -1,11 +1,43 @@
 @echo off
 
+REM We could easily detect current console code page and always pass it in,
+REM if only log file had a setting for separate ecoding...
+REM for /f "tokens=4" %%i in ('chcp') do set CONSOLECP=cp%%i
+REM "%JAVA_DIR%\java.exe" -Xmx512m -jar "%~d0%~p0lib\fb2pdf.jar" -e%CONSOLECP% @"%TMPFILE%"
+
 for /f tokens^=*^ delims^=^ eol^= %%i in ('cmd /c %~d0\%~p0\findjava.cmd') do set JAVA_DIR=%%i
 
-echo Start time: %time%
-echo -----------------------
-"%JAVA_DIR%\java" -Xmx512m -jar "%~d0\%~p0\lib\fb2pdf.jar" %*
-echo ---------------------
-echo End time: %time%
+@echo -----------------------
+@echo Using Java from %JAVA_DIR%
 
+set _argcActual=0
+for %%i in (%*) do set /A _argcActual+=1
 
+@echo -----------------------
+@echo Start time: %time%
+@echo -----------------------
+
+if "%_argcActual%" EQU "0" GOTO NOARGS
+
+call :GETTEMPNAME
+FOR %%I in (%*) do cmd /u /s /c echo %%~I >>"%TMPFILE%"
+"%JAVA_DIR%\java.exe" -Xmx512m -jar "%~d0%~p0lib\fb2pdf.jar" @"%TMPFILE%"
+del /Q /F "%TMPFILE%" >nul
+goto CONT
+
+:NOARGS
+"%JAVA_DIR%\java.exe" -Xmx512m -jar "%~d0%~p0lib\fb2pdf.jar"
+
+:CONT
+
+@echo ---------------------
+@echo End time: %time%
+@echo ---------------------
+
+goto FIN
+
+:GETTEMPNAME
+set TMPFILE=%TMP%\fb2pdf-%RANDOM%-%TIME:~6,5%.tmp
+if exist "%TMPFILE%" GOTO :GETTEMPNAME
+
+:FIN
