@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Pattern;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.Charset;
+import java.nio.charset.CodingErrorAction;
 
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FilenameUtils;
@@ -36,6 +39,7 @@ public class CLIDriver {
     private static CommandLine cl;
     private static PrintWriter outWriter = new PrintWriter(System.out, true);
     private static String logEncoding;
+    private static String conEncoding;
 
     private static String getNonExistingFileName(String pdfname) {
         File f = new File(pdfname);
@@ -144,6 +148,7 @@ public class CLIDriver {
         // it is easy to detect current codepage and pass it in, making sure Java outputs
         // properly (see comments in fb2pdf.cmd). But this may not be backward compatible...
         options.addOption("e", "encoding", true, "Log's encoding (default is cp1251)");
+        options.addOption("c", "console-encoding", true, "Console encoding (default uses Log's encoding value)");
         options.addOption("t", "twoup", false, "Create two-up pdf");
         options.addOption(OptionBuilder
                 .withLongOpt("rotate")
@@ -172,12 +177,24 @@ public class CLIDriver {
 
         String[] stylesheetNames = cl.hasOption('s') ? cl.getOptionValues('s') : new String[]{new File(Utilities.getBaseDir() + "/data/stylesheet.json").getCanonicalPath()};
 
+		// To preserve backward compatibility leave cp1251 here
         logEncoding = cl.hasOption('e') ? cl.getOptionValue('e') : "cp1251";
+		try {
+			Charset s = Charset.forName(logEncoding);
+		} catch (Exception e) {
+            System.err.println(String.format("Unknown log encoding: %s, will use UTF-8.", logEncoding));
+			logEncoding = "UTF-8";
+		}
+
+        conEncoding = cl.hasOption('c') ? cl.getOptionValue('c') : logEncoding;
         try {
-            outWriter = new PrintWriter(new OutputStreamWriter(System.out, logEncoding), true);
-        } catch (UnsupportedEncodingException e) {
-            System.err.println(String.format(
-                    "Unknown encoding: %s, will use the default one.", logEncoding));
+			CharsetEncoder encoder = Charset.forName(conEncoding).newEncoder();
+			encoder.onMalformedInput(CodingErrorAction.REPLACE);
+			encoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
+            outWriter = new PrintWriter(new OutputStreamWriter(System.out, encoder), true);
+        } catch (Exception e) {
+            System.err.println(String.format("Unknown console encoding: %s, will use UTF-8.", conEncoding));
+			conEncoding = "UTF-8";
         }
 
         String fb2name = cl.getArgs()[0].replaceAll("\"", "");
@@ -188,7 +205,7 @@ public class CLIDriver {
             System.exit(1);
         }
 
-        println(String.format("Converting %s...\n", fb2name));
+        println(String.format("Converting \"%s\"...\n", fb2name));
 
         if (fb2file.isDirectory()) {
             String outpath = cl.getArgs().length == 1 ? fb2file.getPath() : cl.getArgs()[1];
@@ -297,7 +314,7 @@ public class CLIDriver {
                 pdfname = getNonExistingFileName(pdfname);
             }
             FB2toPDF.translate(fb2name, pdfname, stylesheet);
-            println(String.format("Success: %s\n", pdfname));
+            println(String.format("Success: \"%s\"\n", pdfname));
             succeeded++;
             if (cl.hasOption("t")) {
                 TwoUp.execute(pdfname, pdfname + ".booklet.pdf");

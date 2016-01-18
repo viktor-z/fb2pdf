@@ -1,10 +1,6 @@
 @echo off
 
-REM We could easily detect current console code page and always pass it in,
-REM if only log file had a setting for separate ecoding...
-REM for /f "tokens=4" %%i in ('chcp') do set CONSOLECP=cp%%i
-REM "%JAVA_DIR%\java.exe" -Xmx512m -jar "%~d0%~p0lib\fb2pdf.jar" -e%CONSOLECP% @"%TMPFILE%"
-
+for /f "tokens=4" %%i in ('chcp') do set CONSOLECP=cp%%i
 for /f tokens^=*^ delims^=^ eol^= %%i in ('cmd /c %~d0\%~p0\findjava.cmd') do set JAVA_DIR=%%i
 
 @echo -----------------------
@@ -21,7 +17,7 @@ if "%_argcActual%" EQU "0" GOTO NOARGS
 
 call :GETTEMPNAME
 FOR %%I in (%*) do cmd /u /s /c echo %%~I >>"%TMPFILE%"
-"%JAVA_DIR%\java.exe" -Xmx512m -jar "%~d0%~p0lib\fb2pdf.jar" @"%TMPFILE%"
+"%JAVA_DIR%\java.exe" -Xmx512m -jar "%~d0%~p0lib\fb2pdf.jar" -e UTF-8 -c %CONSOLECP% @"%TMPFILE%"
 del /Q /F "%TMPFILE%" >nul
 goto CONT
 
