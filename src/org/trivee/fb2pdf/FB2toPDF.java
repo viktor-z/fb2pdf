@@ -400,7 +400,9 @@ public class FB2toPDF {
         X = X > 0 ? X : 0;
         Y = Y > 0 ? Y : 0;
         image.setAbsolutePosition(X, Y);
-        addImage(image);
+        rescaleImage(image, 1.0f, 0, 0);
+        image.setAlignment(Image.MIDDLE);
+        addElement(image);
     }
 
     protected void addImage(Image image) throws DocumentException, FB2toPDFException {
