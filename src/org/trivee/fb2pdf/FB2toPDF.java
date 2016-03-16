@@ -391,8 +391,8 @@ public class FB2toPDF {
     protected void addCenteredImage(Image image) throws DocumentException, FB2toPDFException {
         Rectangle pageSize = doc.getPageSize();
         float dpi = settings().imageDpi;
-        float scaleWidth = pageSize.getWidth() - doc.leftMargin() - doc.rightMargin();
-        float scaleHeight = pageSize.getHeight() - doc.topMargin() - doc.bottomMargin();
+        float scaleWidth = pageSize.getWidth();// - doc.leftMargin() - doc.rightMargin();
+        float scaleHeight = pageSize.getHeight();// - doc.topMargin() - doc.bottomMargin();
         float imgWidth = image.getWidth() / dpi * 72;
         float imgHeight = image.getHeight() / dpi * 72;
         float Y = (scaleHeight - imgHeight) / 2;
