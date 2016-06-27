@@ -1624,6 +1624,8 @@ public class FB2toPDF {
             String query = header.chapterTitle;
             chapterTitle = XQueryUtilities.getString(section, stylesheet.getTransformationSettings(), query, " ");
             Log.info("Header chapter [{0}]", chapterTitle);
+            headerHelperOdd.firstPass = header.skipBeforeSection;
+            headerHelperEven.firstPass = header.skipBeforeSection;
             refreshHeader();
         }
 

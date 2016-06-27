@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.trivee.fb2pdf;
 
 import com.itextpdf.text.BadElementException;
@@ -22,7 +18,7 @@ public class HeaderHelper extends PdfPageEventHelper {
     public static int EVEN = 0;
 
     private Image image;
-    private boolean firstPass = true;
+    public boolean firstPass = true;
     private Document doc;
     private PdfWriter writer;
     private PdfPTable table;
