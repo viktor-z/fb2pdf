@@ -14,6 +14,7 @@ dist/
 .idea/
 *.iml
 *.iws
+.set-project-env
 
 # Mac
 .DS_Store
