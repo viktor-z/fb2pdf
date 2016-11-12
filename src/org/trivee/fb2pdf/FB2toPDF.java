@@ -1204,9 +1204,11 @@ public class FB2toPDF {
     private void setupHeader() throws FB2toPDFException, DocumentException, BadElementException {
         PdfPTable tableOdd = createHeaderTable(true);
         PdfPTable tableEven = createHeaderTable(false);
-        float adjustedMargin =  doc.topMargin() + Math.max(tableOdd.getTotalHeight(), tableEven.getTotalHeight());
-        stylesheet.getPageStyle().setMarginTop(adjustedMargin);
-        doc.setMargins(doc.leftMargin(), doc.rightMargin(), adjustedMargin , doc.bottomMargin());
+        if (stylesheet.getPageStyle().getHeader().addHeightToMargin) {
+            float adjustedMargin = doc.topMargin() + Math.max(tableOdd.getTotalHeight(), tableEven.getTotalHeight());
+            stylesheet.getPageStyle().setMarginTop(adjustedMargin);
+            doc.setMargins(doc.leftMargin(), doc.rightMargin(), adjustedMargin, doc.bottomMargin());
+        }
         headerHelperOdd = new HeaderHelper(doc, writer, tableOdd, HeaderHelper.ODD);
         writer.setPageEvent(headerHelperOdd);
         headerHelperEven = new HeaderHelper(doc, writer, tableEven, HeaderHelper.EVEN);
