@@ -42,10 +42,10 @@
         },
         {
             name:         "serif",
-            regular:      "./data/DroidSerif-Regular.ttf",
-            bold:         "./data/DroidSerif-Bold.ttf",
-            italic:       "./data/DroidSerif-Italic.ttf",
-            boldItalic:   "./data/DroidSerif-BoldItalic.ttf"
+            regular:      "./data/NotoSerif-Regular.ttf",
+            bold:         "./data/NotoSerif-Bold.ttf",
+            italic:       "./data/NotoSerif-Italic.ttf",
+            boldItalic:   "./data/NotoSerif-BoldItalic.ttf"
         },
         {
             name:         "monospaced",
