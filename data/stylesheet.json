@@ -43,10 +43,10 @@
         },
         {
             name:         "serif",
-            regular:      "./data/DroidSerif-Regular.ttf",
-            bold:         "./data/DroidSerif-Bold.ttf",
-            italic:       "./data/DroidSerif-Italic.ttf",
-            boldItalic:   "./data/DroidSerif-BoldItalic.ttf"
+            regular:      "./data/NotoSerif-Regular.ttf",
+            bold:         "./data/NotoSerif-Bold.ttf",
+            italic:       "./data/NotoSerif-Italic.ttf",
+            boldItalic:   "./data/NotoSerif-BoldItalic.ttf"
         },
         {
             name:         "monospaced",
@@ -177,6 +177,7 @@
             enabled: "false",
             dynamic: "true",
             skipBeforeSection: "true",
+            addHeightToMargin: "true",
             //chapterTitle: "(ancestor-or-self::section)[2]/title//*[name()!='a']/text()", 
             //chapterTitle: "string-join(ancestor-or-self::section/title[.//text()[matches(., '[^\\d\\s]')]]//*[name()!='a']/text(), '. ')",
             chapterTitle: "replace(string-join(ancestor-or-self::section/title//*[name()!='a']/text(), '. '), '([^\\s\\w])\\. ', '$1 ')",

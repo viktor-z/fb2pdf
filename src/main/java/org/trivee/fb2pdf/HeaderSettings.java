@@ -14,6 +14,7 @@ public class HeaderSettings {
     public boolean dynamic = true;
     public String chapterTitle = "";
     public boolean skipBeforeSection = false;
+    public boolean addHeightToMargin = true;
     public HeaderSlotSettings leftOdd = new HeaderSlotSettings();
     public HeaderSlotSettings centerOdd = new HeaderSlotSettings();
     public HeaderSlotSettings rightOdd = new HeaderSlotSettings();
