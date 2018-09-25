@@ -119,9 +119,9 @@
     		<zipfileset prefix="lib" file="${lib}/xom.jar" />
     		<zipfileset prefix="lib" file="${lib}/saxon8.jar" />
     		<zipfileset prefix="lib" file="${lib}/saxon8-dom.jar" />
-    		<zipfileset prefix="lib" file="${lib}/pivot-wtk-terra-2.0.1.jar" />
-    		<zipfileset prefix="lib" file="${lib}/pivot-wtk-2.0.1.jar" />
-    		<zipfileset prefix="lib" file="${lib}/pivot-core-2.0.1.jar" />
+    		<zipfileset prefix="lib" file="${lib}/pivot-wtk-terra-2.0.5.jar" />
+    		<zipfileset prefix="lib" file="${lib}/pivot-wtk-2.0.5.jar" />
+    		<zipfileset prefix="lib" file="${lib}/pivot-core-2.0.5.jar" />
     		<zipfileset prefix="lib" file="${lib}/js.jar" />
     		<zipfileset prefix="lib" file="${lib}/js-engine.jar" />
     		<zipfileset prefix="lib" file="${dist}/fb2pdf.jar" />
