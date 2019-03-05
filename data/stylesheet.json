@@ -156,6 +156,11 @@
         //pageWidth:   "111.929mm", 
         //pageHeight:   "83.651mm",
 
+        // Kindle Oasis 2018
+        // 1580 x 1194 px. 
+        //pageWidth: "101.092mm",
+        //pageHeight: "133.783mm",
+
         // Pocketbook Touch 
         //pageWidth:    "84mm",
         //pageHeight:   "106mm",
