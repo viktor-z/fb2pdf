@@ -156,9 +156,36 @@
         //pageWidth:   "111.929mm", 
         //pageHeight:   "83.651mm",
 
+        // Kindle Oasis 2018
+        // 1580 x 1194 px. 
+        //pageWidth: "101.092mm",
+        //pageHeight: "133.783mm",
+
         // Pocketbook Touch 
         //pageWidth:    "84mm",
         //pageHeight:   "106mm",
+
+        //PocketBook 627 firmware 5.20 (1024x758, 212 dpi)
+        //  Portrait
+        //    Nothing: 1024x758 
+        //      pageWidth:    "90.82mm",
+        //      pageHeight:   "122.69mm",
+        //    Pages: 968x758 
+        //      pageWidth:    "90.82mm",
+        //      pageHeight:   "115.98mm",
+        //    Panel+Pages: 893x758 
+        //      pageWidth:    "90.82mm",
+        //      pageHeight:   "106.99mm",
+        //  Landscape
+        //    Nothing: 758x1024
+        //      pageWidth:    "122.69mm",
+        //      pageHeight:   "90.82mm",
+        //    Pages: 702x1024
+        //      pageWidth:    "122.69mm",
+        //      pageHeight:   "84.11mm",
+        //    Panel+Pages: 627x1024 
+        //      pageWidth:    "122.69mm",
+        //      pageHeight:   "75.12mm",
 
         marginLeft:   "1.0pt",
         marginRight:  "1.0pt",
