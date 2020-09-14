@@ -1227,7 +1227,7 @@ public class PdfDocument extends Document {
         Object currentValues[] = new Object[2];
         PdfFont currentFont = null;
         float displacement = 0;
-        Float lastBaseFactor = new Float(0);
+        float lastBaseFactor = 0;
         currentValues[1] = lastBaseFactor;
         // looping over all the lines
         for (PdfLine l: lines) {
@@ -1622,7 +1622,7 @@ public class PdfDocument extends Document {
         if (adjustMatrix)
             text.moveText(baseXMarker - text.getXTLM(), 0);
         currentValues[0] = currentFont;
-        currentValues[1] = new Float(lastBaseFactor);
+        currentValues[1] = lastBaseFactor;
         return lastX;
     }
 

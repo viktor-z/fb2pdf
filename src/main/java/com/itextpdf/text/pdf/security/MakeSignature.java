@@ -121,7 +121,7 @@ public class MakeSignature {
         sap.setCryptoDictionary(dic);
 
         HashMap<PdfName, Integer> exc = new HashMap<PdfName, Integer>();
-        exc.put(PdfName.CONTENTS, new Integer(estimatedSize * 2 + 2));
+        exc.put(PdfName.CONTENTS, estimatedSize * 2 + 2);
         sap.preClose(exc);
 
         String hashAlgorithm = externalSignature.getHashAlgorithm();

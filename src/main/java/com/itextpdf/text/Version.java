@@ -43,6 +43,7 @@
  */
 package com.itextpdf.text;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 /**
@@ -95,8 +96,8 @@ public final class Version {
 			try {
 				Class<?> klass = Class.forName("com.itextpdf.license.LicenseKey");
 				Method m = klass.getMethod("getLicenseeInfo");
-				String[] info = (String[])m.invoke(klass.newInstance());
-				if (info[3] != null && info[3].trim().length() > 0) {
+				String[] info = (String[])m.invoke(klass.getDeclaredConstructor().newInstance());
+				if (info[3] != null && !info[3].trim().isEmpty()) {
 					version.key = info[3];
 				}
 				else {
@@ -108,10 +109,10 @@ public final class Version {
 						version.key += info[5];
 					}
 				}
-				if (info[4] != null && info[4].trim().length() > 0) {
+				if (info[4] != null && !info[4].trim().isEmpty()) {
 					version.iTextVersion = info[4];
 				}
-				else if (info[2] != null && info[2].trim().length() > 0) {
+				else if (info[2] != null && !info[2].trim().isEmpty()) {
 					version.iTextVersion += " (" + info[2];
 					if (!version.key.toLowerCase().startsWith("trial")) {
 						version.iTextVersion += "; licensed version)";
@@ -121,7 +122,7 @@ public final class Version {
 					}
 				}
 				// fall back to contact name, if company name is unavailable
-				else if (info[0] != null && info[0].trim().length() > 0) {
+				else if (info[0] != null && !info[0].trim().isEmpty()) {
 					version.iTextVersion += " (" + info[0];
 					if (!version.key.toLowerCase().startsWith("trial")) {
 						// we shouldn't have a licensed version without company name,

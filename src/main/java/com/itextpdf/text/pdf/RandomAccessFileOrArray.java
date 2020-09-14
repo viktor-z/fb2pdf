@@ -167,10 +167,14 @@ public class RandomAccessFileOrArray implements DataInput {
      * @throws FileNotFoundException if the file does not exist
      * @since 5.1.2
      */
-    private void openForPlainRandomAccess(String filename) throws FileNotFoundException{
+    private void openForPlainRandomAccess(String filename) throws IOException {
         this.plainRandomAccess = true;
         trf = new RandomAccessFile(filename, "r");
-        rf = null;
+        if (rf != null) {
+            rf.close();
+            rf = null;
+        }
+
     }
     
     /**

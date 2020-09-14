@@ -96,7 +96,7 @@ public class Stylesheet
     public static Stylesheet readStylesheet(InputStream stream)
         throws DocumentException, IOException, FB2toPDFException
     {
-        BOMInputStream bomStream = new BOMInputStream(stream);
+        BOMInputStream bomStream = BOMInputStream.builder().setInputStream(stream).get();
         return readStylesheet(new InputStreamReader(bomStream, "UTF-8"));
     }
 

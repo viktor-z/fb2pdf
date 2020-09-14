@@ -142,6 +142,7 @@ public abstract class XmpSchema extends Properties {
 	 * @return an escaped string
 	 * @deprecated use XMLUtil.escapeXml(String s, boolean onlyASCII) instead.
 	 */
+	@Deprecated
 	public static String escape(String content) {
 		return XMLUtil.escapeXML(content, false);
 	}

@@ -289,7 +289,7 @@ public class FB2toPDF {
     private Map<String, Object> getDynamicVariables() {
         Map<String, Object> result = new HashMap<String, Object>();
         if (stylesheet.getPageStyle().getHeader().dynamic) {
-            result.put("pageNum", new Integer(writer.getPageNumber()).toString());
+            result.put("pageNum", Integer.valueOf(writer.getPageNumber()).toString());
             result.put("chapterTitle", chapterTitle);
         } else {
             result.put("pageNum", "$pageNum");

@@ -55,6 +55,7 @@ import com.itextpdf.text.html.HtmlTags;
  * TagProcessor classes.
  * @deprecated
  */
+@Deprecated
 public class HTMLTagProcessors extends HashMap<String, HTMLTagProcessor> {
 
 	/**

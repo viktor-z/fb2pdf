@@ -64,13 +64,13 @@ public class HtmlUtilities {
 
     private static HashMap<String,Float> sizes = new HashMap<String,Float>();
     static {
-        sizes.put("xx-small", new Float(4));
-        sizes.put("x-small", new Float(6));
-        sizes.put("small", new Float(8));
-        sizes.put("medium", new Float(10));
-        sizes.put("large", new Float(13));
-        sizes.put("x-large", new Float(18));
-        sizes.put("xx-large", new Float(26));
+        sizes.put("xx-small", 4F);
+        sizes.put("x-small", 6F);
+        sizes.put("small", 8F);
+        sizes.put("medium", 10F);
+        sizes.put("large", 13F);
+        sizes.put("x-large", 18F);
+        sizes.put("xx-large", 26F);
     }
 
 	/**

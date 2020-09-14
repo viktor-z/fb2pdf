@@ -235,16 +235,6 @@ public class MappedRandomAccessFile {
     }
 
     /**
-     * invokes the close method
-     * @see java.lang.Object#finalize()
-     */
-    @Override
-    protected void finalize() throws Throwable {
-        close();
-        super.finalize();
-    }
-
-    /**
      * invokes the clean method on the ByteBuffer's cleaner
      * @param buffer ByteBuffer
      * @return boolean true on success

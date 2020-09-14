@@ -875,7 +875,7 @@ public class ColumnText {
         float ratio = spaceCharRatio;
         Object currentValues[] = new Object[2];
         PdfFont currentFont = null;
-        Float lastBaseFactor = new Float(0);
+        Float lastBaseFactor = 0f;
         currentValues[1] = lastBaseFactor;
         PdfDocument pdf = null;
         PdfContentByte graphics = null;
@@ -1390,7 +1390,7 @@ public class ColumnText {
                         else ++count;
                     }
                     else if (obj instanceof com.itextpdf.text.List) {
-                        stack.push(new Object[]{list, Integer.valueOf(k), new Float(listIndentation)});
+                        stack.push(new Object[]{list, k, listIndentation});
                         list = (com.itextpdf.text.List)obj;
                         items = list.getItems();
                         listIndentation += list.getIndentationLeft();

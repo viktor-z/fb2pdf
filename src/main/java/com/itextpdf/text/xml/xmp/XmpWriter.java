@@ -193,6 +193,7 @@ public class XmpWriter {
      * @param PdfXConformance
      * @throws IOException
      */
+	@Deprecated
     public XmpWriter(OutputStream os, PdfDictionary info, int PdfXConformance) throws IOException {
         this(os, info);
         if (info != null) {

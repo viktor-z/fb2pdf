@@ -518,30 +518,30 @@ public class AcroFields {
                     if (operator.equals("Tf")) {
                         if (stack.size() >= 2) {
                             ret[DA_FONT] = stack.get(stack.size() - 2);
-                            ret[DA_SIZE] = new Float(stack.get(stack.size() - 1));
+                            ret[DA_SIZE] = stack.get(stack.size() - 1);
                         }
                     }
                     else if (operator.equals("g")) {
-                        if (stack.size() >= 1) {
-                            float gray = new Float(stack.get(stack.size() - 1)).floatValue();
+                        if (!stack.isEmpty()) {
+                            float gray = Float.parseFloat(stack.get(stack.size() - 1));
                             if (gray != 0)
                                 ret[DA_COLOR] = new GrayColor(gray);
                         }
                     }
                     else if (operator.equals("rg")) {
                         if (stack.size() >= 3) {
-                            float red = new Float(stack.get(stack.size() - 3)).floatValue();
-                            float green = new Float(stack.get(stack.size() - 2)).floatValue();
-                            float blue = new Float(stack.get(stack.size() - 1)).floatValue();
+                            float red = Float.parseFloat(stack.get(stack.size() - 3));
+                            float green = Float.parseFloat(stack.get(stack.size() - 2));
+                            float blue = Float.parseFloat(stack.get(stack.size() - 1));
                             ret[DA_COLOR] = new BaseColor(red, green, blue);
                         }
                     }
                     else if (operator.equals("k")) {
                         if (stack.size() >= 4) {
-                            float cyan = new Float(stack.get(stack.size() - 4)).floatValue();
-                            float magenta = new Float(stack.get(stack.size() - 3)).floatValue();
-                            float yellow = new Float(stack.get(stack.size() - 2)).floatValue();
-                            float black = new Float(stack.get(stack.size() - 1)).floatValue();
+                            float cyan = Float.parseFloat(stack.get(stack.size() - 4));
+                            float magenta = Float.parseFloat(stack.get(stack.size() - 3));
+                            float yellow = Float.parseFloat(stack.get(stack.size() - 2));
+                            float black = Float.parseFloat(stack.get(stack.size() - 1));
                             ret[DA_COLOR] = new CMYKColor(cyan, magenta, yellow, black);
                         }
                     }

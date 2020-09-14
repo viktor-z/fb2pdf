@@ -621,6 +621,7 @@ public class PdfSignatureAppearance {
      * @param acro6Layers if <code>true</code> only the layers n0 and n2 will be present
      * @deprecated Adobe no longer supports Adobe Acrobat / Reader versions older than 9
      */
+    @Deprecated
     public void setAcro6Layers(boolean acro6Layers) {
         this.acro6Layers = acro6Layers;
     }

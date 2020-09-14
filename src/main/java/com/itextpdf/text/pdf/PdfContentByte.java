@@ -3327,6 +3327,7 @@ public class PdfContentByte {
      * @return a <CODE>Graphics2D</CODE>
      * @deprecated use the constructor in PdfGraphics2D
      */
+    @Deprecated
     public java.awt.Graphics2D createGraphicsShapes(final float width, final float height) {
         return new PdfGraphics2D(this, width, height, true);
     }
@@ -3339,6 +3340,7 @@ public class PdfContentByte {
      * @return a <CODE>Graphics2D</CODE>
      * @deprecated use the constructor in PdfPrinterGraphics2D
      */
+    @Deprecated
     public java.awt.Graphics2D createPrinterGraphicsShapes(final float width, final float height, final java.awt.print.PrinterJob printerJob) {
         return new PdfPrinterGraphics2D(this, width, height, true, printerJob);
     }
@@ -3350,6 +3352,7 @@ public class PdfContentByte {
      * @return a <CODE>Graphics2D</CODE>
      * @deprecated use the constructor in PdfGraphics2D
      */
+    @Deprecated
     public java.awt.Graphics2D createGraphics(final float width, final float height) {
         return new PdfGraphics2D(this, width, height);
     }
@@ -3362,6 +3365,7 @@ public class PdfContentByte {
      * @return a <CODE>Graphics2D</CODE>
      * @deprecated use the constructor in PdfPrinterGraphics2D
      */
+    @Deprecated
     public java.awt.Graphics2D createPrinterGraphics(final float width, final float height, final java.awt.print.PrinterJob printerJob) {
         return new PdfPrinterGraphics2D(this, width, height, printerJob);
     }
@@ -3375,6 +3379,7 @@ public class PdfContentByte {
      * @return a <CODE>Graphics2D</CODE>
      * @deprecated use the constructor in PdfGraphics2D
      */
+    @Deprecated
     public java.awt.Graphics2D createGraphics(final float width, final float height, final boolean convertImagesToJPEG, final float quality) {
         return new PdfGraphics2D(this, width, height, null, false, convertImagesToJPEG, quality);
     }
@@ -3389,6 +3394,7 @@ public class PdfContentByte {
      * @return a <CODE>Graphics2D</CODE>
      * @deprecated use the constructor in PdfGraphics2D
      */
+    @Deprecated
     public java.awt.Graphics2D createPrinterGraphics(final float width, final float height, final boolean convertImagesToJPEG, final float quality, final java.awt.print.PrinterJob printerJob) {
         return new PdfPrinterGraphics2D(this, width, height, null, false, convertImagesToJPEG, quality, printerJob);
     }
@@ -3402,6 +3408,7 @@ public class PdfContentByte {
      * @return A Graphics2D object
      * @deprecated use the constructor in PdfPrinterGraphics2D
      */
+    @Deprecated
     public java.awt.Graphics2D createGraphicsShapes(final float width, final float height, final boolean convertImagesToJPEG, final float quality) {
         return new PdfGraphics2D(this, width, height, null, true, convertImagesToJPEG, quality);
     }
@@ -3416,6 +3423,7 @@ public class PdfContentByte {
      * @return a Graphics2D object
      * @deprecated use the constructor in PdfPrinterGraphics2D
      */
+    @Deprecated
     public java.awt.Graphics2D createPrinterGraphicsShapes(final float width, final float height, final boolean convertImagesToJPEG, final float quality, final java.awt.print.PrinterJob printerJob) {
         return new PdfPrinterGraphics2D(this, width, height, null, true, convertImagesToJPEG, quality, printerJob);
     }
@@ -3428,6 +3436,7 @@ public class PdfContentByte {
      * @return a <CODE>Graphics2D</CODE>
      * @deprecated use the constructor in PdfPrinterGraphics2D
      */
+    @Deprecated
     public java.awt.Graphics2D createGraphics(final float width, final float height, final FontMapper fontMapper) {
         return new PdfGraphics2D(this, width, height, fontMapper);
     }
@@ -3441,6 +3450,7 @@ public class PdfContentByte {
      * @return a <CODE>Graphics2D</CODE>
      * @deprecated use the constructor in PdfPrinterGraphics2D
      */
+    @Deprecated
     public java.awt.Graphics2D createPrinterGraphics(final float width, final float height, final FontMapper fontMapper, final java.awt.print.PrinterJob printerJob) {
         return new PdfPrinterGraphics2D(this, width, height, fontMapper, printerJob);
     }
@@ -3455,6 +3465,7 @@ public class PdfContentByte {
      * @return a <CODE>Graphics2D</CODE>
      * @deprecated use the constructor in PdfPrinterGraphics2D
      */
+    @Deprecated
     public java.awt.Graphics2D createGraphics(final float width, final float height, final FontMapper fontMapper, final boolean convertImagesToJPEG, final float quality) {
         return new PdfGraphics2D(this, width, height, fontMapper, false, convertImagesToJPEG, quality);
     }
@@ -3470,6 +3481,7 @@ public class PdfContentByte {
      * @return a <CODE>Graphics2D</CODE>
      * @deprecated use the constructor in PdfPrinterGraphics2D
      */
+    @Deprecated
     public java.awt.Graphics2D createPrinterGraphics(final float width, final float height, final FontMapper fontMapper, final boolean convertImagesToJPEG, final float quality, final java.awt.print.PrinterJob printerJob) {
         return new PdfPrinterGraphics2D(this, width, height, fontMapper, false, convertImagesToJPEG, quality, printerJob);
     }
@@ -3481,6 +3493,7 @@ public class PdfContentByte {
      * @since 5.0.1
      * @deprecated use com.itextpdf.text.geom.AffineTransform as parameter
      */
+    @Deprecated
     public void addImage(final Image image, final java.awt.geom.AffineTransform transform) throws DocumentException {
     	double matrix[] = new double[6];
     	transform.getMatrix(matrix);
@@ -3493,6 +3506,7 @@ public class PdfContentByte {
      * @param transform transform to apply to the template prior to adding it.
      * @deprecated use com.itextpdf.text.geom.AffineTransform as parameter
      */
+    @Deprecated
     public void addTemplate(final PdfTemplate template, final java.awt.geom.AffineTransform transform) {
     	double matrix[] = new double[6];
     	transform.getMatrix(matrix);
@@ -3504,6 +3518,7 @@ public class PdfContentByte {
      * @param transform added to the Current Transformation Matrix
      * @deprecated use com.itextpdf.text.geom.AffineTransform as parameter
      */
+    @Deprecated
     public void concatCTM(final java.awt.geom.AffineTransform transform) {
     	double matrix[] = new double[6];
     	transform.getMatrix(matrix);
@@ -3516,6 +3531,7 @@ public class PdfContentByte {
      * @param transform overwrite the current text matrix with this one
      * @deprecated use com.itextpdf.text.geom.AffineTransform as parameter
      */
+    @Deprecated
     public void setTextMatrix(final java.awt.geom.AffineTransform transform) {
     	double matrix[] = new double[6];
     	transform.getMatrix(matrix);
@@ -3527,6 +3543,7 @@ public class PdfContentByte {
      * @param af the transformation
      * @deprecated use com.itextpdf.text.geom.AffineTransform as parameter
      */
+    @Deprecated
     public void transform(final java.awt.geom.AffineTransform af) {
         double matrix[] = new double[6];
         af.getMatrix(matrix);

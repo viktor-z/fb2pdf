@@ -80,6 +80,7 @@ import com.itextpdf.text.xml.simpleparser.SimpleXMLParser;
  * @deprecated please switch to XML Worker instead (this is a separate project)
  */
 
+@Deprecated
 public class HTMLWorker implements SimpleXMLDocHandler, DocListener {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(HTMLWorker.class);

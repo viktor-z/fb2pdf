@@ -472,7 +472,7 @@ public class ElementFactory {
 			list = new List(List.ORDERED);
 		}
 		try{
-			list.setIndentationLeft(new Float(chain.getProperty(HtmlTags.INDENT)).floatValue());
+			list.setIndentationLeft(Float.parseFloat(chain.getProperty(HtmlTags.INDENT)));
 		}catch (Exception e) {
 			list.setAutoindent(true);
 		}
