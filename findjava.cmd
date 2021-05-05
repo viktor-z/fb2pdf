@@ -63,7 +63,7 @@ FOR /F "usebackq skip=2 tokens=1,2,*" %%A IN (`REG QUERY "%KEY_JRE%" /v %JRE_VER
 )
 
 if not defined VerName (
-    @echo %KEY_JRE%\%JRE_VER% not found.
+    @echo Unable to locate Java installation: %KEY_JRE%\%JRE_VER% not found.
     exit 1
 )
 
@@ -74,7 +74,7 @@ FOR /F "usebackq skip=2 tokens=1,2,*" %%A IN (`REG QUERY "%KEY_JRE%\%VerValue%" 
 )
 
 if not defined HomeName (
-    @echo %KEY_JRE%\%JRE_HOME% not found.
+    @echo Unable to locate Java installation: %KEY_JRE%\%JRE_HOME% not found.
     exit 1
 )
 

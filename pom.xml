@@ -2,10 +2,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <prerequisites>
-        <maven>3.0.0</maven>
-    </prerequisites>
-
     <groupId>org.trivee.fb2pdf</groupId>
     <artifactId>fb2pdf</artifactId>
     <packaging>jar</packaging>
@@ -257,6 +253,8 @@
                         <configuration>
                             <name>timestamp.short</name>
                             <pattern>yyyyMMdd</pattern>
+                            <locale>en_US</locale>
+                            <timeZone>UTC</timeZone>
                         </configuration>
                     </execution>
                 </executions>
@@ -265,6 +263,32 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <executions>
+                    <execution>
+                        <id>enforce-java</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>[11,)</version>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>3.0</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>enforce</id>
                         <configuration>
