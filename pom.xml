@@ -67,7 +67,7 @@
 
         <app.main.class>org.trivee.fb2pdf.CLIDriver</app.main.class>
 
-        <org-bouncycastle.version>1.53</org-bouncycastle.version>
+        <org-bouncycastle.version>1.67</org-bouncycastle.version>
         <gson.version>2.4</gson.version>
         <gnu-getopt.version>1.0.13</gnu-getopt.version>
 
