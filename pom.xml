@@ -67,7 +67,9 @@
 
         <app.main.class>org.trivee.fb2pdf.CLIDriver</app.main.class>
 
-        <org-bouncycastle.version>1.67</org-bouncycastle.version>
+		<!-- Starting with 1.67 bouncycastle breaks itext code due to some code restructuring and visibility changes -->
+		<!-- fix would be switching to properly maintened itextpdf (either 5 or even better 7) rather than maintaining fork here -->
+        <org-bouncycastle.version>1.66</org-bouncycastle.version>
         <gson.version>2.4</gson.version>
         <gnu-getopt.version>1.0.13</gnu-getopt.version>
 
@@ -126,17 +128,17 @@
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
+            <artifactId>bcprov-jdk15to18</artifactId>
             <version>${org-bouncycastle.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15on</artifactId>
+            <artifactId>bcpkix-jdk15to18</artifactId>
             <version>${org-bouncycastle.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcmail-jdk15on</artifactId>
+            <artifactId>bcmail-jdk15to18</artifactId>
             <version>${org-bouncycastle.version}</version>
         </dependency>
         <dependency>
