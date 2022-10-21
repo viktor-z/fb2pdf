@@ -1,4 +1,4 @@
-@echo off
+echo off
 
 setlocal ENABLEEXTENSIONS
 
@@ -6,11 +6,18 @@ REM Check for local Java directory first
 
 if exist "%~dp0jdk" (
     set HomeValue=%~dp0jdk
-    goto PROCESS    
+    goto PROCESS
 )
 if exist "%~dp0jre" (
     set HomeValue=%~dp0jre
-    goto PROCESS    
+    goto PROCESS
+)
+
+REM If recent JDk was installed - expect JAVA_HOME
+
+if exist "%JAVA_HOME%" (
+    set HomeValue=%JAVA_HOME%
+    goto PROCESS
 )
 
 REM Check for global Java installation
@@ -21,7 +28,7 @@ set JRE_HOME=JavaHome
 
 if %PROCESSOR_ARCHITECTURE% == x86 (
     if not defined PROCESSOR_ARCHITEW6432 (
-        REM Windows 32 bits 
+        REM Windows 32 bits
         goto DONATIVE
     )
 ) else (
@@ -63,7 +70,7 @@ FOR /F "usebackq skip=2 tokens=1,2,*" %%A IN (`REG QUERY "%KEY_JRE%" /v %JRE_VER
 )
 
 if not defined VerName (
-    @echo Unable to locate Java installation: %KEY_JRE%\%JRE_VER% not found.
+    @echo Unable to locate Java installation: "%KEY_JRE%\%JRE_VER%" not found, "JAVA_HOME" environment is not set properly and there is no JDK or JRE directories in the script start directory. 1>&2
     exit 1
 )
 
@@ -74,7 +81,7 @@ FOR /F "usebackq skip=2 tokens=1,2,*" %%A IN (`REG QUERY "%KEY_JRE%\%VerValue%" 
 )
 
 if not defined HomeName (
-    @echo Unable to locate Java installation: %KEY_JRE%\%JRE_HOME% not found.
+    @echo Unable to locate Java installation: "%KEY_JRE%\%JRE_HOME%" not found, "JAVA_HOME" environment is not set properly and there is no JDK or JRE directories in the script start directory. 1>&2
     exit 1
 )
 
