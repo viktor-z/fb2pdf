@@ -43,7 +43,6 @@
  */
 package com.itextpdf.text;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 /**
