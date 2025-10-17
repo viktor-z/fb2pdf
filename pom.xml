@@ -76,7 +76,7 @@
         <commons-cli.version>1.2</commons-cli.version>
         <commons-codec.version>1.6</commons-codec.version>
         <commons-io.version>2.15.1.redhat-00001</commons-io.version>
-        <commons-lang3.version>3.1</commons-lang3.version>
+        <commons-lang3.version>3.18.0.redhat-00002</commons-lang3.version>
         <commons-logging.version>1.0.4</commons-logging.version>
         <commons-tools.version>1.10.11</commons-tools.version>
 
